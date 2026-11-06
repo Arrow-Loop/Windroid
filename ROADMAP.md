@@ -33,3 +33,8 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [x] Validate artifact tests in PowerShell 7 and 5.1; firstboot fixtures in Git Bash.
 - [ ] Reboot (authorized), validate Linux locking and perform actual vanilla/GApps install/runtime tests. Earlier runtime priorities remain open.
 
+
+## Host prerequisite follow-up — 2026-11-06
+- [x] Verify first reboot and diagnose VMP/service mismatch with elevated PowerShell 7.
+- [ ] Complete reboot requested by official WSL prerequisite installation; if vmcompute remains absent, investigate Windows servicing before further feature changes.
+

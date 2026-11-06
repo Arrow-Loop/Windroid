@@ -20,3 +20,10 @@
 - Added installer configuration gate, firstboot flock and flavour-aware atomic success stamp, legacy stamp reprocessing and retry-safe GApps preseed parking. Packagers carry matching guest helpers; custom distro CLI/tray launchers retain selected names/paths.
 - New artifact tests pass on PowerShell 7 and Windows PowerShell 5.1. Four isolated firstboot tests pass in Git Bash, with flock stubbed. PowerShell parse, shell syntax, existing config tests and whitespace checks pass. CI includes the new tests but has not run.
 - Real WSL/Android behavior, Linux lock semantics, wizard execution, GApps download and app compatibility remain unvalidated. User authorized reboot; checkpoint saved before invoking Windows restart.
+
+## 2026-11-06 — first reboot and WSL host prerequisite diagnosis
+- Confirmed Windows reboot at 18:35:02 local; worktree clean at 3eb30d8 when resuming.
+- WSL2 still unavailable. Elevated PowerShell 7 diagnostic found VMP Enabled but vmcompute service/executable absent; Windows hypervisor is present. WSL1 feature and full Hyper-V hypervisor feature disabled. Firmware-disabled conclusion is not justified by these results.
+- Ran Microsoft's wsl --install --no-distribution elevated. DISM reported successful prerequisite enablement, exit 0, explicitly requiring another restart. No distro imported or Android runtime tested.
+- Evidence: evidence/2026-11-06-baseline/post-reboot-host.txt and wsl-prerequisite-repair.txt. User approved the diagnostic UAC prompt; source/dependencies were not reinstalled.
+- Saving checkpoint before second reboot. If vmcompute remains absent, inspect servicing/component health instead of repeating blind enable/reboot cycles.

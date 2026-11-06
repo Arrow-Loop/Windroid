@@ -61,7 +61,7 @@ No WSL distro imported yet. Windows boot time remains 2026-11-03 07:05 local.
 
 ## Outstanding blockers / unknowns
 
-- Windows restart required before WSL2 runtime tests. No reboot issued.
+- First reboot confirmed: 2026-11-06 18:35:02 local. WSL2 remains unavailable; VirtualMachinePlatform reports Enabled but vmcompute service/executable are absent. Elevated official WSL prerequisite command completed and requests a second reboot.
 - No Nintendo APK/tombstone on this laptop. Handoff reports x86_64 3.6.0,
   com.nintendo.znca, SIGSEGV/SEGV_ACCERR in libpairipcore.so at 0x794cb.
   Do not assume ARM translation, bypass protections, or use personal sign-ins.
@@ -72,26 +72,34 @@ No WSL distro imported yet. Windows boot time remains 2026-11-03 07:05 local.
 
 ## Exact next action
 
-User explicitly authorized reboot on 2026-11-06. Source and documentation are
-being committed before invoking shutdown.exe /r /t 30 (without forced app close).
-On resumption, first inspect Git status/log and Windows LastBootUpTime; do not
-assume the scheduled restart completed. Run wsl --status and wsl --list --verbose.
-If WSL2 is operational, use PowerShell 7 in this repository to run:
+Second prerequisite reboot is being requested after saving this checkpoint.
+First reboot was verified at 2026-11-06 18:35:02 local. Source remains 3eb30d8.
+Elevated PowerShell 7 diagnostic confirmed VirtualMachinePlatform Enabled,
+Microsoft-Windows-Subsystem-Linux Disabled, Hyper-V-Hypervisor Disabled, and
+vmcompute absent. HypervisorPresent=True, so do not assume firmware is disabled.
+Ran official wsl --install --no-distribution elevated; DISM completed with exit 0
+and explicitly requested restart. Logs: lab evidence/2026-11-06-baseline/
+post-reboot-host.txt and wsl-prerequisite-repair.txt. No distro imported.
+
+On resumption check actual boot time, Get-Service vmcompute,WslService,
+wsl --status and wsl --list --verbose. If vmcompute is STILL absent, do NOT
+repeat another blind feature-enable/reboot cycle. Inspect CBS servicing errors,
+feature dependencies and component health before choosing a targeted repair.
+Do not disable Windows security features to make virtualization work.
+
+If WSL2 is operational, use PowerShell 7 from this repository:
 
 ```powershell
 & .\installer\install.ps1 -ArtifactSource 'C:\Users\Public\Documents\Cody-Windroid-Lab\evidence\release-v0.1.0\Windroid\artifacts' -Bench
 ```
 
 Capture output in a new lab evidence subdirectory; do not reuse the disposable
-artifact-source-probe state as an actual installation. Verify binder, firstboot
-stamp VANILLA, session start/stop, app window and networking. Run firstboot tests
-inside WSL with real flock, then test concurrent initialization. Validate GApps
-via a clean reinstall after preserving test evidence; do not register two active
-Waydroid stacks simultaneously. Continue session/network/graphics priorities,
-and investigate Nintendo only with local exact-version app/crash evidence.
-
-If startup fails, retain exit codes/logs and diagnose before making more changes.
-Do not redownload the verified release or reinstall Git/WSL unnecessarily.
+artifact-source-probe state. Verify binder, firstboot VANILLA stamp, session
+start/stop, app windows and networking. Run firstboot tests in WSL with real
+flock and concurrent initialization. Then validate GApps on a clean reinstall
+with evidence retained; only one Waydroid installation may run at a time.
+Continue session/network/graphics priorities and Nintendo exact-version crash
+investigation without account sign-ins or protection bypass.
 
 ## Resume
 
