@@ -1,6 +1,7 @@
 [Unit]
 Description=Windroid first-boot initialization (waydroid init from preseeded images)
 ConditionPathExists=!/var/lib/windroid/.initialized
+ConditionPathExists=/etc/windroid/.configured
 After=network-online.target
 Wants=network-online.target
 

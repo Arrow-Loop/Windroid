@@ -11,10 +11,22 @@ CONF=/etc/windroid/windroid.conf
 LOG=/var/log/windroid-firstboot.log
 
 exec > >(tee -a "$LOG") 2>&1
-[[ -e "$STAMP" ]] && { echo "already initialized"; exit 0; }
+# The installer owns configuration. Importing/booting a distro must not
+# select VANILLA before the Windows -Gapps option has reached this file.
+[[ -e /etc/windroid/.configured ]] || { echo "waiting for installer configuration"; exit 0; }
 mkdir -p "$STAMP_DIR"
+exec 9>"$STAMP_DIR/firstboot.lock"
+flock -x 9
 # shellcheck source=/dev/null
 source "$CONF"
+flavour=VANILLA
+[[ "${GAPPS:-false}" == true ]] && flavour=GAPPS
+if [[ -f "$STAMP" && "$(cat "$STAMP")" == "$flavour" ]]; then
+    echo "already initialized ($flavour)"
+    exit 0
+fi
+# Legacy stamps were empty. Re-run init after the installer has stopped
+# the legacy auto-start service; an empty stamp cannot prove image flavour.
 
 echo "== windroid-firstboot $(date -Is) kernel=$(uname -r)"
 
@@ -54,9 +66,13 @@ if [[ "${GAPPS:-false}" == "true" ]]; then
     else
         if [[ -d /etc/waydroid-extra/images ]]; then
             echo "GAPPS requested: setting aside preseeded VANILLA images"
+            if [[ -e /etc/waydroid-extra/images.vanilla-preseed ]]; then
+                echo "FATAL: both active and parked preseed directories exist; inspect before retrying" >&2
+                exit 1
+            fi
             mv /etc/waydroid-extra/images "/etc/waydroid-extra/images.vanilla-preseed"
         fi
-        waydroid --details-to-stdout init -s GAPPS
+        waydroid --details-to-stdout init -f -s GAPPS
     fi
 else
     waydroid --details-to-stdout init
@@ -79,5 +95,6 @@ sed -i 's/^suspend_action = .*/suspend_action = none/' /var/lib/waydroid/waydroi
 
 systemctl enable waydroid-container.service
 
-touch "$STAMP"
+printf '%s\n' "$flavour" > "$STAMP.tmp"
+mv -f "$STAMP.tmp" "$STAMP"
 echo "== windroid-firstboot done"

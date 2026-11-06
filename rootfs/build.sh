@@ -73,7 +73,7 @@ echo "==> Installing packages"
 in_chroot "apt-get update"
 in_chroot "apt-get install -y --no-install-recommends \
     systemd systemd-sysv dbus sudo curl ca-certificates gnupg \
-    kmod iproute2 python3 procps gzip bindfs"
+    kmod iproute2 python3 procps gzip bindfs util-linux"
 # Official Waydroid repo setup; the script takes the codename as a
 # POSITIONAL arg ($1) — the '-s' in the docs is bash's own stdin flag
 # (verified from the script source; UPSTREAM-FACTS §5). Pass the release

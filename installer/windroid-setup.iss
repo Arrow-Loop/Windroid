@@ -50,6 +50,7 @@ Source: "..\scripts\windroid.ps1"; DestDir: "{app}\scripts"
 Source: "..\scripts\bench.ps1"; DestDir: "{app}\scripts"
 Source: "..\windows\tray\windroid-tray.ps1"; DestDir: "{app}\windows\tray"
 Source: "..\assets\windroid.ico"; DestDir: "{app}\assets"
+Source: "..\rootfs\files\*"; DestDir: "{app}\rootfs\files"; Flags: recursesubdirs createallsubdirs
 Source: "{#ArtifactDir}\versions.json"; DestDir: "{app}\artifacts"
 Source: "{#ArtifactDir}\bzImage-windroid-*"; DestDir: "{app}\artifacts"; Flags: nocompression
 Source: "{#ArtifactDir}\modules-windroid-*.vhdx"; DestDir: "{app}\artifacts"; Flags: nocompression

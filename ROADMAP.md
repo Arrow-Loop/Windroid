@@ -27,3 +27,9 @@
 - [ ] Validate uninstall/coexistence and submit narrowly scoped PRs only after evidence supports them.
 
 Earlier unchecked items remain open where this checkpoint records only partial completion. SESSION_STATE.md in source/Windroid is the authoritative next-action checkpoint.
+
+## Implementation checkpoint — 2026-11-06
+- [x] Complete installer/guest configuration protocol and packaging with isolated regression checks.
+- [x] Validate artifact tests in PowerShell 7 and 5.1; firstboot fixtures in Git Bash.
+- [ ] Reboot (authorized), validate Linux locking and perform actual vanilla/GApps install/runtime tests. Earlier runtime priorities remain open.
+

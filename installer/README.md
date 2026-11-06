@@ -33,3 +33,30 @@ or a release download base URL. Artifact names and checksums come from the
 release's `versions.json` manifest.
 
 Not yet built (backlog): winget manifest.
+
+## Configuration ordering and release downloads
+
+With no `-ArtifactSource`, use adjacent `artifacts/versions.json` when present;
+otherwise download the upstream distribution ZIP, verify SHA256SUMS.txt, and
+extract its artifacts. Published v0.1.0 has no standalone manifest asset.
+Kernel, modules VHDX and rootfs hashes are all required and checked.
+
+Guest firstboot waits for `/etc/windroid/.configured`. During configuration the
+installer stops any legacy firstboot/container service, installs matching guest
+helpers from `rootfs/files`, applies GApps/share settings, then writes the gate.
+The explicit firstboot invocation serializes with systemd using flock and writes
+the selected flavour to its success stamp only after initialization succeeds.
+Legacy empty stamps are reprocessed; failed GApps downloads can be retried with
+the same parked VANILLA preseed. Completed installations cannot silently switch
+flavour by rerunning the installer; back up data and reinstall instead.
+
+Both distribution formats include the guest helpers. When using an installer
+from source, keep its repository layout. Direct rootfs imports must finish
+configuration and create `/etc/windroid/.configured` before invoking firstboot;
+they no longer initialize Android automatically before configuration.
+
+Validation: `installer/tests/test-artifacts.ps1` tests release ZIP extraction,
+cache reuse and corruption rejection. `python3 rootfs/test-firstboot.py` tests
+configuration gating, legacy stamps and download retry behavior with isolated
+fixtures. Git Bash stubs flock; actual Linux locking and Android runtime behavior
+still require WSL validation.

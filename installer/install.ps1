@@ -32,8 +32,8 @@
 [CmdletBinding()]
 param(
     [switch]$Gapps,
-    [string]$ArtifactSource = "https://github.com/calm032019/Windroid/releases/latest/download",
-    [string]$DistroName = "Windroid",
+    [string]$ArtifactSource,
+    [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._-]*$')][string]$DistroName = "Windroid",
     [string]$InstallRoot = "$env:LOCALAPPDATA\Windroid",
     [ValidateRange(2, 64)][int]$MemoryCapGB = 0,   # 0 = auto: min(8GB, 50% RAM)
     [switch]$Bench
@@ -62,8 +62,45 @@ function Mark-Done([ref]$state, $stage) {
     Save-State $state.Value
 }
 
+function Resolve-ArtifactSource([string]$source, [string]$cacheDir) {
+    if ($source) { return $source }
+    $bundled = Join-Path $PSScriptRoot '..\artifacts'
+    if (Test-Path -LiteralPath (Join-Path $bundled 'versions.json')) { return $bundled }
+
+    # v0.1.0 publishes a distribution ZIP, not individual kernel/rootfs files
+    # or versions.json. Verify that ZIP before extracting its artifacts.
+    New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
+    $base = 'https://github.com/calm032019/Windroid/releases/latest/download'
+    $sums = Invoke-WebRequest -UseBasicParsing -Uri "$base/SHA256SUMS.txt"
+    $sumText = if ($sums.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($sums.Content) } else { [string]$sums.Content }
+    $match = [regex]::Match($sumText, '(?im)^([a-f0-9]{64})\s+\*?Windroid\.zip\s*$')
+    if (-not $match.Success) { throw 'Release checksums do not contain Windroid.zip. Use -ArtifactSource with an extracted release artifacts directory.' }
+    $expected = $match.Groups[1].Value
+    $zip = Join-Path $cacheDir 'Windroid.zip'
+    if (-not (Test-Path -LiteralPath $zip) -or (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne $expected) {
+        $partial = "$zip.partial"
+        Invoke-WebRequest -UseBasicParsing -Uri "$base/Windroid.zip" -OutFile $partial
+        if ((Get-FileHash -LiteralPath $partial -Algorithm SHA256).Hash -ne $expected) { throw 'Release ZIP SHA-256 mismatch; nothing was imported.' }
+        Move-Item -LiteralPath $partial -Destination $zip -Force
+    }
+    $expanded = Join-Path $cacheDir 'expanded'
+    Expand-Archive -LiteralPath $zip -DestinationPath $expanded -Force
+    $artifacts = Join-Path $expanded 'Windroid\artifacts'
+    if (-not (Test-Path -LiteralPath (Join-Path $artifacts 'versions.json'))) { throw 'Release ZIP has no Windroid/artifacts/versions.json.' }
+    return $artifacts
+}
+
+function Assert-ArtifactHash([string]$path, [string]$sha) {
+    if ($sha -notmatch '^[a-fA-F0-9]{64}$') { throw "Missing or invalid SHA-256 for $path" }
+    if ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $sha) { throw "SHA-256 mismatch for $path" }
+}
+
 New-Item -ItemType Directory -Force -Path $InstallRoot, $KernelDir, $DistroDir, $BinDir | Out-Null
 $state = Get-State
+if ($state.PSObject.Properties.Name -contains 'gapps') {
+    if ($Gapps -and -not $state.gapps) { Fail 'This installation was configured as VANILLA. Back up Android data and reinstall with -Gapps; changing image flavour on a resumed install is not supported.' }
+    $Gapps = [bool]$state.gapps
+}
 
 # ---------------------------------------------------------------- 1 preflight
 if (-not (Test-Done $state "preflight")) {
@@ -109,31 +146,38 @@ if (-not (Test-Done $state "wsl")) {
     try { wsl --status | Out-Null; $wslOk = ($LASTEXITCODE -eq 0) } catch { }
     if (-not $wslOk) {
         wsl --install --no-distribution
-        if ($LASTEXITCODE -ne 0) { Fail "wsl --install failed (code $LASTEXITCODE)" }
-        Mark-Done ([ref]$state) "wsl"
+        if ($LASTEXITCODE -notin @(0, 3010)) { Fail "wsl --install failed (code $LASTEXITCODE). First-time WSL setup may require an elevated terminal." }
+        # Do not checkpoint WSL as ready before the required reboot. Reruns
+        # must recheck it instead of skipping straight to import.
         Write-Host ""
         Write-Host "A REBOOT is likely required to finish enabling WSL." -ForegroundColor Yellow
         Write-Host "After rebooting, rerun this same command — it resumes automatically." -ForegroundColor Yellow
         exit 0
     }
     wsl --update | Out-Null
+    if ($LASTEXITCODE -ne 0) { Fail "wsl --update failed (code $LASTEXITCODE); the WSL stage will retry on rerun." }
     # .wsl-file features and current fixes need a reasonably fresh WSL (>= 2.4.4).
     # wsl.exe output is UTF-16; strip the interleaved NULs before parsing.
     $verLine = ((wsl --version) -replace "`0", "") | Select-String -Pattern 'WSL[^\d]*([\d.]+)' | Select-Object -First 1
     $ver = if ($verLine) { $verLine.Matches.Groups[1].Value } else { $null }
     Add-Content $LogFile "WSL version: $ver"
-    if ($ver -and ([version]$ver -lt [version]"2.4.4")) { Fail "WSL $ver is too old (need >= 2.4.4). Run 'wsl --update' and rerun." }
+    if (-not $ver) { Fail "Could not determine the WSL version. Run 'wsl --version' and 'wsl --update', then rerun." }
+    if ([version]$ver -lt [version]"2.4.4") { Fail "WSL $ver is too old (need >= 2.4.4). Run 'wsl --update' and rerun." }
     Mark-Done ([ref]$state) "wsl"
 }
 
 # ---------------------------------------------------------------- 3 artifacts
 if (-not (Test-Done $state "artifacts")) {
+    try { $ArtifactSource = Resolve-ArtifactSource $ArtifactSource (Join-Path $InstallRoot 'release-cache') }
+    catch { Fail "Cannot obtain release artifacts: $($_.Exception.Message) Use -ArtifactSource <extracted Windroid\artifacts>." }
     Write-Step "Fetching artifacts from $ArtifactSource"
     function Get-Artifact($name, $dest) {
+        if (-not $name -or $name -match '[/\\]' -or $name -in @('.', '..')) { throw "Invalid artifact filename: $name" }
         # Test-Path on an https:// string throws DriveNotFoundException —
         # branch on the source shape, not on path existence.
         if ($ArtifactSource -match '^https?://') {
-            Invoke-WebRequest -Uri "$ArtifactSource/$name" -OutFile $dest
+            try { Invoke-WebRequest -UseBasicParsing -Uri "$ArtifactSource/$name" -OutFile $dest }
+            catch { throw "Cannot fetch $name from $ArtifactSource. Releases may bundle artifacts inside Windroid.zip; extract it and pass -ArtifactSource <Windroid\artifacts>. $($_.Exception.Message)" }
         } else {
             Copy-Item (Join-Path $ArtifactSource $name) $dest -Force
         }
@@ -142,7 +186,8 @@ if (-not (Test-Done $state "artifacts")) {
     $manifest = Get-Content (Join-Path $InstallRoot "manifest.json") -Raw | ConvertFrom-Json
 
     $kernelName  = $manifest.kernel.artifact
-    $modulesName = $kernelName -replace '^bzImage-', 'modules-' -replace '$', '.vhdx'
+    $modulesName = $manifest.kernel.modules_artifact
+    if (-not $modulesName) { $modulesName = $kernelName -replace '^bzImage-', 'modules-' -replace '$', '.vhdx' }
     $rootfsName  = $manifest.rootfs.flavours.vanilla.artifact
     Get-Artifact $kernelName  (Join-Path $KernelDir "bzImage")
     Get-Artifact $modulesName (Join-Path $KernelDir "modules.vhdx")
@@ -151,11 +196,9 @@ if (-not (Test-Done $state "artifacts")) {
     # Checksums per manifest — refuse to proceed on mismatch.
     foreach ($pair in @(
         @{ path = (Join-Path $KernelDir "bzImage");        sha = $manifest.kernel.sha256 },
+        @{ path = (Join-Path $KernelDir "modules.vhdx");   sha = $manifest.kernel.modules_sha256 },
         @{ path = (Join-Path $DistroDir "rootfs.tar.gz");  sha = $manifest.rootfs.flavours.vanilla.sha256 })) {
-        if ($pair.sha) {
-            $got = (Get-FileHash $pair.path -Algorithm SHA256).Hash.ToLower()
-            if ($got -ne $pair.sha.ToLower()) { Fail "sha256 mismatch for $($pair.path)" }
-        }
+        Assert-ArtifactHash $pair.path $pair.sha
     }
     Mark-Done ([ref]$state) "artifacts"
 }
@@ -262,8 +305,32 @@ if (-not (Test-Done $state "configure")) {
     wsl -d $DistroName -u root -e bash -c "zgrep -q '^CONFIG_ANDROID_BINDER_IPC=y' /proc/config.gz"
     if ($LASTEXITCODE -ne 0) { Fail "Custom kernel not active in WSL (binder missing). Check [wsl2] kernel= in $WslConfig, run 'wsl --shutdown', retry." }
 
+    # Older rootfs releases started firstboot as soon as this first WSL
+    # command booted systemd, before -Gapps was applied. Quiesce that worker
+    # before configuring anything; then install the matching guest fixes.
+    wsl -d $DistroName -u root -e systemctl stop windroid-firstboot.service waydroid-container.service
+    if ($LASTEXITCODE -ne 0) { Fail 'Could not stop firstboot/container before guest configuration.' }
+    $guestFiles = Join-Path $PSScriptRoot '..\rootfs\files'
+    if (Test-Path -LiteralPath $guestFiles) {
+        $guestSource = ((wsl -d $DistroName -u root -e wslpath -a $guestFiles) -join '' -replace "`0", '').Trim()
+        if ($LASTEXITCODE -ne 0 -or -not $guestSource) { Fail 'Cannot resolve the bundled guest files in WSL.' }
+        foreach ($file in @(
+            @{ path = 'usr/local/bin/windroid-firstboot'; mode = '0755' },
+            @{ path = 'usr/local/bin/windroid-session'; mode = '0755' },
+            @{ path = 'usr/local/sbin/windroid-prep'; mode = '0755' },
+            @{ path = 'etc/systemd/system/windroid-firstboot.service'; mode = '0644' })) {
+            wsl -d $DistroName -u root -e install -D -m $file.mode "$guestSource/$($file.path)" "/$($file.path)"
+            if ($LASTEXITCODE -ne 0) { Fail "Cannot install guest helper $($file.path)." }
+        }
+        wsl -d $DistroName -u root -e systemctl daemon-reload
+        if ($LASTEXITCODE -ne 0) { Fail 'Cannot reload guest service definitions.' }
+    } elseif ($Gapps) {
+        Fail 'GApps setup requires the matching rootfs/files guest helpers beside this installer. Use the complete distribution or repository checkout.'
+    }
+
     if ($Gapps) {
         wsl -d $DistroName -u root -e bash -c "sed -i 's/^GAPPS=false/GAPPS=true/' /etc/windroid/windroid.conf"
+        if ($LASTEXITCODE -ne 0) { Fail 'Could not select GAPPS in the guest configuration.' }
     }
     # Windows -> Android Downloads sharing (plan Phase 2.5): pass the WSL
     # view of the user's Downloads folder into the guest. NOT via sed with
@@ -273,13 +340,22 @@ if (-not (Test-Done $state "configure")) {
     # guest reads /etc/windroid/downloads-path as raw text.
     $downloads = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
     $wslDownloads = ((wsl -d $DistroName -e wslpath -a "$downloads") -join '' -replace "`0", "").Trim()
+    if ($LASTEXITCODE -ne 0) { Fail 'Could not resolve Windows Downloads in the guest.' }
     if ($wslDownloads) {
         $env:WINDROID_DL_B64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($wslDownloads))
         $oldWslEnv = $env:WSLENV
         $env:WSLENV = "WINDROID_DL_B64" + $(if ($oldWslEnv) { ":" + $oldWslEnv } else { "" })
-        wsl -d $DistroName -u root -e bash -c 'echo $WINDROID_DL_B64 | base64 -d > /etc/windroid/downloads-path'
-        $env:WSLENV = $oldWslEnv
+        try {
+            wsl -d $DistroName -u root -e bash -c 'echo $WINDROID_DL_B64 | base64 -d > /etc/windroid/downloads-path'
+            if ($LASTEXITCODE -ne 0) { Fail 'Could not configure the Windows Downloads share.' }
+        } finally {
+            $env:WSLENV = $oldWslEnv
+            Remove-Item Env:WINDROID_DL_B64 -ErrorAction SilentlyContinue
+        }
     }
+    wsl -d $DistroName -u root -e touch /etc/windroid/.configured
+    if ($LASTEXITCODE -ne 0) { Fail 'Could not mark guest configuration complete.' }
+    $state | Add-Member -NotePropertyName gapps -NotePropertyValue ([bool]$Gapps) -Force
     Mark-Done ([ref]$state) "configure"
 }
 
@@ -295,13 +371,15 @@ if (-not (Test-Done $state "firstboot")) {
 if (-not (Test-Done $state "smoketest")) {
     Write-Step "Smoke test: session up -> RUNNING -> down (ddcash-style)"
     wsl -d $DistroName -u windroid -e bash -lc "windroid-session start"
+    $startCode = $LASTEXITCODE
     $ok = $false
-    for ($i = 0; $i -lt 40; $i++) {
+    for ($i = 0; $startCode -eq 0 -and $i -lt 40; $i++) {
         $status = (wsl -d $DistroName -u windroid -e bash -lc "waydroid status 2>/dev/null") -join "`n"
-        if ($status -match "Session:\s*RUNNING" -and $status -match "Container:\s*RUNNING") { $ok = $true; break }
+        if ($LASTEXITCODE -eq 0 -and $status -match "Session:\s*RUNNING" -and $status -match "Container:\s*RUNNING") { $ok = $true; break }
         Start-Sleep -Seconds 3
     }
     wsl -d $DistroName -u windroid -e bash -lc "windroid-session stop" | Out-Null
+    if ($LASTEXITCODE -ne 0) { Fail 'Smoke test could not stop the session cleanly.' }
     if (-not $ok) { Fail "smoke test: session never reached RUNNING (see ~/.local/state/windroid/session.log in the distro)" }
     Write-Host "Smoke test: PASS" -ForegroundColor Green
     Mark-Done ([ref]$state) "smoketest"
@@ -321,7 +399,7 @@ if (-not (Test-Done $state "integrate")) {
     # repo checkout must not get a dead shim/shortcut.
     if (Test-Path (Join-Path $BinDir "windroid.ps1")) {
         # windroid.cmd shim so `windroid` works from any shell once on PATH.
-        Set-Content -Path (Join-Path $BinDir "windroid.cmd") -Value "@powershell -NoProfile -ExecutionPolicy Bypass -File `"$BinDir\windroid.ps1`" %*"
+        Set-Content -Path (Join-Path $BinDir "windroid.cmd") -Value "@powershell -NoProfile -ExecutionPolicy Bypass -File `"$BinDir\windroid.ps1`" -DistroName `"$DistroName`" %*"
         $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
         if ($userPath -notlike "*$BinDir*") {
             [Environment]::SetEnvironmentVariable("Path", "$userPath;$BinDir", "User")
@@ -345,7 +423,7 @@ if (-not (Test-Done $state "integrate")) {
         $shell = New-Object -ComObject WScript.Shell
         $lnk = $shell.CreateShortcut((Join-Path $programs "Windroid Tray.lnk"))
         $lnk.TargetPath = "powershell.exe"
-        $lnk.Arguments  = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$BinDir\windroid-tray.ps1`""
+        $lnk.Arguments  = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$BinDir\windroid-tray.ps1`" -DistroName `"$DistroName`" -InstallRoot `"$InstallRoot`""
         if (Test-Path (Join-Path $InstallRoot "windroid.ico")) { $lnk.IconLocation = "$(Join-Path $InstallRoot "windroid.ico"),0" }
         $lnk.Save()
     } else {

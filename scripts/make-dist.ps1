@@ -38,16 +38,20 @@ Copy-Item (Join-Path $repo "installer\install.ps1"),(Join-Path $repo "installer\
 Copy-Item (Join-Path $repo "scripts\windroid.ps1"),(Join-Path $repo "scripts\bench.ps1") "$root\scripts"
 Copy-Item (Join-Path $repo "windows\tray\windroid-tray.ps1") "$root\windows\tray"
 Copy-Item (Join-Path $repo "assets\windroid.ico") "$root\assets"
+# Carry guest fixes alongside the installer, including when reusing an older
+# rootfs release whose auto-firstboot service predates the configuration gate.
+New-Item -ItemType Directory -Force -Path "$root\rootfs" | Out-Null
+Copy-Item (Join-Path $repo 'rootfs\files') "$root\rootfs" -Recurse
 foreach ($a in @("versions.json", $kernelName, $modulesName, $rootfsName)) {
     Copy-Item (Join-Path $ArtifactDir $a) "$root\artifacts"
 }
 
 Set-Content -Path "$root\INSTALL.cmd" -Encoding Ascii -Value @'
 @echo off
-rem Windroid installer. No admin needed (WSL installs per-user).
+rem Windroid distro installs per-user; enabling WSL may require elevation.
 rem If a reboot is requested on first run, rerun this file afterwards -
 rem it resumes where it left off.
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0installer\install.ps1" -ArtifactSource "%~dp0artifacts"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0installer\install.ps1" -ArtifactSource "%~dp0artifacts" %*
 echo.
 pause
 '@

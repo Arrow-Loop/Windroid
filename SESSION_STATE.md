@@ -40,27 +40,24 @@ upstream compatibility. Persist progress through usage limits/restarts.
 - Configured persistent continuation instructions/checkpoint and researched
   documented resume support; see docs/CONTINUATION.md.
 
-## Active investigation / uncommitted work
+## Active investigation
 
-`installer/install.ps1` has an INCOMPLETE draft covering release ZIP discovery,
-all three artifact hashes, WSL checkpoint/error handling, configure sequencing,
-guest helper copying, persisted GApps choice, smoke-test failures and custom
-distro launcher arguments. Do not treat this as an implemented/validated fix.
-
-IMPORTANT: the draft currently copies unchanged guest helpers and writes a
-`.configured` marker that they do not yet consume. The legacy firstboot script
-still skips on an empty `.initialized` stamp; the GApps race is NOT fixed yet.
-Complete the guest-side protocol and distribution packaging before running
-the full patched installer. Add regression tests before committing this draft.
-Only installer/install.ps1 was modified by the interrupted implementation.
+Installer/guest configuration changes are implemented with isolated regression
+checks. Firstboot now waits for .configured, uses flock, reprocesses legacy empty
+stamps, records flavour on success and retries failed GApps downloads without
+moving the VANILLA preseed twice. Distribution packagers include guest helpers.
+Artifact discovery extracts and verifies the release ZIP; all artifact hashes
+are checked. WSL error/checkpoint handling and custom distro launchers improved.
+These changes need real WSL/Android validation; no runtime fix is claimed yet.
 
 ## Last successful operation and validation
 
-After interruption, inspected status/diff and verified all PowerShell files
-parse, installer UTF-8 BOM is preserved, existing merge/revert tests pass,
-and `git diff --check` passes. These are static/existing tests, not proof of
-the draft's new behavior. CLI help confirms version 0.167.0-alpha.3.2 and
-`codex resume` / `codex exec resume` support. No background Codex run launched.
+PowerShell parse checks pass. Release discovery/integrity regression tests pass
+in PowerShell 7.6.9 and Windows PowerShell 5.1. Existing config merge/revert tests
+pass. Four isolated firstboot tests pass under Git Bash; flock is stubbed there,
+so Linux lock behavior is pending. Changed shell scripts pass bash -n, and
+Git diff whitespace checks pass. Tests were added to CI but CI has not run.
+No WSL distro imported yet. Windows boot time remains 2026-11-03 07:05 local.
 
 ## Outstanding blockers / unknowns
 
@@ -75,17 +72,26 @@ the draft's new behavior. CLI help confirms version 0.167.0-alpha.3.2 and
 
 ## Exact next action
 
-Run `git status --short` and `git diff -- installer/install.ps1`, then read
-`rootfs/files/usr/local/bin/windroid-firstboot` and its systemd unit. Complete
-the GApps configuration gate, firstboot serialization and flavour-aware success
-stamp/retry handling; package matching guest helpers in make-dist.ps1 and the
-Inno setup file. Add isolated regression tests for release discovery/checksums
-and the GApps race. Keep tests independent of a real Android install.
+User explicitly authorized reboot on 2026-11-06. Source and documentation are
+being committed before invoking shutdown.exe /r /t 30 (without forced app close).
+On resumption, first inspect Git status/log and Windows LastBootUpTime; do not
+assume the scheduled restart completed. Run wsl --status and wsl --list --verbose.
+If WSL2 is operational, use PowerShell 7 in this repository to run:
 
-Then validate PowerShell 7 and 5.1, shell syntax and relevant behavioral tests;
-commit the coherent installer/guest change only after checks pass. Obtain the
-required Windows restart at a saved checkpoint, verify WSL status again, then
-perform vanilla/GApps install and runtime tests from the verified local release.
+```powershell
+& .\installer\install.ps1 -ArtifactSource 'C:\Users\Public\Documents\Cody-Windroid-Lab\evidence\release-v0.1.0\Windroid\artifacts' -Bench
+```
+
+Capture output in a new lab evidence subdirectory; do not reuse the disposable
+artifact-source-probe state as an actual installation. Verify binder, firstboot
+stamp VANILLA, session start/stop, app window and networking. Run firstboot tests
+inside WSL with real flock, then test concurrent initialization. Validate GApps
+via a clean reinstall after preserving test evidence; do not register two active
+Waydroid stacks simultaneously. Continue session/network/graphics priorities,
+and investigate Nintendo only with local exact-version app/crash evidence.
+
+If startup fails, retain exit codes/logs and diagnose before making more changes.
+Do not redownload the verified release or reinstall Git/WSL unnecessarily.
 
 ## Resume
 

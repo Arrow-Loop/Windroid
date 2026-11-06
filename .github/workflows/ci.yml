@@ -29,6 +29,7 @@ jobs:
       - name: Python compile + preseed dry parse
         run: |
           python3 -m py_compile rootfs/preseed-images.py
+          python3 rootfs/test-firstboot.py
           python3 -c "import json; json.load(open('manifest/versions.json')); json.load(open('manifest/versions.schema.json'))"
 
       - name: PowerShell parse
@@ -59,6 +60,10 @@ jobs:
       - name: .wslconfig merge/revert unit test
         shell: pwsh
         run: installer/tests/test-wslconfig-merge.ps1
+
+      - name: Release artifact discovery and integrity tests
+        shell: pwsh
+        run: installer/tests/test-artifacts.ps1
 
       - name: Workflow YAML validity
         run: |
