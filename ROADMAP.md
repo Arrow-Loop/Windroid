@@ -1,0 +1,29 @@
+# Windroid lab roadmap (handoff, not yet committed to repository)
+
+- [ ] Confirm laptop ownership, Windows edition, hardware, recovery image, and isolation.
+- [ ] Bootstrap Git, development tools, repo, and evidence folder.
+- [ ] Install Windroid from known release, with reproducible installation log.
+- [ ] Reproduce WSL detection and validate pending `{sysnative}` branch fix.
+- [ ] Diagnose local artifact source fallback and error messages.
+- [ ] Reproduce GAPPS/VANILLA race and build idempotent fix.
+- [ ] Fix launcher script invocation and execution policy UX.
+- [ ] Isolate WSLg/LXC/Weston surface and window movement defects.
+- [ ] Investigate Waydroid networking dropout.
+- [ ] Investigate Nintendo native crash in `libpairipcore.so`; assess app support limitations without bypassing protections.
+- [ ] Submit narrowly scoped validated PRs upstream and document test matrix.
+
+## Audit checkpoint — 2026-11-06
+- [x] Inspect hardware, Windows edition, virtualization, available disk and repository state. Ownership/isolation authorized by user; recovery image remains unverified.
+- [x] Locate existing Git and repository; retain evidence folder and baseline results.
+- [x] Read handoff and development docs; verify and extract official v0.1.0 ZIP.
+- [x] Reproduce default artifact manifest Not Found; retain logs.
+- [x] Install WSL and enable VirtualMachinePlatform (restart pending).
+- [x] Establish tracked session checkpoint and resume instructions; verify CLI resume commands without starting another agent.
+- [ ] Finish installer draft and matching guest gate/flavour-aware firstboot logic plus packaging; add regression tests, validate and commit coherent fix.
+- [ ] Restart Windows, verify WSL2 VM startup, and establish actual Windroid runtime baseline.
+- [ ] Validate Sysnative wizard fix on this machine (code already preserved as ba4e275).
+- [ ] Reproduce/validate vanilla and GApps installs, recovery, networking and desktop window behavior.
+- [ ] Obtain local Nintendo crash evidence without account sign-ins or protection bypass; diagnose exact x86_64 failure.
+- [ ] Validate uninstall/coexistence and submit narrowly scoped PRs only after evidence supports them.
+
+Earlier unchecked items remain open where this checkpoint records only partial completion. SESSION_STATE.md in source/Windroid is the authoritative next-action checkpoint.
