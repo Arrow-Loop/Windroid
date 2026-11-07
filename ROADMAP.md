@@ -1,11 +1,11 @@
-# Windroid lab roadmap (handoff, not yet committed to repository)
+# Windroid lab roadmap
 
 - [ ] Confirm laptop ownership, Windows edition, hardware, recovery image, and isolation.
-- [ ] Bootstrap Git, development tools, repo, and evidence folder.
-- [ ] Install Windroid from known release, with reproducible installation log.
+- [x] Bootstrap Git, development tools, repo, and evidence folder.
+- [x] Install Windroid from verified release artifacts and source helpers; retain installation logs.
 - [ ] Reproduce WSL detection and validate pending `{sysnative}` branch fix.
-- [ ] Diagnose local artifact source fallback and error messages.
-- [ ] Reproduce GAPPS/VANILLA race and build idempotent fix.
+- [x] Diagnose and fix release artifact discovery/cache/hash validation.
+- [x] Implement and test configuration gate/flavour-aware initialization; verify local VANILLA and GApps outcomes.
 - [ ] Fix launcher script invocation and execution policy UX.
 - [ ] Isolate WSLg/LXC/Weston surface and window movement defects.
 - [ ] Investigate Waydroid networking dropout.
@@ -68,3 +68,8 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [ ] Diagnose Nintendo runtime fault using upstream allocator/runtime evidence and unmodified controls; no protection bypass or successful compatibility claim.
 - [ ] Resolve System UI ANR/seamless rendering and WSL fragmented-memory channel failures; complete GApps smoke/integration and repeated networking validation.
 These entries supersede stale pending-artifact/reboot steps above; historical checkpoints are retained.
+
+## GApps installer completion — 2026-11-06
+- [x] Complete actual resumed GApps smoke/integration stages, exit0; installed CLI status verified. Smoke began with an already-ready session and stopped cleanly.
+- [x] Verify Android IP/DNS connectivity after Nintendo failure (two replies each).
+- [ ] Validate separate post-smoke restart and ordinary-app rendering; installer completion does not close graphics, account usability, repeated networking or long-session reliability.

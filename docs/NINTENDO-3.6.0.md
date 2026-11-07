@@ -36,7 +36,9 @@ protection bypasses were used. No Nintendo account sign-in was performed.
   vendor image dated 2026-10-22, with Windroid helper changes from this branch.
 - Nested Weston fallback enabled during this app test; seamless mode remains
   unresolved. Google Play Services package presence was confirmed without
-  inspecting accounts. GApps installer smoke/integration validation is pending.
+  inspecting accounts. After app tests, resumed installer smoke/integration
+  passed, a separate restart took83s, and Settings rendered inside nested Weston.
+  This does not validate Nintendo compatibility or seamless graphics.
 - Installed inspection tools from Ubuntu packages: aapt, apksigner and Java;
   dependency installation also updated guest Mesa packages. Exact package
   changes are retained in the local apk-tools-install transcript.
@@ -80,6 +82,14 @@ PID 20270 reports `invalid pointer ... (page signature mismatch)` followed by
 confirm signal 6. No matching x86 tombstone was collected. Thus absence of a
 tombstone or presence of a PID is not evidence of successful app startup.
 The target was force-stopped at 20:17:06 local to end the restart loop.
+
+The same diagnostic text occurs in AOSP's
+[linker allocator](https://android.googlesource.com/platform/bionic/+/77d0f90c7a06dfa7e96790d9651f3877443f72b9/linker/linker_allocator.cpp):
+it checks allocator page metadata during pointer validation, and also checks
+allocator identity during realloc. This supports investigating linker memory
+ownership/corruption; it does not identify the caller, prove memory exhaustion,
+or establish an intentional protection check. The linked revision is a source
+reference, not a verified symbol match for this installed image.
 
 The contained Android screen also showed a System UI ANR. This limits visual
 validation and does not establish the cause of either app's native failure.

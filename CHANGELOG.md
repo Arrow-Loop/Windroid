@@ -1,4 +1,4 @@
-# Windroid lab changelog (handoff, not yet committed to repository)
+# Windroid lab changelog
 
 ## 2026-11-06
 - Created laptop bootstrap script for local inventory, development tools, Windroid clone, and journal directories.
@@ -57,3 +57,14 @@
 - Installed unchanged signed x86 splits as an ABI control after recovering unrelated package/compositor failures. Longer observation shows rapid SIGABRT/restart loop, with libc page-signature mismatch and recursive signal-handler abort; target force-stopped. Short PID presence/no tombstone was not success. Root cause remains unresolved for both ABIs.
 - Added docs/NINTENDO-3.6.0.md with hashes, environment, methods and limitations. APKs/native libraries/raw memory logs remain local in evidence/nintendo-3.6.0. Guest inspection-tool install also updated Mesa packages; transcript retained.
 - Reused one persistent root WSL terminal after shutdown to avoid new VMBus channel allocation under fragmented memory. This investigation technique is not a persisted WSL fix. GApps smoke/integration and graphics/network reliability remain open.
+
+## 2026-11-06 — resumed GApps smoke and integration
+- Resumed the source installer with the same public InstallRoot, -Gapps -MemoryCapGB 3 -SkipWslUpdate -Bench and existing verified artifact directory. It skipped completed stages, accepted the already-ready session, verified both running states, stopped cleanly, and completed CLI/tray/Start Menu integration (exit0). state.json now records all stages complete. This is lifecycle/integration proof, not proof that Google login or app graphics work.
+- Installed windroid.cmd status returned STOPPED after smoke; runtime bin files present. No Android data reset or reinstall occurred.
+- Android IP1.1.1.1 and example.com DNS pings passed2/2 each after Nintendo restart-loop termination. Guest DNS resolution also passed; guest ping binary absent, so no guest ICMP result claimed. Evidence: gapps-network-after-nintendo.txt.
+- Began separate post-smoke lifecycle start through retained root terminal and user1000 DBus environment. Record result before declaring restart reliability. Host available memory at this point was about807MiB/7778MiB; avoid increasing guest cap blindly.
+
+## 2026-11-06 — post-smoke recovery validation
+- Separate post-smoke start reached Android ready in83.361s; Settings visibly rendered inside contained Weston. Android IP and DNS pings again passed2/2; ConnectivityService reports validated Ethernet default network. No network defect reproduced in these two GApps observations; long-session dropout remains open.
+- ShellCheck0.9.0 installed in guest; changed session helper passes shellcheck -S warning. Seven Linux lifecycle tests and applicable Git Bash tests already passed. No new kernel/sysctl or protected-app changes.
+- Compared confirmed upstream kernel tags6.18.33.1 and6.18.54.1: channel.c has identical Git blob SHA162d6aeece7b3b6e4c321b07008efac49c253af4; inspected hv_sock ring-size selection is unchanged. A newer binder-kernel rebuild alone is not established as a fix for the captured ring allocation defect. Deferred that expensive experiment pending a specific patch hypothesis.

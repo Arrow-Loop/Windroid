@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-06 (America/New_York), resumed at 20:12 local.
+Updated 2026-11-06 (America/New_York), validation checkpoint about20:29 local.
 
 ## Objective and scope
 Make Windroid reliable and investigate Nintendo Switch App startup. Work only in
@@ -11,7 +11,7 @@ No quota polling, resets/credits, parallel agents or personal-account automation
 - Repo: C:\Users\Public\Documents\Cody-Windroid-Lab\source\Windroid
 - Lab: C:\Users\Public\Documents\Cody-Windroid-Lab
 - Journal: lab journals/ENGINEERING-JOURNAL.md. Read HANDOFF.md and dev guidance.
-- Branch codex/lab-reliability; latest committed c82baad session lifecycle fix.
+- Branch codex/lab-reliability; commits db3d92c Weston readiness; 4222460 Nintendo report/checkpoint.
 - Earlier commits: ba4e275 Sysnative; 3eb30d8 installer/firstboot; 80a6332 INI
   normalization; 4a69a11 CLI APK argument/error handling. No push/PR performed.
 - PowerShell runtime is already 7.6.9 (bundled Codex pwsh); standard Program
@@ -28,7 +28,9 @@ No quota polling, resets/credits, parallel agents or personal-account automation
 - Current GApps initialized using verified local-only official system20260927
   and vendor20261022. GAPPS stamp/Play Services presence verified. Initial smoke
   timed out180s; manual starts later became ready; bundled apps installed.
-  Installer state still has smoketest/integrate pending. No full GApps pass.
+  Resumed source installer completed smoketest/integrate exit0; state records
+  all stages. Smoke began already-ready and stopped cleanly. Separate start
+  then reached ready in83.361s. Account/seamless-graphics usability unresolved.
 - Updated composer matches upstream Binder-threadpool fix; seamless Windows
   app windows still splash/freeze while Android screencap shows UI. Global
   HiDPI experiment failed and was reverted. Nested fallback is temporary.
@@ -53,7 +55,7 @@ No quota polling, resets/credits, parallel agents or personal-account automation
   than opening many WSL commands under fragmentation. It may expire on reset:
   never assume tool session IDs remain live. No listener/service was installed.
 - Fresh source session start reached ready20:13:18. Session helper in guest has
-  uncommitted Weston socket wait fix: explicit wayland-1, actual readiness wait
+  committed Weston socket wait fix (db3d92c): explicit wayland-1, actual readiness wait
   instead of fixed2sec, early child exit diagnostics. Real socket previously
   appeared after4sec, causing launch failure. Seven Linux lifecycle tests pass.
 - x86 first launch20:13:56: pid3679 after4sec; no target x86 tombstone. Force-
@@ -63,20 +65,31 @@ No quota polling, resets/credits, parallel agents or personal-account automation
   Target force-stopped20:17:06; pidof then empty. System UI ANR observed.
 
 ## Last successful operation and exact next action
-Collected scoped x86 process log and target ApplicationExitInfo confirming signal6,
-force-stopped restart loop; no target pid remains. Both ABIs fail; no causal
-protection/runtime conclusion. Seven Linux lifecycle tests pass; Git Bash suite
-passes with two Linux-only skips. Updated Nintendo report and mirrored roadmap/
-changelog/journal. Commit readiness fix and reproduction documentation after
-final diff checks. Then investigate Android libc page-signature mismatch from
-upstream source and validate ordinary app/runtime/network health. Complete
-installer smoketest/integrate only with real stage execution and preserved data.
-Do not repeat Nintendo restart loops without a concrete diagnostic hypothesis.
+Resumed actual installer smoke/integration exit0; installed CLI status STOPPED.
+Separate post-smoke start reached ready83.361s. Android IP/DNS pings passed2/2
+both before and after lifecycle restart. Settings rendered visibly in nested
+Weston after restart; System UI ANR no longer visible in that check. Window
+movement remains unproven (first automation drag blocked by other window, retry
+returned screenshot without clear movement). No seamless graphics fix claimed.
+ConnectivityService reports validated Ethernet; installed CLI reports both states
+RUNNING on wayland-1. Exact Android fingerprint: waydroid/lineage_waydroid_x86_64/
+waydroid_x86_64:13/TQ3A.230901.001/eng.aleast.20260927.143833:userdebug/test-keys.
+Kernel-tag comparison found unchanged VMBus allocator; no blind rebuild done.
+Read docs/WSL-SESSION-RELIABILITY.md before further transport experiments.
+AOSP linker allocator source matches x86 diagnostic, but no installed symbol
+match/caller/root cause established. Report updated with source/limits.
+Next: inspect nested Weston/Android compositor logs after an ordinary Settings
+control (Nintendo remains force-stopped). Compare with the earlier seamless
+failure evidence to identify a specific surface lifecycle/geometry hypothesis;
+preserve working contained fallback and user data. WSL fixes require a distinct
+controlled upstream patch experiment, not repeating compaction/rebuild guesses.
 ## Validation, uncommitted work and blockers
-- Uncommitted: windroid-session socket wait, rootfs/test-session.py fixture/test
-  updates, Nintendo report/known-limits, checkpoint/changelog/roadmap updates.
+- Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
+  Current documentation checkpoint includes resumed GApps/network validation and
+  WSL transport runbook; check actual Git state for its commit/status.
 - Linux seven lifecycle tests and bash syntax pass. Git Bash applicable suite
-  passed (two Linux-only tests skipped). shellcheck absent; not claimed run.
+  passed (two Linux-only tests skipped). Installed ShellCheck0.9.0; changed helper
+  passes shellcheck -S warning (evidence/session-shellcheck.txt).
 - Prior firstboot6 Linux tests, CLI/artifacts PS7/5.1 checks pass as documented.
 - Blockers: seamless graphics, intermittent SurfaceFlinger DEAD_OBJECT abort,
   WSL fragmented-memory new-channel failures. Nintendo cause still unresolved.
