@@ -73,3 +73,10 @@ These entries supersede stale pending-artifact/reboot steps above; historical ch
 - [x] Complete actual resumed GApps smoke/integration stages, exit0; installed CLI status verified. Smoke began with an already-ready session and stopped cleanly.
 - [x] Verify Android IP/DNS connectivity after Nintendo failure (two replies each).
 - [ ] Validate separate post-smoke restart and ordinary-app rendering; installer completion does not close graphics, account usability, repeated networking or long-session reliability.
+
+## Live framework and graphics trace checkpoint — 2026-11-06
+- [x] Capture bounded compositor protocol with backed-up, reversible instrumentation; remove it after tests.
+- [x] Reject stale ready markers when live framework/package queries fail; test recovery and bounded wait behavior, verify healthy real probe.
+- [x] Identify forced-size maximized-state protocol error; revert unsupported workaround and retain evidence.
+- [ ] Recover/validate contained presentation after rollback (framework ready, current Windows view black), then isolate default-size seamless geometry/input/ANR behavior. Readiness is not graphics proof.
+- [ ] Continue wizard Sysnative runtime check, long-session networking/WSL transport, and Nintendo cause investigation after runtime stabilization.

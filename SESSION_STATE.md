@@ -65,40 +65,35 @@ No quota polling, resets/credits, parallel agents or personal-account automation
   Target force-stopped20:17:06; pidof then empty. System UI ANR observed.
 
 ## Last successful operation and exact next action
-Resumed actual installer smoke/integration exit0; installed CLI status STOPPED.
-Separate post-smoke start reached ready83.361s. Android IP/DNS pings passed2/2
-both before and after lifecycle restart. Settings rendered visibly in nested
-Weston after restart; System UI ANR no longer visible in that check. Window
-movement remains unproven (first automation drag blocked by other window, retry
-returned screenshot without clear movement). No seamless graphics fix claimed.
-ConnectivityService reports validated Ethernet; installed CLI reports both states
-RUNNING on wayland-1. Exact Android fingerprint: waydroid/lineage_waydroid_x86_64/
-waydroid_x86_64:13/TQ3A.230901.001/eng.aleast.20260927.143833:userdebug/test-keys.
-Kernel-tag comparison found unchanged VMBus allocator; no blind rebuild done.
-Read docs/WSL-SESSION-RELIABILITY.md before further transport experiments.
-AOSP linker allocator source matches x86 diagnostic, but no installed symbol
-match/caller/root cause established. Report updated with source/limits.
-Ordinary Settings control stayed rendered about10min; bounded crash filter had
-no matching fatal records and Nintendo pid absent. shared_memory mount/boot hook
-verified. Runtime ANGLE+pastel over SwiftShader is intentional upstream vendor33
-substitution, not a failed property override (see UPSTREAM-FACTS follow-up).
-Next: inspect Waydroid hwcomposer source/environment setup for a supported way
-to collect a bounded Wayland configure/ack/attach trace for one Settings launch.
-Use that new evidence to compare the historical 1x1/2x surface-buffer mismatches;
-preserve working contained fallback/config backups and Android data. Do not
-repeat direct-mode/DPI tests without this specific diagnostic instrumentation. WSL fixes require a distinct
-controlled upstream patch experiment, not repeating compaction/rebuild guesses.
+Resumed graphics protocol investigation21:00-21:08 local. Detailed methods and
+results: docs/GRAPHICS-INVESTIGATION.md. Direct-mode Settings showed a native
+frame but an Android ANR; not a usable result. no_background switch not proven.
+Forced640x480 size caused exact maximized-state protocol violation and HAL
+restart loops. Do not repeat the unsafe override or global DPI test.
+Rollback completed: width/height/no_background cleared to empty; multi_windows
+false; original windroid.conf restored; two experiment-created overlay files
+removed after byte checks. Original compositor definition matches backup.
+Untraced nested start21:00:47->21:02:33 ready106s. Live framework query passes,
+but current Windows contained view appears BLACK after show-full-ui/Settings.
+NEXT: inspect newly captured rollback-settings-android.png and bounded crash/
+Weston logs to distinguish Android content from nested/WSLg presentation. Keep
+original images/data/config; do not reinstall. Root PTY52561 remains available.
+Code draft complete/tested: live app-list readiness query rejects stale-log/IPC
+errors, waits for recovery without duplicate session, and uses a wall-clock
+readiness budget. Healthy live ensure probe1.909s; deployed to guest after backup.
+Commit completed code/docs, then continue runtime recovery and next roadmap work.
 ## Validation, uncommitted work and blockers
 - Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
   Current documentation checkpoint includes resumed GApps/network validation and
   WSL transport runbook committed bd6f90c. Current checkpoint adds verified
   modern software-renderer identity; check actual Git state for final status.
-- Linux seven lifecycle tests and bash syntax pass. Git Bash applicable suite
-  passed (two Linux-only tests skipped). Installed ShellCheck0.9.0; changed helper
-  passes shellcheck -S warning (evidence/session-shellcheck.txt).
+- Ten Linux lifecycle tests pass; Git Bash ten tests pass with two Linux-only
+  skips. Bash syntax/ShellCheck warning level pass. Live query passes. Current
+  changes: session helper/tests and graphics report/checkpoint/changelog/roadmap.
 - Prior firstboot6 Linux tests, CLI/artifacts PS7/5.1 checks pass as documented.
 - Blockers: seamless graphics, intermittent SurfaceFlinger DEAD_OBJECT abort,
   WSL fragmented-memory new-channel failures. Nintendo cause still unresolved.
 - Evidence: lab evidence/2026-11-06-runtime and evidence/nintendo-3.6.0. Raw APKs,
   native binaries, tombstones/memory dumps and GApps images remain local-only.
   Bundle bb97fcb5123085bf3fe7793724bec516bb2b10a3e74358997d31c8ab6775cc95.
+
