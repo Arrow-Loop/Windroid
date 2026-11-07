@@ -1,5 +1,24 @@
 # Upstream facts — verified 2026-08-30
 
+## Lab update — 2026-11-06: composer Binder pool race
+
+The shipped v0.1.0 vendor image reproduced a composer abort on this Intel
+Surface Book 3: `hwc_binder_thread` calls into thread-pool configuration after
+the composer service has started its pool. Android refuses a reduction in pool
+size. Settings remained at its splash even though Android reported its activity
+resumed and networking worked. This does not establish the cause of the separate
+Nintendo native crash.
+
+Upstream fixes the redundant configuration call in
+[android_hardware_waydroid commit 4aee4c8](https://github.com/waydroid/android_hardware_waydroid/commit/4aee4c8d953e5cf7cb58d838242b71899a51269a),
+dated 2026-10-18. Official MAINLINE OTA offers
+`lineage-20.0-20261022-MAINLINE-waydroid_x86_64-vendor.zip`, ZIP SHA-256
+`91663c337013145208b6c533d7e1fa2a915a9864ddc8fc56966f40cd759648ac`.
+Source: [official vendor channel](https://ota.waydro.id/vendor/waydroid_x86_64/MAINLINE.json).
+The lab is testing this image with the old image retained for rollback; build
+date alone is not proof that a particular binary contains the source fix.
+Runtime validation and the updated image hash belong in the engineering journal.
+
 Working agreement #1 says never invent paths, flags, prop keys, or config
 names. This file is the ledger: every upstream value our code depends on,
 with where it was verified. Anything tagged **UNVERIFIED** must be confirmed

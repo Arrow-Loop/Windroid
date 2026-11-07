@@ -65,6 +65,10 @@ jobs:
         shell: pwsh
         run: installer/tests/test-artifacts.ps1
 
+      - name: CLI installation paths and failures
+        shell: pwsh
+        run: installer/tests/test-cli-install.ps1
+
       - name: Workflow YAML validity
         run: |
           python3 -c "import yaml,glob; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"

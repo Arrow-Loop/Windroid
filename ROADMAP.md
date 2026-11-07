@@ -46,3 +46,9 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [ ] Diagnose AppData kernel load access, warm-start timeout/WSAETIMEDOUT, SystemUI crash and Settings rendering; repeat network tests.
 - [ ] Validate clean GApps install, graphics and app compatibility; previous roadmap runtime tasks remain open.
 
+
+## Follow-up checkpoint — 2026-11-06
+- [x] Capture graphics compositor crashes and compare Android/Windows frames; reject and revert unsuccessful global HiDPI experiment.
+- [x] Validate VANILLA uninstall and CLI APK path/error handling in PowerShell 7/5.1.
+- [ ] Complete local-only GApps image retry and verify packages/rendering; seamless graphics remains unresolved.
+

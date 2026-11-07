@@ -36,3 +36,9 @@
 - Six fixture tests pass in WSL with real flock, including concurrent initialization and duplicate/spaced INI properties. Applicable Git Bash tests, PowerShell artifact tests (7/5.1), parse and shell syntax checks pass.
 - Clean session start after WSL shutdown: 80s. Android routing and DNS pings pass. Settings WSLg window observed at splash; complete usability/window movement still pending.
 - Warm restart exceeded readiness timeout and one WSL command returned WSAETIMEDOUT; WSL shutdown recovered it. First boot SystemUI NPE observed; root cause unproven. These remain open, along with GApps and Nintendo.
+
+## 2026-11-06 — graphics isolation and CLI installation checks
+- Captured composer Binder-pool abort matching Waydroid upstream commit 4aee4c8. Verified official vendor20261022 ZIP and tested vendor-only replacement with rollback retained during the experiment. The first updated run did not reproduce that abort; Windows still showed Settings splash while Android screencap showed full Settings UI.
+- Weston logs showed 200% scaling and mismatched surface/buffer dimensions. Tested documented WESTON_RDP_HI_DPI_SCALING=false with backup/rollback; it did not yield a usable Windows app and SurfaceFlinger crashed in that run. Reverted override. No graphics fix is claimed.
+- Saved baseline logs/state externally and successfully tested source uninstallation after checking exact removal targets. Started clean GApps installation in public lab runtime directory; GApps image selection was correct. Native download was slow, so downloaded the same official image via direct mirror, verified its OTA hash, and began local-only image preseeding for retry. GApps runtime validation is pending.
+- CLI APK install now passes filenames as native arguments and rejects path-conversion, session-start and install failures. Mocked regression tests pass in PowerShell 7 and 5.1, including spaces/apostrophes and explicit selected distro.

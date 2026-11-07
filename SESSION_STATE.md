@@ -59,20 +59,32 @@ while active; preserve evidence and upstream compatibility.
   SIGSEGV/SEGV_ACCERR libpairipcore.so PC 0x794cb. No account sign-ins or bypasses.
 - No quota polling/automatic reset/credit fallback configured; no parallel agent.
 
-## Uncommitted work
-Structured firstboot property normalization, six-test regression suite, installer
--SkipWslUpdate switch (still enforces minimum version), README and this checkpoint.
-Commit coherent changes with actual results before a substantial session ends.
+## Environment experiment in progress
+Firstboot normalization and -SkipWslUpdate committed as 80a6332.
+Observed composer Binder pool abort matches upstream 4aee4c8 (2026-10-18).
+Downloaded official MAINLINE vendor 20261022; ZIP SHA256 verified
+91663c337013145208b6c533d7e1fa2a915a9864ddc8fc56966f40cd759648ac.
+Old vendor image backed up at /var/lib/windroid/vendor-before-20261022.img.
+Current vendor.img SHA256 c49c75c0e703bac7f1495e6db0e9232390a6539b3d732999dd601c63cb01bdd3.
+Composer abort not reproduced in first updated-image run, but Windows Settings
+still displays splash. Android screenshot android-settings.png shows full UI.
+WSLg weston logs show 200% scale and surface/buffer dimensions differing by 2.
+Testing documented WESTON_RDP_HI_DPI_SCALING=false in global .wslgconfig,
+with backup evidence/2026-11-06-runtime/wslgconfig-before-dpi.txt. Added this key
+to install state wslgconfigChanges so uninstall can remove it. WSL shutdown
+completed; startup for this DPI test is currently running. No Windows reboot.
 
 ## Exact next action
-Inspect Settings window again (Computer Use sky target returned msrdc.exe window
-1836442, title Settings (Windroid); rediscover fresh handles after resets).
-Capture Android runtime/crash logs and confirm app reaches usable settings UI.
-Save validation and commit the firstboot normalization + skip-update changes.
-Continue warm start/stop reliability and graphics/network checks. Then stop the
-single Waydroid stack and validate GApps via clean reinstall, preserving baseline
-logs and fixing install metadata/kernel access path deliberately. Never run two
-Waydroid stacks concurrently. Do not claim the Nintendo crash fixed without logs.
+Wait for/inspect DPI-test startup (tool session 8485 may not survive app reset;
+inspect actual processes/log instead of launching duplicate session start).
+Then inspect Settings (Windroid) msrdc window with fresh sky handles and compare
+with Android screenshot. Inspect /mnt/wslg/weston.log for scale and dimensions.
+If rendered Windows Settings now works, document optional HiDPI workaround and
+validate move/resize; do not silently change all WSL users' scaling by default.
+Record vendor/source fix findings in journal and commit coherent documentation.
+Continue reliable startup and GApps validation. GApps requires clean reinstall,
+not installer flavour change on completed VANILLA state. Preserve runtime logs,
+original artifacts, kernel access probe and image rollback first.
 
 ## Evidence / resume
 Lab evidence/2026-11-06-runtime contains installation transcripts, kernel access
@@ -80,3 +92,19 @@ probe/config backup, cold-guest-baseline.txt, cold-session-start.txt,
 cold-running-status.txt, android-ip-connectivity.txt, android-dns-connectivity.txt.
 Read AGENTS.md, this file, ROADMAP.md, CHANGELOG.md, docs/CONTINUATION.md and Git
 status/diff on resume. Reopen this chat and say Resume Windroid.
+## Latest checkpoint — clean GApps test started
+The DPI-disabled test failed: no usable Windows window and a SurfaceFlinger
+crash was captured (dpi-test-crash-full.txt). Reverted .wslgconfig to its backup.
+Preserved logs and state, then successfully ran the source uninstaller after
+verifying its absolute test install/removal targets. Old AppData installation
+and distro are removed. Its in-distro vendor rollback copy was removed with it;
+original release artifacts and all externally saved evidence remain intact.
+
+A fresh -Gapps -SkipWslUpdate -Bench installation is CURRENTLY RUNNING with
+InstallRoot C:\Users\Public\Documents\Cody-Windroid-Lab\runtime\Windroid,
+DistroName Windroid, and the original verified local release artifacts.
+Transcript: evidence/2026-11-06-runtime/gapps-install.txt.
+Exact next action: monitor this one install (tool session33426 if still active),
+inspect logs/stamps/config to prove GAPPS selection, then verify Play service
+packages and repeat rendering/networking tests without account sign-ins.
+Do not reuse deleted AppData state or start a competing Waydroid stack.

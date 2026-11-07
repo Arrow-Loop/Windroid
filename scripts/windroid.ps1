@@ -19,6 +19,7 @@ function Invoke-Guest([string]$cmd, [string]$user = "windroid") {
     # The `bash -c` form is deliberate — prior art found direct-exec less
     # reliable for detached processes (docs/UPSTREAM-FACTS.md §6).
     wsl -d $DistroName -u $user -e bash -lc $cmd
+    if ($LASTEXITCODE -ne 0) { throw "Guest command failed (exit $LASTEXITCODE): $cmd" }
 }
 
 switch ($Command) {
@@ -28,10 +29,15 @@ switch ($Command) {
     "shell"  { wsl -d $DistroName -u root -e waydroid shell }
     "install" {
         if (-not $Arg) { Write-Error "usage: windroid install <path-to.apk>"; exit 2 }
-        if (-not (Test-Path $Arg)) { Write-Error "not found: $Arg"; exit 2 }
-        $winPath = (Resolve-Path $Arg).Path
-        $wslPath = (wsl -d $DistroName -e wslpath -a "$winPath").Trim()
-        Invoke-Guest "windroid-session ensure && waydroid app install '$wslPath'"
+        if (-not (Test-Path -LiteralPath $Arg -PathType Leaf)) { Write-Error "not found: $Arg"; exit 2 }
+        $winPath = (Resolve-Path -LiteralPath $Arg).Path
+        $wslPath = ((wsl -d $DistroName -e wslpath -a $winPath) -join '' -replace "`0", '').Trim()
+        if ($LASTEXITCODE -ne 0 -or -not $wslPath) { throw 'Could not convert the APK path for WSL.' }
+        Invoke-Guest 'windroid-session ensure'
+        # Pass the filename as one native argument. Embedding it in bash
+        # source breaks on ordinary apostrophes in filenames/directories.
+        wsl -d $DistroName -u windroid -e waydroid app install $wslPath
+        if ($LASTEXITCODE -ne 0) { throw "APK installation failed (exit $LASTEXITCODE)." }
         Write-Host "Installed. The app appears in Start Menu > Windroid shortly (desktop sync)."
     }
     "adb" {
