@@ -10,6 +10,9 @@ must not be repeated just because an earlier journal entry was pending.
 - [ ] Validate live tray actions after committed974d6c5 (PS7/5.1 checks pass); staged with
   backup in lab runtime; live file-picker/notification-area behavior remains open.
 - [ ] Isolate seamless WSLg presentation and framework/compositor instability.
+  Latest nested stall has HWC window creation waiting on a Wayland roundtrip;
+  standalone shared-queue probe hangs2/3 while private-queue control passes3/3.
+  Validate an Android composer queue-ownership correction before claiming a fix.
   GL/Pixman nested controls can navigate; neither partial nor boot-wide HWUI
   Vulkan proved a fix. All temporary renderer/size/protocol overrides removed.
 - [ ] Resolve WSL fragmented-memory VMBus/new-session failures with a specific
@@ -25,7 +28,9 @@ must not be repeated just because an earlier journal entry was pending.
 - [ ] Compile/exercise wizard page when compiler installation is permitted;
   prior installation was rejected by automatic approval review. Core Sysnative
   detection is already verified in a real32bit process.
-- [ ] Diagnose AppData kernel lookup; public lab kernel/modules path works.
+- [ ] Preserve historical AppData lookup failure evidence; fresh byte-identical
+  AppData kernel/modules control booted successfully on Nov7. Error not reproduced;
+  original cause remains unknown. Lab configuration uses the working public path.
 - [ ] Confirm owner recovery-image availability before destructive recovery.
 - [ ] Prepare narrowly scoped validated upstream contributions and test matrix;
   no push/PR performed yet. Broader hardware/coexistence coverage remains open.

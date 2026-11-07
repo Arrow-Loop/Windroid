@@ -1,5 +1,24 @@
 # Windroid lab changelog
 
+## 2026-11-07 — composer queue investigation
+- Captured a control-app/SF/composer blocked-call chain during native window
+  creation, distinct from idle blanking. Fresh protocol clients remain responsive;
+  mounted socket identity and composer/Weston peer connection were verified.
+- Added standalone queue-ownership diagnostic. Linux shared default-queue mode
+  timed out in2/3 trials; private roundtrip queue passed200 requests in3/3.
+  This supports a specific Android composer hypothesis, not a validated fix.
+- Installed only wayland-utils1.2.0 for read-only protocol controls; no other
+  packages upgraded. Public-path recovery CLI and Android IP/DNS checks passed;
+  visual launch failed despite readiness, as documented in the graphics report.
+
+## 2026-11-07 — AppData kernel lookup control
+- A fresh copy of the working kernel/modules under LocalAppData/Windroid/kernel
+  booted with exit0 and reported the expected custom kernel after WSL shutdown.
+  Hashes match the public-path files. The historical lookup error is not
+  reproduced; original files/ACLs are no longer available for comparison.
+- Restored the byte-identical public-path .wslconfig backup. Memory/reclaim
+  settings, distro data and source defaults are unchanged. No causal fix claimed.
+
 ## 2026-11-07 — nested idle screen
 - Disable the default five-minute idle timeout only on Windroid's embedded
   nested Weston display. It had hidden a still-drawing Android control behind

@@ -66,8 +66,8 @@ API fallback or second agent against this worktree.
   bdbfba689dd18116b40cb1c6f49361eb678102e91093113dbcf15055bf9c687b.
 - .wslconfig remains memory=3GB, autoMemoryReclaim=gradual. Host available RAM
   was743MiB/7778 at09:27; do not raise the cap blindly.
-- Old root PTY11413 ended at WSL shutdown. Current retained root PTY40201 is
-  alive with HISTFILE=/dev/null; verify session IDs after resets. Reuse it to
+- Old root PTYs11413/40201 ended at WSL shutdown. Retained rootPTY1497 is alive
+  with HISTFILE=/dev/null; verify session IDs after resets. Reuse it to
   avoid additional VMBus allocations. No listener/monitoring service installed.
 - Nintendo currently installed ABI is x86 and target remains force-stopped.
 
@@ -89,41 +89,53 @@ API fallback or second agent against this worktree.
   plus393ms targeted PM query. No root permission/probe change was justified.
 - Microsoft documents dropCache as another reclaim mode; it has NOT been applied.
 
-## Exact next action: resume control and test native resize
-Own org.windroid.lab.control APK built/signed successfully and is installed.
-Original Windows request session1753262248 remains pending; direct guest
-session1157688239 succeeded 2.4 seconds after return. Root diagnostic PM session
-1485978451 also succeeded. The initial immediate PM query caught an async gap;
-do not repeat earlier claims that direct guest installation failed.
-CLI/tray wording now truthfully says Installation requested; tests pass.
-Control launched and Android frames advanced, but native view went black.
-Fresh Windows target binding/activation revealed Weston's own idle-lock overlay.
-No Windows lock/authentication dialog was automated. Ubuntu's official Weston
-manual confirms default300sec blank/lock and --idle-time=0 disables that timer.
-Source now adds this flag only to the Windroid-owned nested compositor, with a
-regression in delayed-socket startup. No Windows security/config changes.
-Linux13 tests19.707s and GitBash13/3skips49.007s pass; syntax/ShellCheck0.
-Helper deployed with backup; normal stop/start/control exit0 at10:31:22.
-SystemUI ANR appeared, captured target trace; Wait then close-app recovery.
-Control received native taps and Space; paused frame987 visibly confirmed.
-Last UI input10:36:03.476; no-input observation10:41:35 showed identical paused
-frame987, no idle overlay/black screen (>331seconds). Idle control PASS.
-NEXT: resume with Space, confirm frames advance; test normal native window
-resize using the own control, observe dimensions and composer/framework PIDs.
-Do not force Android sizes/DPI or repeat prior renderer experiments.
-Install wording fix committed8d09062; PS7/5.1 CLI/tray checks and parse/BOM pass.
-Optional control source committed0e43a6e; verified build/sign and native input.
-Current rootPTY40201; no live background jobs at last check; compositor15347.
-Own APK SHA25606bce86e5d93514ccd923cb809beebb838302c24b127ecc4f67461db407ddfd5;
-SDK/R8/devkey cached under lab tools/android-control, never commit those artifacts.
+## Exact next action: investigate composer private roundtrip queue build
+Idle fix committedbd8d2b6; Linux/GitBash checks and native >331sec paused visibility
+passed. Truthful async installation messages8d09062 and own Android control
+0e43a6e committed. Native mouse and Space controls observed. Animation resumed
+10:42:33 after input detection/refresh. Border drag did not verify resize;
+no resize failure/pass claim. SystemUI ANR recovered separately, unresolved.
+Previous control/SF/SystemUI PIDs1774/104/2966, nestedWeston15347 ended at shutdown.
+Original installer AppData kernel files no longer exist, so original ACLs can't
+be reconstructed. New byte-identical working kernel/modules copies now exist
+at %LOCALAPPDATA%\Windroid\kernel for one fresh lookup control. No files replaced.
+Evidence integration-2026-11-07/kernel-path-control has hashes and public config
+backup wslconfig.before.txt. AppData boot/uname returned0 with expected kernel;
+the historical lookup error is not reproduced. Public config restored byte-for-
+byte, shutdown0/publicboot0. Installed WindowsCLI start completed0 at10:48:48,
+Androidready10:48:41. Result collected14:28 after a long gap, not continuous proof.
+New retained rootPTY1497 (HISTFILE=/dev/null). IP/DNS2/2 each pass14:29.
+Normal own control launch returned0/Activitycreated14:29:37, but no draw callbacks
+and Windows shows Weston desktop. Android screencap timed out/zero bytes.
+Target backtraces0: control3366 main waits RenderProxy::setStopped; RenderThread
+waits SurfaceComposer getDynamicDisplayInfo. SF117 main waits HIDLpresent;
+HWC84 main waits wl_display_roundtrip_queue in window::create. HWCwaylandthread135
+polls; thread138 waits adapter recursive mutex during getColorModes. This is a
+specific blocked creation/presentation chain, not the old idle overlay.
+Weston323 epoll; fresh wayland-info on parent/nested/Androidmounted socket all0.
+Only wayland-utils installed (one new package, no upgrades); gdb NOT installed
+because its plan upgraded unrelated Python packages. Host/container socket
+inode/dev match; namespace-aware ss confirms HWC500 stream peers with Weston323.
+Second composer trace14:35:38 retains same window-create roundtrip wait.
+Standalone diagnostics/wayland-roundtrip/probe.py: shared default queue stalls2/3,
+private sync queue passes200 in3/3 on hostlibwayland1.22. This supports a queue
+ownership hypothesis, not Android fix proof. Probe jobs finished; current stall
+preserved. No renderer/DPI/size override; source idle fix remains deployed.
+NEXT: review upstream HWC build dependencies and design a private per-roundtrip
+queue correction with error handling. Determine a reproducible Android build
+before any vendor replacement; validate on actual control, then lifecycle/input.
+Do not blindly retry renderers, relaunch Nintendo or claim Linux probe as Android
+runtime proof. Exact sources/results in lab kernel-path-control evidence.
+Do not unregister distros or reset app/account data. Source defaults unchanged.
+Own pending install sessions absent after restart; historical cause unresolved.
+SDK/R8/devkey cached lab tools/android-control; never commit binary/key artifacts.
 ## Blockers, evidence and uncommitted work
 - Unresolved: seamless graphics/framework crashes, WSL fragmented-memory new
-  channels, AppData kernel lookup (public path works), Nintendo cause.
+  channels, Nintendo cause. Historical AppData lookup failure not reproduced.
 - Inno compiler download/install was rejected by automatic approval review as
   'blocked by policy'. Do not retry via another launcher. Core WOW64 detection
   is verified; compiled wizard UI remains untested. No approval is pending.
-- Nested idle flag/regression and docs are ready for coherent commit; optional
-  control and install wording already committed. Check actual Git state.
+- Source changes committed throughbd8d2b6; pending kernel-control/checkpoint docs.
 - Reports: docs/NINTENDO-3.6.0.md, GRAPHICS-INVESTIGATION.md and
   WSL-SESSION-RELIABILITY.md. Raw evidence: lab evidence/integration-2026-11-07,
   graphics-protocol-2026-11-06, 2026-11-06-runtime and nintendo-3.6.0.

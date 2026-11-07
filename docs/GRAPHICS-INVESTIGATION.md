@@ -250,3 +250,37 @@ recovery restarted System UI and recreated the control Activity, after which
 the input observations above succeeded. System UI PID2966 was later sleeping
 at0%CPU, control PID1774 and SurfaceFlinger104 remained present, and the bounded
 VMBus error count was0. This is recovery evidence, not a framework fix.
+
+## Stalled control after public-path recovery
+
+The public-path recovery start completed0 at10:48:48, with Android ready10:48:41.
+Results were collected14:28 after a long observation gap; this is not continuous
+uptime proof. IP/DNS pings again passed2/2 each. Normal control launch created
+its Activity at14:29:37 and returned0, but no draw callbacks followed. Windows
+showed only the nested desktop, and bounded Android screencap produced zero
+bytes. This is a rendering failure despite the session's framework probe.
+
+Bounded target backtraces completed0. Control3366 main waits in
+`RenderProxy::setStopped`; its RenderThread waits for
+`SurfaceComposer::getDynamicDisplayInfo`. SurfaceFlinger117 main waits for HIDL
+present, while another Binder thread waits for composer color modes. Composer84
+main waits in `wl_display_roundtrip_queue` inside `window::create`; thread138
+waits on the adapter recursive mutex during `getColorModes`. Its Wayland thread
+is polling and EGL worker awaits work. Weston323's kernel stack is in epoll.
+This establishes a sampled blocked creation/presentation chain, not its cause.
+It differs from the previously sampled idle compositor and the fixed idle screen.
+Raw traces stay local under `integration-2026-11-07/kernel-path-control`.
+
+A second composer trace over four minutes later retained the same window-create
+roundtrip wait. New `wayland-info` clients returned0 against WSLg, nested Weston
+and the exact Android-mounted socket. Socket inode/dev matched the host path,
+and namespace-aware socket inspection confirmed composer500's stream peers with
+Weston323. This rules out a stale mounted socket in this observation. Only
+wayland-utils1.2.0 was installed, with no other package upgrades.
+
+The first-party [queue probe](../diagnostics/wayland-roundtrip/README.md) then
+reproduced a shared-default-queue hang in2/3 trials; giving roundtrips a private
+queue passed200 requests in3/3. Host libwayland1.22 differs from the Android
+binary's linked library, so this is supporting mechanism evidence only. The
+next implementation investigation is composer queue ownership, with full
+Android runtime validation required before replacing or shipping a binary.
