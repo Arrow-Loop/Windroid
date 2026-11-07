@@ -40,3 +40,19 @@ calls default-queue roundtrips during window creation alongside a default-queue
 dispatch thread. The probe supports investigating that pattern. It does not
 prove the installed Android library has the same race or validate a composer
 patch. No vendor binary, app protection, renderer or security setting changed.
+
+## Android validation still required
+
+Build guidance was reviewed against upstream HWC commit
+`a575cfcc12ab79a122844218f2c6df5bd208cca0`. Its Android.bp links a static Wayland
+client and platform/HIDL/generated Waydroid interfaces, so a normal Android SDK
+app build cannot produce a replacement composer. The SDK used for the Canvas
+control is not that platform build environment.
+
+The lab has about81.3GB free disk and8GB physical RAM, with a3GB WSL cap.
+The [current AOSP requirements](https://source.android.com/docs/setup/start/requirements)
+describe400GB free disk and64GB RAM for a full current tree; those are not
+measured minimum requirements for this older individual HAL. No full source sync
+was started. Investigate a smaller native Android Wayland probe/matching-library
+build before considering an entire platform build. No external build host,
+remote CI workload or paid capacity has been requested or configured.

@@ -121,9 +121,14 @@ Standalone diagnostics/wayland-roundtrip/probe.py: shared default queue stalls2/
 private sync queue passes200 in3/3 on hostlibwayland1.22. This supports a queue
 ownership hypothesis, not Android fix proof. Probe jobs finished; current stall
 preserved. No renderer/DPI/size override; source idle fix remains deployed.
-NEXT: review upstream HWC build dependencies and design a private per-roundtrip
-queue correction with error handling. Determine a reproducible Android build
-before any vendor replacement; validate on actual control, then lifecycle/input.
+HWC Android.bp reviewed at upstreampin a575cfcc12ab79a122844218f2c6df5bd208cca0:
+static Wayland, platform/HIDL/generated interfaces; SDK-only build insufficient.
+Host81.3GB free/8GBRAM versus current full-AOSP guidance400GB/64GB (not a measured
+older HAL minimum). No full tree sync, external host or remoteCI initiated.
+NEXT: identify the Waydroid manifest's exact Android Wayland library revision;
+assess a small matching native Android queue probe build before full HAL build.
+Then design/review a per-roundtrip private queue correction and error handling,
+with actual Android validation required before vendor replacement/shipping.
 Do not blindly retry renderers, relaunch Nintendo or claim Linux probe as Android
 runtime proof. Exact sources/results in lab kernel-path-control evidence.
 Do not unregister distros or reset app/account data. Source defaults unchanged.
