@@ -56,11 +56,27 @@ start() {
     if [[ "${NESTED_WESTON:-false}" == "true" ]]; then
         # Prior-art fallback: nest a Weston so Waydroid never talks to
         # WSLg's RDP compositor directly (stuck 1x1 buffer bug).
+        local weston_pid=''
+        local weston_socket="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wayland-1"
         if ! pgrep -f 'weston --backend=wayland-backend' >/dev/null; then
             WAYLAND_DISPLAY=wayland-0 setsid nohup weston \
-                --backend=wayland-backend.so --width=1280 --height=800 \
+                --backend=wayland-backend.so --socket=wayland-1 --width=1280 --height=800 \
                 > "$WESTON_LOG" 2>&1 < /dev/null 9>&- &
-            sleep 2
+            weston_pid=$!
+        fi
+        for _ in $(seq "$READY_TIMEOUT"); do
+            [[ -S "$weston_socket" ]] && break
+            if [[ -n "$weston_pid" ]] && ! kill -0 "$weston_pid" 2>/dev/null; then
+                echo "ERROR: nested Weston exited before creating $weston_socket" >&2
+                tail -n 20 "$WESTON_LOG" >&2
+                return 1
+            fi
+            sleep 1
+        done
+        if [[ ! -S "$weston_socket" ]]; then
+            echo "ERROR: nested Weston socket not ready after ${READY_TIMEOUT}s" >&2
+            tail -n 20 "$WESTON_LOG" >&2
+            return 1
         fi
         export WAYLAND_DISPLAY=wayland-1
     fi

@@ -29,6 +29,8 @@ class SessionTests(unittest.TestCase):
         (self.root / 'status').write_text('Session: STOPPED\nContainer: STOPPED\n')
         self.stub('sudo', '[[ "${1:-}" == -n ]] && shift\nexec "$@"')
         self.stub('prep', 'exit 0')
+        self.stub('pgrep', 'exit 1')
+        self.stub('pkill', 'exit 1')
         self.stub('waydroid', '''case "$*" in
 status) cat "$TEST_STATE" ;;
 "session start")
@@ -70,6 +72,22 @@ esac''')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('could not stop', result.stderr)
 
+    @unittest.skipIf(os.name == 'nt', 'Linux Wayland socket fixture required')
+    def test_nested_start_waits_for_delayed_socket(self):
+        self.conf.write_text('NESTED_WESTON=true\nSESSION_READY_TIMEOUT=6\n')
+        runtime = self.root / 'runtime'
+        runtime.mkdir()
+        self.env['XDG_RUNTIME_DIR'] = self.posix + '/runtime'
+        self.env['TEST_COMPOSITOR'] = self.posix + '/compositor.py'
+        (self.root / 'compositor.py').write_text(
+            'import os,socket,time\ntime.sleep(2.5)\n'
+            's=socket.socket(socket.AF_UNIX)\n'
+            's.bind(os.environ["XDG_RUNTIME_DIR"]+"/wayland-1")\ntime.sleep(8)\n')
+        self.stub('weston', 'exec "$TEST_PYTHON" "$TEST_COMPOSITOR"')
+        result = self.run_session('start')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.root / 'starts').exists())
+
     @unittest.skipIf(os.name == 'nt', 'real Linux flock required')
     def test_concurrent_starts_only_spawn_one_daemon(self):
         from concurrent.futures import ThreadPoolExecutor
@@ -78,6 +96,15 @@ esac''')
         for result in results:
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual((self.root / 'starts').read_text().splitlines(), ['start'])
+
+    def test_nested_compositor_exit_does_not_launch_session(self):
+        self.conf.write_text('NESTED_WESTON=true\nSESSION_READY_TIMEOUT=3\n')
+        self.stub('weston', 'echo "compositor failed"\nexit 23')
+        result = self.run_session('start')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('nested Weston exited', result.stderr)
+        self.assertIn('compositor failed', result.stderr)
+        self.assertFalse((self.root / 'starts').exists())
 
 
 if __name__ == '__main__':
