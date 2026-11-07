@@ -11,10 +11,24 @@ CONF=/etc/windroid/windroid.conf
 LOG_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/windroid"
 SESSION_LOG="$LOG_DIR/session.log"
 WESTON_LOG="$LOG_DIR/nested-weston.log"
-READY_TIMEOUT=90
 # shellcheck source=/dev/null
 source "$CONF"
+READY_TIMEOUT="${SESSION_READY_TIMEOUT:-180}"
+if [[ ! "$READY_TIMEOUT" =~ ^[1-9][0-9]*$ ]] || (( READY_TIMEOUT > 600 )); then
+    echo 'SESSION_READY_TIMEOUT must be an integer from 1 to 600 seconds' >&2
+    exit 2
+fi
 mkdir -p "$LOG_DIR"
+
+# Serialize lifecycle requests from simultaneous Start Menu/CLI/tray launches.
+# Detached children below must close this descriptor rather than holding the
+# lifecycle lock for the entire Android session.
+case "${1:-}" in
+    start|ensure|stop)
+        exec 9>"$LOG_DIR/session.lock"
+        flock -x -w "$READY_TIMEOUT" 9 || { echo 'Timed out waiting for another session operation' >&2; exit 1; }
+        ;;
+esac
 
 ensure_host_plumbing() {
     # All root-side work (shared_memory tmpfs, net modules, container
@@ -23,11 +37,20 @@ ensure_host_plumbing() {
 }
 
 session_running() {
-    waydroid status 2>/dev/null | grep -q 'Session:[[:space:]]*RUNNING'
+    local status
+    status="$(waydroid status 2>/dev/null)" || return 1
+    grep -q 'Session:[[:space:]]*RUNNING' <<< "$status" &&
+        grep -q 'Container:[[:space:]]*RUNNING' <<< "$status"
 }
 
 start() {
-    if session_running; then echo "session already RUNNING"; return 0; fi
+    if session_running; then
+        if grep -q 'is ready' "$SESSION_LOG" 2>/dev/null; then
+            echo "session already RUNNING"
+            return 0
+        fi
+        echo 'session is running; waiting for Android readiness'
+    else
     ensure_host_plumbing
 
     if [[ "${NESTED_WESTON:-false}" == "true" ]]; then
@@ -36,7 +59,7 @@ start() {
         if ! pgrep -f 'weston --backend=wayland-backend' >/dev/null; then
             WAYLAND_DISPLAY=wayland-0 setsid nohup weston \
                 --backend=wayland-backend.so --width=1280 --height=800 \
-                > "$WESTON_LOG" 2>&1 < /dev/null &
+                > "$WESTON_LOG" 2>&1 < /dev/null 9>&- &
             sleep 2
         fi
         export WAYLAND_DISPLAY=wayland-1
@@ -44,7 +67,8 @@ start() {
 
     : > "$SESSION_LOG"
     PYTHONUNBUFFERED=1 setsid nohup waydroid session start \
-        > "$SESSION_LOG" 2>&1 < /dev/null &
+        > "$SESSION_LOG" 2>&1 < /dev/null 9>&- &
+    fi
 
     for _ in $(seq "$READY_TIMEOUT"); do
         if grep -q 'is ready' "$SESSION_LOG"; then
@@ -95,13 +119,16 @@ start() {
 stop() {
     waydroid session stop 2>/dev/null || true
     pkill -f 'weston --backend=wayland-backend' 2>/dev/null || true
-    sudo -n /usr/local/sbin/windroid-prep down 2>/dev/null || true
+    if ! sudo -n /usr/local/sbin/windroid-prep down; then
+        echo 'ERROR: could not stop the Android container' >&2
+        return 1
+    fi
     echo "stopped"
 }
 
 case "${1:-}" in
     start)  start ;;
-    ensure) session_running || start ;;
+    ensure) start ;;
     stop)   stop ;;
     status) waydroid status ;;
     *) echo "usage: windroid-session start|stop|status|ensure" >&2; exit 2 ;;

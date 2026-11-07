@@ -52,3 +52,11 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [x] Validate VANILLA uninstall and CLI APK path/error handling in PowerShell 7/5.1.
 - [ ] Complete local-only GApps image retry and verify packages/rendering; seamless graphics remains unresolved.
 
+
+## Lifecycle and GApps checkpoint — 2026-11-06
+- [x] Add and test lifecycle serialization, readiness waiting and stop-error propagation.
+- [x] Verify GApps selection/success stamp after local verified-image retry; manual startup reaches ready.
+- [x] Capture VMBus allocation failure / WSL vsock timeout mechanism.
+- [ ] Complete GApps smoke/integration and permanent graphics/memory fixes.
+- [ ] Await supplied APKMirror path/user Store download, verify artifact, reproduce scoped Nintendo crash. Preserve account data after manual sign-in.
+

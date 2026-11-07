@@ -19,6 +19,18 @@ The lab is testing this image with the old image retained for rollback; build
 date alone is not proof that a particular binary contains the source fix.
 Runtime validation and the updated image hash belong in the engineering journal.
 
+### WSL communication failures under memory fragmentation
+
+The lab also captured order-7 page-allocation failures in `vmbus_alloc_ring`
+and `hvs_probe`, followed by `UtilAcceptVsock: accept4 failed 110` and failed
+new WSL sessions. Evidence: lab `vsock-memory-diagnostics.txt`. This matches
+the mechanism reported in [Microsoft WSL issue #40795](https://github.com/microsoft/WSL/issues/40795).
+Free-memory totals alone did not exclude this failure. A WSL restart recovered
+communication. One-shot compaction could not run through an already failing
+channel; after recovery the lab set the runtime compaction-proactiveness value
+from 20 to 80 for an experiment. This is not persisted or a validated production
+fix, and no kernel patch from that issue has been applied.
+
 Working agreement #1 says never invent paths, flags, prop keys, or config
 names. This file is the ledger: every upstream value our code depends on,
 with where it was verified. Anything tagged **UNVERIFIED** must be confirmed

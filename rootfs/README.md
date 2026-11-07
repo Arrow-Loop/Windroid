@@ -28,6 +28,15 @@ downloading the GApps image on the user's machine.
 
 ## Guest layout (files/)
 
+Session lifecycle calls are serialized with a per-user flock. `ensure` checks
+both session/container state and the Android readiness log; it waits for an
+existing startup instead of spawning another session. `SESSION_READY_TIMEOUT`
+in windroid.conf controls the wait (1..600 seconds, default 180). The larger
+default accommodates measured 80–91 second starts on the 8 GB lab machine; it
+does not establish that timeout was the cause of later GApps startup failures.
+Container-stop failures propagate to the caller. Isolated checks live in
+`rootfs/test-session.py`; real application/session recovery still needs testing.
+
 | Path | Role |
 |---|---|
 | `etc/wsl.conf` | systemd on + `/mnt/shared_memory` tmpfs before WSLg (black-window fix) |

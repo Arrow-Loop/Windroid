@@ -30,6 +30,7 @@ jobs:
         run: |
           python3 -m py_compile rootfs/preseed-images.py
           python3 rootfs/test-firstboot.py
+          python3 rootfs/test-session.py
           python3 -c "import json; json.load(open('manifest/versions.json')); json.load(open('manifest/versions.schema.json'))"
 
       - name: PowerShell parse
