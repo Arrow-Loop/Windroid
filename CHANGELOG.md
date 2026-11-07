@@ -1,5 +1,19 @@
 # Windroid lab changelog
 
+## 2026-11-07 — scoped queue experiment and seamless control
+- Narrowed the diagnostic interposer to exported window creation callers;
+  initialization/other calls use the original function. Strict compilation and
+  real service branch logs confirm both paths; nested control renders.
+- The earlier broad prototype rendered the direct WSLg control after System UI
+  recovery; mouse/Space passed. Maximize produced an updating3000x1810 view but
+  left the old927x1553 view over it in Windows. Android showed only the new view.
+  Header movement remained inconclusive; complete seamless reliability not claimed.
+- Removed the broad experiment after hash checks, restored lab config files
+  byte-for-byte and runtime multi-window=false. Scoped experiment remains local;
+  no installer/product default or vendor image replacement.
+- System UI is already compiled speed/prebuilt; no speculative recompilation.
+  Its startup ANR persists independently of the sampled queue stall.
+
 ## 2026-11-07 — initial real composer queue-shim trial
 - Activated the diagnostic only in Waydroid's overriding composer service,
   through removable lab overlays. Its loaded mapping and actual roundtrip

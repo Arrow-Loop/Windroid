@@ -14,6 +14,9 @@ must not be repeated just because an earlier journal entry was pending.
   standalone shared-queue probe hangs2/3 while private-queue control passes3/3.
   Native installed-library stress now hangs3/3 shared and passes3/3 private;
   experimental isolated interposer passes3/3. Real composer validation next.
+  Scoped lab interposer preserves startup dispatch and renders nested control.
+  Direct WSLg control rendered/received input after System UI recovery, but
+  maximize retained a stale old-size view in Windows; integration remains open.
   Validate an Android composer queue-ownership correction before claiming a fix.
   GL/Pixman nested controls can navigate; neither partial nor boot-wide HWUI
   Vulkan proved a fix. All temporary renderer/size/protocol overrides removed.

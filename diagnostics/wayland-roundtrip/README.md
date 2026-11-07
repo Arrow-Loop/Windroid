@@ -97,17 +97,31 @@ roundtrip implementation.
 
 ## Experimental per-call queue shim
 
-`queue-shim.c` interposes only `wl_display_roundtrip`. Each call creates its own
-sync queue, invokes the original queue-specific function and destroys that
-queue while preserving errno. It resolves the already-loaded HAL via
+`queue-shim.c` interposes `wl_display_roundtrip` only when its caller is the
+exported `window::create` function in `hwcomposer.waydroid.so`, identified by
+`dladdr` without binary addresses. Other callers retain the original function,
+including initial registry discovery before the dispatch thread exists.
+Window calls create a private sync queue, invoke the original queue-specific
+function and destroy the queue while preserving errno. It resolves the loaded HAL via
 `RTLD_NOLOAD`, because HAL modules can be local to the dynamic loader. It does
 not open a HAL, change a display setting or modify the vendor binary.
 
 `build-shim.sh` builds the optional shared library with the same verified NDK.
 Activation is deliberately absent from the builder and installer. Native
-`preload` stress trials with this library passed20000 requests in3/3, with the
-reported roundtrip origin pointing to the shim. This validates isolated
-interposition; a real composer lifecycle/visual/input test is still required.
+`preload` stress trials with the first broad prototype passed20000 requests in
+3/3, with the reported origin pointing to the shim. That prototype was removed
+after review found it also changed initialization dispatch. Those results do
+not describe the current scoped version. A direct `preload` probe call now
+retains shared-queue behavior; its warm20000-request control reached the original
+branch and exited142, as expected for the reproduction.
+
+The scoped version compiled without warnings and real composer logs confirmed
+original initialization followed by private window creation. Nested Windows
+frames were visible; System UI still ANRed independently. The earlier broad
+prototype also rendered a direct WSLg control and accepted mouse/Space after
+System UI recovery, but maximizing left a stale old-size view over the updating
+maximized view. Android's own screenshot contained only the maximized view.
+These are bounded diagnostics, not a permanent or complete integration fix.
 
 The installed HAL has a `JUMP_SLOT` relocation for `wl_display_roundtrip`, making
 a composer-only loader experiment possible. Any such experiment needs a backup

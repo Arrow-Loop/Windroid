@@ -9,5 +9,5 @@ compiler="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-lin
 [[ -x "$compiler" ]] || { echo 'Android33 x86_64 compiler is unavailable' >&2; exit 2; }
 mkdir -p "$(dirname -- "$output")"
 "$compiler" -std=c11 -O1 -g -Wall -Wextra -Werror -shared -fPIC \
-    -Wl,-soname,libwindroid-queue.so "$source_dir/queue-shim.c" -ldl -pthread -o "$output"
+    -Wl,-soname,libwindroid-queue.so "$source_dir/queue-shim.c" -ldl -llog -pthread -o "$output"
 sha256sum "$output"

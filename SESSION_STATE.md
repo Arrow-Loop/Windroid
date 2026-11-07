@@ -90,60 +90,55 @@ API fallback or second agent against this worktree.
   plus393ms targeted PM query. No root permission/probe change was justified.
 - Microsoft documents dropCache as another reclaim mode; it has NOT been applied.
 
-## Exact next action: bounded seamless queue-shim control
-Native diagnostic/interposer committed59f93f8. Android shared-queue stress20000
-stalled3/3 (alarm142), private queue3/3pass and shim3/3pass. NDK25c verified
-SHA256769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108;
-cachedZIP labtools/android-control, extractedguest /opt/windroid-lab-tools.
-Native compilation strictwarnings, builder syntax/ShellCheck pass. No fullAOSP
-sync or external/paid build. ManifestWayland AOSPandroid13r75 commit
-21f44c8186caa56b3e01a99554f22ab1aa74094d (metadata1.19.0); exactinstalled
-library tested via exports rather than inferred binary/source match.
+## Exact next action: bounded four-vCPU System UI startup control
+Native queue diagnostic committed59f93f8; newer scoped source pending commit.
+NDK25c ZIP SHA256769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108;
+cached labtools/android-control, extracted /opt/windroid-lab-tools/android-ndk-r25c.
+Original native20000-request stress: shared3/3alarm142; private3/3pass; broad
+shim3/3pass. Broad prototype affected registryinit, so it was removed, not shipped.
+Seamless broad trial: ready15:14:02, launch0. InitialwhiteWindowsframe was
+confounded by SystemUIANR. After verified SystemUI495 TERM15:17:32, nativefull
+controlvisible; tap377/883 andSpacepausedframe883 passed. Maximize15:21:06
+recreatedActivity/view3000x1810, but Windows retainedold927x1553pausedview over
+newupdatingview. Androidscreenshotonlynewview. Headerdragmovementinconclusive.
+OldPID84tracequarantined wrong-pid84; actualcomposer85traceused. NoNintendochange.
 
-EXPERIMENT ACTIVE: only composer service uses LD_PRELOAD, through two new
-Waydroid overlay files (source images untouched):
+Fallback restoration complete15:24:35: config/cfg byte-matchbackups in lab
+kernel-path-control; runtime multi=false; broad overlay files hashchecked/removed.
+New SCOPED shim uses privatequeue only for window::create, passes othercalls to
+original; no hard-coded addresses, logsfirstpath. Source compiledstrictwarnings.
+RealHWC84 logged originalinit15:26:35.852 thenprivatewindow15:26:35.857. Ready
+15:28:36/control0 15:28:44; Windowscounter1291visible with separateSystemUIANR.
+Warm own-probe outsideWindow callprintsoriginshim/originalbranch thenalarm142,
+confirmingpass-through; firstboot-timeprobe0bytes is inconclusive, notqueueproof.
+
+EXPERIMENT ACTIVE, composer-only LD_PRELOAD via two owned files:
 - /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
   SHA256762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2
 - /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
-  SHA256bf330edb93f4e1009f9db96d51dfb08fe96dfaeb7f495616a9c8df594721e4b9
-Original activeRC is lab evidence/integration-2026-11-07/kernel-path-control/
-init.waydroid.rc.before-shim. VendorRC does not control this service; initial
-ineffective vendoroverlayRC was hash-checked/removed. No global preload,
-privilege/capability or security changes. Read-only AT_SECURE0/SELinuxDisabled
-reflect existing image, not agent modifications.
-ROLLBACK: normal gueststop; verify both owned file hashes, remove only those two
-files; normalstart; compare activeRC against original backup and confirm no shim
-mapping/environment. Do not delete overlay directories or unrelated contents.
+  SHA256c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578
+Original image files unchanged. ActiveRCbackup init.waydroid.rc.before-shim in
+lab evidence/integration-2026-11-07/kernel-path-control. ROLLBACK normalstop,
+verifythesehashes/removeonly2files, normalstart and compareoriginalRC/no shimmap.
+No globalpreload, privilege/security/renderer/DPI/size change. Source product
+false/true defaults retained; lab nestedtrue/multifalse restored. RootPTY1497
+alive, sourcehelperbdbfba... unchanged; Androidcontrol1673/SF106/SystemUI493.
 
-Actual shim mapping and HWCroundtrip JUMP_SLOT target into shim verified.
-Active normal cycle ready15:04:19/controllaunch0 at15:04:32; native frames visible.
-SystemUI ANR15:03:28 KeyguardService still occurred; close-app recovery recreated
-ownActivity15:06:50. Native tap522,520 at15:07:30; Space animationfalse15:08:16;
-Windows pausedframe726 confirmed. Screencap0/31791bytes. Composer81 main sampled
-waiting for Binder work, not roundtrip. One nested pass, not permanent/seamless
-proof. Androidcontrol1631/SF97/SystemUI2851; hostHWC9767; rootPTY1497 alive.
-All nativeprobe/backgroundtrial jobs finished. Own Androidprobe files are only
-under /data/local/tmp/windroid-lab-queue, retained for reproducibility.
+NEXT: prepare one processors=4 .wslconfig trial with rawbackup/hash, retaining
+memory3GB/reclaimgradual/kernel paths/nestedfallback/scopedshim. Baseline8vCPU
+ready134sec andSystemUIKeyguardANR15:27:48. SystemUIalreadyAOTspeed/prebuilt,
+so don'trecompile. CurrentSwiftShaderprimarysource defaults workerpool to logical
+CPUcount (inference, notexactbinarysourceproof); baselineHWC had8workerthreads.
+Hypothesis: fewerworkers reduce oversubscription/pressure on4physical-core/8GB
+host. Microsoftdocuments processors key. Stopnormally/checkpoint/shutdownWSL,
+which endsPTY1497. StartviarealWindowsCLI, verify nproc4/ready/ANR/UI; restore
+original.wslconfig afterboundedtrialregardlessofresult. No CPUconfigchange yet.
 
-NEXT: back up /etc/windroid/windroid.conf, waydroid.cfg and current runtime
-persist.waydroid.multi_windows=false. waydroid.cfg currently says true while
-Android's persisted runtime value is false; don't confuse the two. Conduct one
-bounded seamless trial with NESTED_WESTON=false/MULTI_WINDOWS=true and runtime
-multi_windows=true using active shim, ordinaryGL and no size/DPI/renderer change.
-Normal stop/start and launch own control. Verify actual socket mapping/native
-frames/input, retain logs. Restore lab nested fallback/config/property afterward
-regardless of outcome; don't claim product defaults fixed from one observation.
-Nintendo remains force-stopped; no account/protected app changes.
-
-## Blockers, evidence and uncommitted work
-- Unresolved: seamless graphics/framework startup ANRs, WSL memory/channel
-  failures, Nintendo crash cause; historical AppData lookup error not reproduced.
-- Inno installation was rejected by automatic approval review as 'blocked by
-  policy'; do not retry via another launcher. Compiled wizardUI still untested.
-- Source diagnostics committed59f93f8. Pending checkpoint and real-shim trial
-  documentation; inspect actual diff before commit. No push/PR performed.
-- Evidence: lab evidence/integration-2026-11-07/kernel-path-control. Earlier
-  baseline/graphics/Nintendo directories and docs retain prior successful work.
-  Binary images/APKs/SDKs/keys/raw traces stay outside Git.
-- Mirror substantive ROADMAP/CHANGELOG updates into lab and maintain journal.
-  No automatic quota-reset continuation/submission loop or paid fallback.
+## Blockers and evidence
+- Unresolved: startupSystemUIANR, stalepresentation/resize, WSLmemorychannels,
+  Nintendo nativecrashes. Queue intervention is diagnostic, not shipped fix.
+- Inno install rejected by automatic approval review ('blocked by policy'); do
+  not retry through another launcher. Compiled wizard UI remains untested.
+- Pending: scopedshim source + docs/checkpoint; inspectdiffbeforecommit.
+- Reports/evidence and journal retain exactcommands/results. Rawbinaries/APKs/
+  SDKs/keys/memorytraces remain outsideGit. No push/PR or quota automation.
