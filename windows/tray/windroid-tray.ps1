@@ -19,7 +19,29 @@ Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 $host.UI.RawUI.WindowTitle = "Windroid Tray"
 
 function Invoke-Guest([string]$cmd, [string]$user = "windroid") {
-    wsl -d $DistroName -u $user -e bash -lc $cmd 2>&1
+    $output = wsl -d $DistroName -u $user -e bash -lc $cmd 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Guest command failed (exit $LASTEXITCODE): $($output -join "`n")"
+    }
+    $output
+}
+function Install-TrayApk([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "APK not found: $Path" }
+    $apk = (Resolve-Path -LiteralPath $Path).Path
+    $wslPath = ((wsl -d $DistroName -e wslpath -a $apk) -join '' -replace "`0", '').Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $wslPath) { throw 'Could not convert the APK path for WSL.' }
+    Invoke-Guest 'windroid-session ensure' | Out-Null
+    # Keep the path out of shell source, including spaces and apostrophes.
+    wsl -d $DistroName -u windroid -e waydroid app install $wslPath | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "APK installation failed (exit $LASTEXITCODE)." }
+}
+function Invoke-TrayAction([scriptblock]$Action, [string]$SuccessText) {
+    try {
+        & $Action | Out-Null
+        if ($SuccessText) { Show-Tip $icon 'Windroid' $SuccessText }
+    } catch {
+        Show-Tip $icon 'Windroid' $_.Exception.Message 'Error'
+    }
 }
 function Show-Tip($icon, $title, $text, $kind = "Info") {
     $icon.BalloonTipTitle = $title
@@ -38,39 +60,37 @@ $icon.Visible = $true
 $menu = New-Object System.Windows.Forms.ContextMenuStrip
 
 $null = $menu.Items.Add("Status", $null, {
-    $s = (Invoke-Guest "waydroid status") -join "`n"
-    if (-not $s) { $s = "Not running (or distro '$DistroName' not registered)" }
-    Show-Tip $icon "Windroid status" $s
+    Invoke-TrayAction {
+        $s = (Invoke-Guest "waydroid status") -join "`n"
+        if (-not $s) { $s = "No status returned for distro '$DistroName'." }
+        Show-Tip $icon "Windroid status" $s
+    }
 })
 $null = $menu.Items.Add("Start session", $null, {
     Show-Tip $icon "Windroid" "Starting session…"
-    $out = Invoke-Guest "windroid-session start"
-    if ($out -match "session ready|already RUNNING") { Show-Tip $icon "Windroid" "Session running." }
-    else { Show-Tip $icon "Windroid" "Start failed — see logs.`n$($out | Select-Object -Last 3)" "Error" }
+    Invoke-TrayAction { Invoke-Guest "windroid-session start" } 'Session running.'
 })
 $null = $menu.Items.Add("Stop session", $null, {
-    Invoke-Guest "windroid-session stop" | Out-Null
-    Show-Tip $icon "Windroid" "Session stopped."
+    Invoke-TrayAction { Invoke-Guest "windroid-session stop" } 'Session stopped.'
 })
 $null = $menu.Items.Add("Restart session", $null, {
-    Invoke-Guest "windroid-session stop" | Out-Null
-    $out = Invoke-Guest "windroid-session start"
-    Show-Tip $icon "Windroid" $(if ($out -match "session ready") { "Session restarted." } else { "Restart failed — see logs." })
+    Invoke-TrayAction {
+        Invoke-Guest "windroid-session stop"
+        Invoke-Guest "windroid-session start"
+    } 'Session restarted.'
 })
 $null = $menu.Items.Add("-")
 $null = $menu.Items.Add("Install APK…", $null, {
     $dlg = New-Object System.Windows.Forms.OpenFileDialog
     $dlg.Filter = "Android packages (*.apk)|*.apk"
     if ($dlg.ShowDialog() -eq "OK") {
-        $wslPath = (wsl -d $DistroName -e wslpath -a "$($dlg.FileName)").Trim()
         Show-Tip $icon "Windroid" "Installing $([IO.Path]::GetFileName($dlg.FileName))…"
-        Invoke-Guest "windroid-session ensure && waydroid app install '$wslPath'" | Out-Null
-        Show-Tip $icon "Windroid" "Installed. It appears in the Start Menu shortly."
+        Invoke-TrayAction { Install-TrayApk $dlg.FileName } 'Installed. It appears in the Start Menu shortly.'
     }
 })
 $null = $menu.Items.Add("Android Settings", $null, {
     # Android's stock settings package (AOSP/LineageOS): com.android.settings
-    Invoke-Guest "windroid-session ensure && waydroid app launch com.android.settings" | Out-Null
+    Invoke-TrayAction { Invoke-Guest "windroid-session ensure && waydroid app launch com.android.settings" }
 })
 $null = $menu.Items.Add("-")
 $null = $menu.Items.Add("Open logs", $null, {
@@ -102,7 +122,7 @@ $null = $menu.Items.Add("Exit", $null, {
 })
 
 $icon.ContextMenuStrip = $menu
-$icon.add_DoubleClick({ Invoke-Guest "windroid-session ensure" | Out-Null })
+$icon.add_DoubleClick({ Invoke-TrayAction { Invoke-Guest "windroid-session ensure" } })
 
 # ---- Taskbar icon watcher -------------------------------------------------
 # WSLg cannot associate Waydroid windows with their .desktop entries: its
