@@ -137,10 +137,19 @@ files and validatesdistroname. Trayprefersbinicon. PS7/5.1shortcutfixturesand
 existingtraycommandsPASS; changedparse/BOMpass. Actualall9completedinstaller
 resumeexit0 repairedWindowsToolsLNK(correctCOMtarget/args/icon); stagedupdated
 traywithbackup. Shortcutfixcommitted2e39eb0; resyncsurvivalnotyetvalidated.
-Normalgueststop09:17:16->09:17:21 exit0. NEXT: `wsl --shutdown` fromPowerShell7
-to recovertransport. This ends
-PTY11413. Open ONE newrootWSLterminal withhistorydisabled, startnormally, verify
-newToolsLNK/binicon surviveWSLg resync and actualSettingsLNKactivation reaches
-guest; record result. Do not reinstall/resetimages or changeaccountdata.
-No quota/serviceautomation. Currentlabfallbacknestedtrue/multifalse, normalGL,
-no temporarydebugflag/overlays. Sourcehelper0c6ff1a installed/hashverified.
+Normalgueststop09:17:16->09:17:21 exit0; WSLshutdowncompleted0. OldPTY11413
+ENDED. NewrootPTY40201 alive; kernel/hash/configunchanged. NormalactualWindows
+SettingsLNKactivation09:19:39 launcherPID14668 reachedguest: app212/helper261,
+Weston318/session340 by09:19:42. WSLuserlogincreateduser1000DBus(no manualbus
+configuration). This is the active start; do not launch a duplicate.
+ToolsLNK/biniconexistafterWSLstart; post-syncsurvival/nativeviewnotyetclaimed.
+ActualWindowsLNKcoldstartPASS: user0ready09:20:40, SettingsSTART09:20:44,
+nativeNetworkviewobserved09:21:56. WSLgAndroidfolderSettingsLNKrefreshed09:18:33;
+ToolsTrayLNKstill09:14:19 andbiniconintact(hashA15637E8...), validates2e39eb0
+resyncsurvival. No permanentVMBusorgraphicsfixclaimed. OneSkytitlebardrag/AltSpace
+movementcontrolinconclusive(noverifiedboundschange); leavewindowmovementopen.
+Hostfree743MiB/7778 at09:27; retain3GBguestcap, do not raiseblindly.
+NEXT: two rapid actualWindowsSettingsLNKactivations inworkingcontainedsession;
+comparebefore/afterWeston/SFidentities, guestactivitylaunches andVMBuserrors.
+Baseline filebefore-warm-shortcut-controls.txt. RootPTY40201 alive; no duplicate
+manualsessionstart, noaccount/imagechanges. Updatecheckpoint/journal/docsonresult.

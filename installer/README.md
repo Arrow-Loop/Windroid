@@ -75,4 +75,6 @@ installation stages are complete, without reinitializing Android. Only a
 matching legacy link is migrated; unrelated shortcuts/files are preserved.
 `installer/tests/test-tray-shortcut.ps1` covers this behavior using isolated
 files and a COM substitute; checks pass in PowerShell7 and5.1. Actual completed
-installer resume also repaired the lab link; resync survival is checked separately.
+installer resume repaired the lab link, and it survived the subsequent WSLg
+resync with its bin icon intact. The actual Windows Settings shortcut also
+started a fresh Android session and rendered Settings after transport recovery.
