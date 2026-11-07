@@ -333,6 +333,19 @@ release 2026-01-04.
 
 ## New facts from Phase 0 (spike 2026-08-30)
 
+### Software-renderer identity follow-up (lab 2026-11-06)
+
+Keep the documented `ro.hardware.egl=swiftshader` configuration input. On the
+tested Android13/GApps20260927 + vendor20261022 images, configured/derived props
+contain swiftshader, but runtime reports EGL `angle` and Vulkan `pastel`.
+SurfaceFlinger identifies ANGLE over the SwiftShader Vulkan device. This agrees
+with Waydroid's [init substitution patch](https://github.com/waydroid/android_vendor_waydroid/blob/lineage-20/waydroid-patches/base-patches-33/system/core/0013-init-Substitute-swiftshader-with-angle-pastel-on-ven.patch)
+for vendor SDK33 and later. It is software rendering, not evidence that the
+firstboot override failed. Do not force runtime EGL back to a removed legacy
+driver. Nested Weston separately reports Mesa llvmpipe on this laptop.
+
+### Original spike facts
+
 - **`waydroid init` never early-returns**: `is_initialized()` (cfg file
   AND rootfs dir) only triggers a log line; init proceeds into
   `setup_config()` regardless (1.6.2 `actions/initializer.py` L125). The

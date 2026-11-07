@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-06 (America/New_York), validation checkpoint about20:29 local.
+Updated 2026-11-06 (America/New_York), validation checkpoint about20:33 local.
 
 ## Objective and scope
 Make Windroid reliable and investigate Nintendo Switch App startup. Work only in
@@ -78,15 +78,21 @@ Kernel-tag comparison found unchanged VMBus allocator; no blind rebuild done.
 Read docs/WSL-SESSION-RELIABILITY.md before further transport experiments.
 AOSP linker allocator source matches x86 diagnostic, but no installed symbol
 match/caller/root cause established. Report updated with source/limits.
-Next: inspect nested Weston/Android compositor logs after an ordinary Settings
-control (Nintendo remains force-stopped). Compare with the earlier seamless
-failure evidence to identify a specific surface lifecycle/geometry hypothesis;
-preserve working contained fallback and user data. WSL fixes require a distinct
+Ordinary Settings control stayed rendered about10min; bounded crash filter had
+no matching fatal records and Nintendo pid absent. shared_memory mount/boot hook
+verified. Runtime ANGLE+pastel over SwiftShader is intentional upstream vendor33
+substitution, not a failed property override (see UPSTREAM-FACTS follow-up).
+Next: inspect Waydroid hwcomposer source/environment setup for a supported way
+to collect a bounded Wayland configure/ack/attach trace for one Settings launch.
+Use that new evidence to compare the historical 1x1/2x surface-buffer mismatches;
+preserve working contained fallback/config backups and Android data. Do not
+repeat direct-mode/DPI tests without this specific diagnostic instrumentation. WSL fixes require a distinct
 controlled upstream patch experiment, not repeating compaction/rebuild guesses.
 ## Validation, uncommitted work and blockers
 - Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
   Current documentation checkpoint includes resumed GApps/network validation and
-  WSL transport runbook; check actual Git state for its commit/status.
+  WSL transport runbook committed bd6f90c. Current checkpoint adds verified
+  modern software-renderer identity; check actual Git state for final status.
 - Linux seven lifecycle tests and bash syntax pass. Git Bash applicable suite
   passed (two Linux-only tests skipped). Installed ShellCheck0.9.0; changed helper
   passes shellcheck -S warning (evidence/session-shellcheck.txt).
