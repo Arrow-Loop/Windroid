@@ -18,6 +18,14 @@ these command paths and the real lifecycle callbacks without starting the UI.
 The focused checks pass on PowerShell 7 and Windows PowerShell 5.1; they do not
 establish live file-picker, notification-area, or Android rendering behavior.
 
+A November7 lab-only sharing control used the installed bindfs options and
+shared root propagation to expose a fresh test directory under Android shared
+storage. Windows-to-Android reads and Android-to-Windows writes matched the
+fixtures. The temporary mount and empty Android directory were removed;
+personal Downloads was not inspected or remounted. This checks the namespace
+transport, not app file-picker permissions. Evidence remains in lab
+`evidence/integration-2026-11-07/file-share-result.json`.
+
 Stage 2 (Tauri or WinUI 3) is backlog; requirements to carry over live in
 the WSA behaviour reference (docs/UPSTREAM-FACTS.md §8): per-app Start Menu
 entries, a settings surface with app list + shutdown + GPU/network toggles,

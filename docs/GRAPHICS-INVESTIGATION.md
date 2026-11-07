@@ -115,11 +115,62 @@ A bounded navigation sample without the control client showed Battery at
 1,790 ms and Network at 5,355 ms after the next click. Thus this Pixman/full-UI
 path can update and navigate, with latency. Earlier isolated stale snapshots
 are not proof that every such frame is permanently frozen. An original-GL
-control using the same full-UI/no-shade launch method is in progress before any
-claim that Pixman alone improved reliability. Source renderer defaults remain
-unchanged.
+control using the same full-UI/no-shade launch method also rendered/navigated.
+Its Battery page appeared between the 4,347 ms and 26,679 ms observations;
+exact completion latency is unknown. The existing app launcher also rendered
+from that working session. No renderer-only improvement is established, and
+the installed helper was restored to the source GL default.
 
 The live-framework timeout now escalates to SIGKILL after one additional second
 if the query ignores termination. A stubborn 30-second mock distinguishes this
 from an unbounded wait. Linux and Git Bash checks pass; the latter uses a wider
 wall-time assertion to allow process startup under this host's Android load.
+
+## Clean seamless and boot-wide Vulkan controls
+
+A clean seamless start, with no premature app launch, exceeded 180 seconds;
+the ready marker appeared about ten seconds later. The supported app launcher
+then waited another 37 seconds for a live framework response. Windows still
+showed a splash while Android rendered Settings behind a Trebuchet ANR. Its
+main thread was sampled runnable in icon-cache initialization with substantial
+scheduler wait. Earlier premature launch is therefore not the sole explanation;
+this stack alone does not prove a graphics deadlock.
+
+A distinct boot-wide Vulkan control applied `debug.hwui.renderer=skiavk` through
+backed-up Waydroid properties and offline regeneration, before UI process forks.
+System UI, Launcher and Settings all reported Skia Vulkan. Windows still showed
+a stale splash/dim frame while Android screencap showed the full Settings page.
+Startup again exceeded 180 seconds. The crash buffer also captured an early
+system-server null dereference in `RefBase::incStrong` through the HIDL service
+manager on an NDK MediaCodec thread, followed by DeadSystemExceptions and a
+Launcher initialization NPE. This confounds startup and does not establish a
+causal link to Vulkan. No renderer workaround is justified by these controls.
+
+Rollback restored `waydroid.cfg.before-boot-vulkan`, the original nested lab
+configuration and offline-derived properties. The HWUI override is absent;
+multi_windows=false and source rendering defaults remain unchanged. No image
+download or app/account reset occurred. Startup after rollback completed with
+exit0 in 121 seconds on November 6. November 7 live-framework and IP/DNS controls
+passed after an overnight gap, but host sleep prevents a continuous-uptime claim.
+The official vendor feed was checked and still lists the installed 20261022
+image as latest; the verified artifact was reused.
+
+## Installed composer provenance — 2026-11-07
+
+[Waydroid issue 2436](https://github.com/waydroid/waydroid/issues/2436) describes
+a focus-lock cycle and excessive display hotplugs after the September vendor
+image. The focus change merged in
+[HWC PR87](https://github.com/waydroid/android_hardware_waydroid/pull/87) on
+October18; the dimension-change guard merged as
+[5af0c114](https://github.com/waydroid/android_hardware_waydroid/commit/5af0c114a19fc916de837ad553524cd2aade2719)
+on October19. Both predate this lab's October22 vendor image.
+
+Read-only inspection extracted the installed HWC's compressed mini debug
+symbols into local evidence. Build ID is `6c430943c45f04be014a87a0715b8653`,
+SHA256 `3dcfbc40b2944fd02d252b06c2eddbfcfd30b926f60d52a8d75ade245c68d1d8`.
+Its `keyboard_handle_enter` unlocks the recursive mutex at `0x49bda` before the
+task virtual call at `0x49bfc`. Its xdg configure path compares previous/current
+width and height at `0x47cba`/`0x47cbf` and skips `do_hotplug` when unchanged.
+These specific fixes are already reflected in the installed binary. Rebuilding
+them alone is not a new test hypothesis; this does not exclude other lock or
+surface-lifecycle defects. No binary was patched or replaced.

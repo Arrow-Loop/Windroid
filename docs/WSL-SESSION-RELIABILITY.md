@@ -87,3 +87,11 @@ Evidence remains under lab `evidence/2026-11-06-runtime`, including
 `vsock-memory-diagnostics.txt`, `gapps-post-smoke-start.txt`,
 `gapps-network-post-smoke-restart.txt`, `post-smoke-connectivity-memory.txt`,
 `kernel-tag-comparison.txt` and `installed-cli-running-status.txt`.
+
+On November7, the installed Windows CLI again reported both states RUNNING,
+and the live framework ensure returned0. Six bounded awake samples from
+08:33:31 through08:38:42 each received2/2 replies for both an IP and a DNS name
+(12 successful ping commands). This short sample did not reproduce dropout.
+An earlier overnight gap included host sleep and is not continuous-uptime
+evidence. No network setting or persistent monitoring service was installed.
+Evidence: lab `evidence/integration-2026-11-07/network-awake-samples.jsonl`.

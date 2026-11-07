@@ -1,109 +1,110 @@
 # Windroid session state
 
-Updated 2026-11-06 (America/New_York), active control checkpoint21:41 local.
+Updated 2026-11-07 (America/New_York).
 
 ## Objective and scope
-Make Windroid reliable and investigate Nintendo Switch App startup. Work only in
-this dedicated lab and Windroid repositories. Preserve upstream compatibility.
-No quota polling, resets/credits, parallel agents or personal-account automation.
+Make Windroid reliable and investigate Nintendo Switch App startup. Work only
+in this dedicated lab and Windroid repositories. Preserve upstream compatibility
+and Android app/account data. No account automation, protected APK modification,
+quota polling, retry submissions, paid-credit fallback, or parallel agents.
 
-## Workspace and history
-- Repo: C:\Users\Public\Documents\Cody-Windroid-Lab\source\Windroid
+## Workspace and resume references
+- Repository: C:\Users\Public\Documents\Cody-Windroid-Lab\source\Windroid
 - Lab: C:\Users\Public\Documents\Cody-Windroid-Lab
-- Journal: lab journals/ENGINEERING-JOURNAL.md. Read HANDOFF.md and dev guidance.
-- Branch codex/lab-reliability; commits db3d92c Weston readiness; 4222460 Nintendo report/checkpoint.
-- Earlier commits: ba4e275 Sysnative; 3eb30d8 installer/firstboot; 80a6332 INI
-  normalization; 4a69a11 CLI APK argument/error handling. No push/PR performed.
-- PowerShell runtime is already 7.6.9 (bundled Codex pwsh); standard Program
-  Files PowerShell7 path is absent. Do not reinstall tools just for that path.
+- Handoff: lab HANDOFF.md; engineering journal: lab journals/ENGINEERING-JOURNAL.md.
+- Read AGENTS.md, ROADMAP.md, CHANGELOG.md, docs/CONTINUATION.md, README.md and
+  docs/PLAN.md, then actual Git branch/status/log/diff before modifying files.
+- Branch codex/lab-reliability. No push/PR performed. Git is already installed
+  at C:\Program Files\Git\cmd\git.exe. Use command-local commit identity only.
+- Development shell is PowerShell7.6.9 (bundled); Windows PowerShell5.1 is a
+  compatibility target. Do not reinstall tools for missing standard pwsh path.
 
-## Completed and verified
-- WSL prerequisites resolved after two reboots; WSL3.0.3, WSLg1.0.79. Windows
-  boot 2026-11-06 18:42:39 local. vmcompute available; custom binder kernel
-  6.18.33.1-microsoft-standard-WSL2-windroid+.
-- Official v0.1.0 ZIP verified under evidence/release-v0.1.0 (reuse).
-- Source VANILLA initialization/smoke/integration passed; IP and DNS ping passed.
-  Startup80-91s. Real duplicate INI properties fixed. VANILLA later uninstalled
-  with evidence preserved; old AppData distro/root removed after path checks.
-- Current GApps initialized using verified local-only official system20260927
-  and vendor20261022. GAPPS stamp/Play Services presence verified. Initial smoke
-  timed out180s; manual starts later became ready; bundled apps installed.
-  Resumed source installer completed smoketest/integrate exit0; state records
-  all stages. Smoke began already-ready and stopped cleanly. Separate start
-  then reached ready in83.361s. Account/seamless-graphics usability unresolved.
-- Updated composer matches upstream Binder-threadpool fix; seamless Windows
-  app windows still splash/freeze while Android screencap shows UI. Global
-  HiDPI experiment failed and was reverted. Nested fallback is temporary.
-- User-supplied APKM identity/signatures inspected, unchanged x86_64 splits
-  installed; Nintendo3.6.0/14330 crash reproduced: SIGSEGV/SEGV_ACCERR,
-  libpairipcore.so+0x794cb. Twelve tombstones in ONE launch window, not12 trials.
-  Root cause unresolved; no APK modification/protection bypass or account login.
-- Official signed x86 splits successfully installed in package session2058170059
-  with --abi x86 (replace, preserving data). Earlier failed ENOMEM session was
-  abandoned. Current installed Nintendo ABI is x86, NOT x86_64.
+## Completed work
+- WSL prerequisites resolved after two Windows reboots. Verified release v0.1.0
+  retained locally. VANILLA source install, smoke, integration, IP/DNS and
+  uninstall validated; removed only that baseline after preserving evidence.
+- Installer fixes: artifact discovery/cache/hash checks; GApps configuration
+  gate, flavour stamp, initialization locking/retry; duplicate INI normalization;
+  explicit SkipWslUpdate. Real resumed GApps smoke/integration completed exit0.
+- CLI APK paths/error handling fixed. Core Sysnative WSL detection tested in a
+  real32bit Windows PowerShell process: redirected System32 absent, Sysnative
+  present and --status exit0. Compiled wizard page remains untested.
+- Session helper fixes committed: lifecycle serialization, failure propagation,
+  explicit nested socket readiness, live framework/package response required
+  beyond stale ready log, bounded health query with TERM-to-KILL escalation.
+  Ten Linux lifecycle tests and applicable Git Bash checks pass; ShellCheck and
+  Bash syntax pass. Commits include db3d92c,4d2a694,83a4ca9; inspect actual log.
+- Nintendo3.6.0/14330 unchanged signed x86_64 splits reproduce libpairipcore
+  SEGV_ACCERR +0x794cb. Unchanged x86 split also fails with allocator abort and
+  restart loop. Force-stopped; no successful compatibility result or bypass.
+- GL/Pixman matched nested controls both rendered/navigated Settings; Pixman
+  alone not a proven fix. Forced-size workaround produced an exact Wayland
+  maximized buffer/configure error and was reverted. Compositor trace overlays
+  removed and original definition byte-matched. Global DPI override reverted.
 
-## Environment and active investigation
-- Distro Windroid; InstallRoot C:\Users\Public\Documents\Cody-Windroid-Lab\runtime\Windroid.
-  Kernel/modules under public root; old AppData kernel lookup failure unresolved.
-- Guest config NESTED_WESTON=true, MULTI_WINDOWS=false; runtime multi_windows=false.
-  Source defaults remain false/true. Preserve GApps/Android user data; user may
-  have signed into Google. Never inspect credentials or automate account UI.
-- Kernel order7 vmbus_alloc_ring/hvs_probe failures precede WSL new-session
-  WSAETIMEDOUT (upstream WSL#40795). Runtime compaction80 experiment did NOT
-  prevent recurrence and was not persisted. WSL shutdown recovers channels.
-- Established persistent root WSL PTY11413 after21:09 shutdown; reuse it rather
-  than opening many WSL commands under fragmentation. It may expire on reset:
-  never assume tool session IDs remain live. No listener/service was installed.
-- Fresh source session start reached ready20:13:18. Session helper in guest has
-  committed Weston socket wait fix (db3d92c): explicit wayland-1, actual readiness wait
-  instead of fixed2sec, early child exit diagnostics. Real socket previously
-  appeared after4sec, causing launch failure. Seven Linux lifecycle tests pass.
-- x86 first launch20:13:56: pid3679 after4sec; no target x86 tombstone. Force-
-  stopped after collection, relaunched20:14:59; later pid9399 top BootActivity.
-  Longer check found SIGABRT/restart loop, NOT survival. PID20270 libc reports
-  invalid pointer/page signature mismatch and recursive signal-handler abort.
-  Target force-stopped20:17:06; pidof then empty. System UI ANR observed.
+## Current environment and verified rollback
+- Distro Windroid, InstallRoot lab runtime\Windroid; custom binder kernel
+  6.18.33.1-microsoft-standard-WSL2-windroid+, WSL3.0.3/WSLg1.0.79.
+- GApps system20260927 and vendor20261022 are verified local official images;
+  do not redownload. Latest official vendor feed still lists20261022.
+- Lab guest fallback NESTED_WESTON=true, MULTI_WINDOWS=false; Android persistent
+  multi_windows=false. Source defaults remain seamless false/true.
+- Boot-wide HWUI Vulkan trial activated in SystemUI, Launcher and Settings but
+  Windows remained stale/splash while Android rendered Settings. An early
+  system_server HIDL/media-codec crash confounds startup; no causal claim.
+- Rollback COMPLETE: restored waydroid.cfg.before-boot-vulkan, original guest
+  config and offline-derived props; no HWUI override or temporary overlays.
+  Installed session helper is original GL default with committed fixes.
+- Rollback start22:01:47->22:03:48 on Nov6: ready, exit0 (121s).
+- Nov7 08:27 Android IP and DNS pings2/2 each; 08:29 live ensure exit0, both
+  states running. Overnight wall-clock gap includes host sleep; not continuous
+  uptime/stress proof. No networking dropout reproduced in these samples.
+- Retained root WSL PTY11413 still live Nov7. Reuse if available to limit new
+  VMBus allocations, but verify session ID after reset. No listener installed.
+
+## Active investigation, validation and uncommitted work
+- Tray fix974d6c5: Stop/Install could announce success after failure; its APK
+  path still interpolated into shell source. Fix now checks native exit codes,
+  passes APK path as a literal argument, and catches action failures for error
+  balloons; restart stops on failed stop. Source and CI regression test changed.
+- Focused tray tests execute real lifecycle callbacks without creating Windows
+  UI, mocking WSL. APK spaces/apostrophes, selected distro, path/ensure/install
+  failures, stale success text on failure, stop/restart/status failures and
+  successful restart pass in PowerShell7 and5.1. Existing CLI tests pass in both.
+  Changed PowerShell parse/BOM and Git whitespace checks pass.
+- Tray fix committed974d6c5 and staged in runtime/bin; original script backed up
+  in graphics evidence (matching SHA256 verified).
+  No live tray/file-picker validation claimed. Check actual diff after reset.
+- Evidence: lab evidence/graphics-protocol-2026-11-06 (boot-vulkan-*, rollback,
+  overnight-*-2026-11-07); lab evidence/2026-11-06-runtime; Nintendo report
+  docs/NINTENDO-3.6.0.md and local evidence/nintendo-3.6.0. Raw APKs/binaries,
+  tombstones/memory dumps and GApps images remain local-only.
+
+## Blockers and limits
+- Seamless graphics and intermittent framework/compositor crashes remain open.
+- Fragmented-memory order7 VMBus ring failures can break new WSL commands while
+  retained terminal works. WSL shutdown recovers; compaction80 did not fix it
+  and was not persisted. No unverified kernel/socket-buffer patch applied.
+- AppData custom-kernel lookup failure unresolved; public lab paths work.
+- Nintendo root cause unresolved; currently installed ABI is x86. Do not repeat
+  rapid restart loops without a new diagnostic hypothesis.
+- Automatic approval review rejected the Inno compiler download/install command
+  as 'blocked by policy'. Do not retry through another launcher. Wizard UI
+  compilation remains pending. No question/approval request currently pending.
 
 ## Last successful operation and exact next action
-Graphics protocol experiment overlays removed; dimensions/no_background empty,
-HWUI debug override empty, multi_windows=false, nested config restored. Original
-compositor definition matched backup; Android data/images retained.
-After WSL shutdown, new rootPTY11413 is live. Fresh start ready21:11:15. Full UI
-reproduced SystemUI ANR (render thread ANGLE texture staging); later host view
-black with Android Settings rendering. Runtime skiavk confirmed for both UI
-processes but did not fix presentation; cleared before container restart.
-Temporary installed-helper Pixman trial reached ready124s. Full-UI property plus
-Android am Settings launch (no shade refresh) rendered a usable frame. Battery
-click reached Android; bounded later navigation showed old page1790ms/new5355ms.
-Simple-shm animation control worked and was stopped; updates also occurred after
-it stopped, so no claim that animation is required to unfreeze presentation.
-MATCHED GL CONTROL: ready114s, full-UI/no-shade launch rendered and navigated;
-existing windroid-app also rendered withoutblack. Pixman alone not proven fix;
-source/installed helper now originalGL default with83a4ca9, no renderer override.
-NEXT ACTIVE CONTROL: clean seamless repeat justified by previous premature-launch
-ANR confound. Settings force-stopped, runtime multi_windowstrue, stop in progress.
-Apply select-direct.py only once STOPPED, start normally, waitlive readiness,
-then launch only via windroid-app Settings and test native navigation. No early
-am/show-full-ui calls. Restore original nestedconf/multifalse afterward if needed.Current Git code commits4d2a694/83a4ca9 validated; ten Linux tests, applicable Git
-Bash tests (two Linux-only skips), syntax/ShellCheck pass. Stubborn query test
-passes Linux2.234s/GitBash4.844s. No code awaiting commit except docs updates.
-Wizard compiler installation was rejected by automatic approval review with
-blocked by policy; do not retry via another launcher. Read-only32bit
-probe completedexit0: redirectedSystem32wsl absent, Sysnativepresent/status0,
-hypervisortrue. Core WOW64 fix runtime-verified; compiledwizardUI untested.
-Per-process launcher ExecutionPolicy flag used; global policy unchanged. Continue remaining
-roadmap work after this controlled rendering comparison without routine approval.
-## Validation, uncommitted work and blockers
-- Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
-  Current documentation checkpoint includes resumed GApps/network validation and
-  WSL transport runbook committed bd6f90c. Current checkpoint adds verified
-  modern software-renderer identity; check actual Git state for final status.
-- Ten Linux lifecycle tests pass; Git Bash ten tests pass with two Linux-only
-  skips. Bash syntax/ShellCheck warning level pass. Live query passes. Current
-  changes are documentation only; helper/tests committed4d2a694 and83a4ca9.
-- Prior firstboot6 Linux tests, CLI/artifacts PS7/5.1 checks pass as documented.
-- Blockers: seamless graphics, intermittent SurfaceFlinger DEAD_OBJECT abort,
-  WSL fragmented-memory new-channel failures. Nintendo cause still unresolved.
-- Evidence: lab evidence/2026-11-06-runtime and evidence/nintendo-3.6.0. Raw APKs,
-  native binaries, tombstones/memory dumps and GApps images remain local-only.
-  Bundle bb97fcb5123085bf3fe7793724bec516bb2b10a3e74358997d31c8ab6775cc95.
+Tray fix974d6c5 committed/staged with backup; PS7/5.1 checks pass. Lab-only
+bindfs read/write control PASS; unmounted and removed empty Android target.
+Six awake IP/DNS samples08:33:31->08:38:42 allpass (12 commands,2/2 each).
+No sampler remains running; source fixtures retained only in lab evidence.
+Installed HWC already contains focus-unlock and hotplug dimension guards:
+BuildID6c430943c45f04be014a87a0715b8653; no rebuild/image change justified yet.
+Passive Nintendo analysis: runtime/filebytes match atPC0x794cb; eight-byte data
+read fromrax+rdx falls in---mapping inall12records, whilePCisinr-x. Missing raw
+fault address limits confirmation; intentionality/cause stillunresolved. No
+relaunch or app/protection changes. Reports/journal and mirrored lab docs updated.
+NEXT: inspect debuggerd usage, then capture bounded live backtraces of ONLY
+unprotected HWC and SurfaceFlinger in the current black nested session, before
+any restart. Compare frame/fence waiting with another lock cycle; preserve
+Android/WSLg logs and account data. Evidence: lab evidence/integration-2026-11-07.
+After meaningful findings, update checkpoint/journal and commit coherent docs.

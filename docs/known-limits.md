@@ -40,7 +40,11 @@ real test-matrix results, not guesses.
   installed, disable its container service before using Windroid.
 - **8 GB machines**: usable with the default memory cap and reclaim, but
   expect slower cold starts and app evictions. Published minimum spec lives
-  in the README.
+  in the README. The November2026 Intel i5-1035G7/8GB lab has not established
+  reliable visual usability: startup can exceed180s, and seamless or nested
+  presentation can remain stale/black despite a live Android framework.
+  See the [graphics investigation](GRAPHICS-INVESTIGATION.md); installer smoke
+  and network passes do not close this hardware test-matrix gap.
 
 ## Backlog (v1 non-goals recorded per plan §1 — do not build yet)
 

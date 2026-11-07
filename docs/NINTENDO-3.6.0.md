@@ -65,6 +65,23 @@ The library is ELF64 / machine x86-64, and the fault PC falls within its
 file-declared executable load segment. That alone does not establish which
 runtime memory operation failed or whether a protection check was intentional.
 
+### Passive operand analysis — 2026-11-07
+
+The existing twelve records were inspected without relaunching or changing the
+app. At relative PC `0x794cb`, all four instruction bytes from the captured
+runtime memory match the unchanged library: `48 8b 34 10`, an eight-byte read
+from `[rax + rdx]` into `rsi`. In every record, `rdx=0xf00b0`; the calculated
+read range lies inside a `---` (no-access) mapping. The PC itself lies in the
+APK's `r-x` mapping. This is more specific than the ELF segment observation:
+the captured state is consistent with a forbidden data read, rather than a
+missing execute permission at that PC.
+
+The text tombstones omit the fault address, so the calculated operand is not an
+independently reported fault address. This analysis does not establish why the
+runtime produced that address, identify an intentional rejection, or explain
+the separate x86 allocator abort. No protection setting, APK byte, mapping or
+runtime behavior was changed. Detailed addresses and raw dumps remain local.
+
 ## Controls and limitations
 
 An official signed x86 split comparison also failed at startup. Initial transfer
