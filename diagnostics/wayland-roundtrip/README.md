@@ -76,6 +76,11 @@ Stage only that executable in an owned Android test directory. In the lab,
 test process. These paths were verified on this image; do not apply them to
 other images without checking. Keep an external timeout as well.
 
+`WINDROID_PROBE_LIBRARY=/absolute/path/to/owned-copy.so` optionally selects a
+separately built library for isolated load/queue checks. The default remains the
+installed composer. Relative paths are rejected. This permits baseline loader
+validation without replacing the active HAL; no mode calls the HAL open method.
+
 NDK r25c archive SHA256
 `769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108`, published
 SHA1`53af80a1cce9144025b81c78c8cd556bff42bd0e` verified. The legacy toolchain is

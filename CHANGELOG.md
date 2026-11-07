@@ -1,5 +1,13 @@
 # Windroid lab changelog
 
+## 2026-11-07 — isolated native composer builds
+- Built the unchanged pinned composer, queue-only candidate and combined pointer
+  candidate with NDK25c/VNDK33. All12 C++ units compile; strict links and isolated
+  Android load-only pass. No HAL open method/service replacement performed yet.
+- Baseline reproduces shared-queue stalls3/3 at20000 requests; private3/3 pass.
+  Matching Wayland1.19 scanner and documented HIDL-generator adaptation required.
+- Optional probe library path permits owned-copy validation; default selection
+  passes, relative path rejects2. Native UI testing paused at Windows lock.
 ## 2026-11-07 — CPU budget comparison and source candidates
 - Both four- and restored eight-vCPU cold starts reached readiness in about90s
   and rendered the control without System UI recovery in the observed window.

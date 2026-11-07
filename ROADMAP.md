@@ -13,7 +13,8 @@ must not be repeated just because an earlier journal entry was pending.
   Latest nested stall has HWC window creation waiting on a Wayland roundtrip;
   standalone shared-queue probe hangs2/3 while private-queue control passes3/3.
   Native installed-library stress now hangs3/3 shared and passes3/3 private;
-  experimental isolated interposer passes3/3. Real composer validation next.
+  experimental isolated interposer passes3/3. Baseline and source candidates now
+  compile/strict-link/load; rebuilt service validation remains pending.
   Scoped lab interposer preserves startup dispatch and renders nested control.
   Direct WSLg control rendered/received input after System UI recovery, but
   maximize retained a stale old-size view in Windows; integration remains open.
@@ -31,7 +32,7 @@ must not be repeated just because an earlier journal entry was pending.
 - [ ] Finish Windows integration checks: live tray, app shortcuts, lab-only file
   sharing, clipboard/audio and window movement. Do not inspect account data.
   Investigate first pointer click arriving0,0; source ignores enter coordinates.
-  Candidate source patch is unbuilt and has not been runtime-validated.
+  Combined source candidate compiles/strict-links/loads but has no pointer runtime proof.
 - [ ] Compile/exercise wizard page when compiler installation is permitted;
   prior installation was rejected by automatic approval review. Core Sysnative
   detection is already verified in a real32bit process.

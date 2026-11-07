@@ -102,22 +102,35 @@ API fallback or second agent against this worktree.
   zero upgrades/removals. Plan/install logs retained in kernel-path-control.
 
 ## Exact next action
-Inspect/hash/extract cached VNDK33 headers and fetch pinned HWC source plus needed
-Waydroid HIDL definitions. Determine whether an isolated NDK/VNDK33 component build
-can reproduce an UNMODIFIED baseline before compiling the two candidates. Record
-compiler/ABI/dependency limitations explicitly. Do not install a candidate vendor
-binary before baseline checks, rollback preparation and bounded validation.
-No full AOSP sync, external build host or paid service is authorized/needed.
-If isolated build is infeasible, document the specific blocker and advance other
-roadmap checks rather than repeating completed experiments.
+All baseline/queue-only/combined composer builds strict-link and isolated-load0.
+See diagnostics/wayland-roundtrip/NATIVE-BUILD.md for exact inputs/limitations.
+Cached scripts in lab tools/hwc-native-build; guest build root
+/opt/windroid-lab-tools/hwc-native-build. Baseline queue stress shared3/3alarm142,
+private3/3pass0. No rebuilt binary installed in service yet.
 
+NEXT normal stop via retained rootPTY68395/user windroid, verify stop0, then one
+bounded rebuilt BASELINE service trial without preload. Original HWC and both
+scoped-overlay files backed up in guest build root rollback-scoped with matching
+hashes recorded before-component-backup-hashes.txt. New owned overlay path
+/var/lib/waydroid/overlay/vendor/lib64/hw/hwcomposer.waydroid.so does not yet exist.
+After stop0/hash checks: remove ONLY the two recorded scoped overlay files and
+stage baseline74fbd6... at the new path. Normal start, verify actual loaded hash,
+framework/control progress and target failures. Then queue-only4bdce0... trial
+with otherwise identical config. Preserve app/account data and original images.
+Rollback: normal stop, verify/remove owned HWC overlay; restore the exact backed
+up RC/library from rollback-scoped to their recorded paths, verify hashes, start.
+
+Windows is LOCKED (16:24 observation); native UI automation stopped; user asked
+to unlock. Continue non-UI work. Android capture before-component.png shows own
+control frame17340, taps0. This is Android progress, not native Windows proof.
+No UI interaction through lock/authentication. Pointer runtime must wait unlock.
 ## Blockers, validation and uncommitted work
 - Open: intermittent System UI ANR, seamless stale/resize presentation, first input,
   WSL VMBus channel allocation, Nintendo native crashes and remaining integration.
 - Inno compiler install was rejected by automatic approval review (blocked by
   policy); do not retry through another launcher. Wizard UI remains untested.
-- Pending coherent commit: CPU comparison, two UNBUILT source candidates and
-  checkpoint/docs. Inspect actual diff; applicability is not runtime validation.
+- CPU comparison/source candidates committed ecbf33c. Pending:
+  native probe/build documentation. Load-only is not service runtime validation.
 - Raw binaries/APKs/SDKs/traces remain outside Git. No push/PR or quota automation.
 - Journal: lab journals/ENGINEERING-JOURNAL.md. Prior detailed evidence remains
   under evidence/integration-2026-11-07/{kernel-path-control,cpu-budget-control}.

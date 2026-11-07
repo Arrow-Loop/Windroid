@@ -35,7 +35,14 @@ int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     /* Each process is finite even if the requested roundtrip stalls. */
     alarm(5);
-    void *library = dlopen("/vendor/lib64/hw/hwcomposer.waydroid.so", RTLD_NOW | RTLD_LOCAL);
+    const char *library_path = getenv("WINDROID_PROBE_LIBRARY");
+    if (!library_path || !*library_path)
+        library_path = "/vendor/lib64/hw/hwcomposer.waydroid.so";
+    if (library_path[0] != '/') {
+        fprintf(stderr, "WINDROID_PROBE_LIBRARY must be an absolute path\n");
+        return 2;
+    }
+    void *library = dlopen(library_path, RTLD_NOW | RTLD_LOCAL);
     if (!library) {
         fprintf(stderr, "dlopen: %s\n", dlerror());
         return 3;

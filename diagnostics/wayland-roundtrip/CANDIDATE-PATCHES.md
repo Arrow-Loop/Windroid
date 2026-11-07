@@ -1,10 +1,13 @@
-# Unbuilt upstream source candidates
+# Experimental upstream source candidates
 
 These patches target `waydroid/android_hardware_waydroid` commit
 `a575cfcc12ab79a122844218f2c6df5bd208cca0`. They are review artifacts, not changes
 to installed vendor images or installer inputs. Individual and combined
 `git apply --check` checks pass against that exact source; reverse checks also
-pass against generated candidate files. No full HAL compilation was performed.
+pass against generated candidate files. The queue-only HAL now compiles and links
+with strict undefined-symbol checks and passes isolated Android load-only.
+The combined queue/pointer HAL also compiles, strict-links and loads. Service/runtime validation remains
+pending; see NATIVE-BUILD.md.
 
 `candidate-window-sync.patch` gives only window-creation sync callbacks private
 queues and fails explicitly on queue/connection errors. Initialization retains
