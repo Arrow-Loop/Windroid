@@ -91,12 +91,15 @@ esac''')
         self.log.write_text('Android is ready\n')
         self.stub('waydroid', '''case "$*" in
 status) cat "$TEST_STATE" ;;
-"app list") sleep 10 ;;
+"app list") trap '' TERM; sleep 30 ;;
 esac''')
         started = time.monotonic()
         result = self.run_session('ensure')
         self.assertNotEqual(result.returncode, 0)
-        self.assertLess(time.monotonic() - started, 6)
+        # Git Bash process startup on the 8 GB Windows lab adds several
+        # seconds under Android load. Still distinguish escalation from the
+        # unbounded 30-second query without imposing a Linux timing budget.
+        self.assertLess(time.monotonic() - started, 12 if os.name == 'nt' else 6)
 
     def test_stopped_container_does_not_report_ready(self):
         (self.root / 'status').write_text('Session: RUNNING\nContainer: STOPPED\n')

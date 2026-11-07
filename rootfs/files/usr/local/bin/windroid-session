@@ -51,7 +51,7 @@ android_ready() {
     (( max_wait > 0 )) || return 1
     if (( max_wait > 5 )); then max_wait=5; fi
     grep -q 'is ready' "$SESSION_LOG" 2>/dev/null || return 1
-    apps="$(timeout "$max_wait" waydroid app list 2>/dev/null)" || return 1
+    apps="$(timeout -k 1 "$max_wait" waydroid app list 2>/dev/null)" || return 1
     grep -q '^packageName:' <<< "$apps"
 }
 
