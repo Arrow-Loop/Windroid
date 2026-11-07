@@ -4,7 +4,7 @@
 #
 # Start order and quirks are prior-art-proven (docs/UPSTREAM-FACTS.md §6):
 # modprobe one module per call, container first (root, via systemd),
-# then the user session; poll the session log for readiness.
+# then the user session; check the ready log and live Android framework.
 set -euo pipefail
 
 CONF=/etc/windroid/windroid.conf
@@ -43,9 +43,23 @@ session_running() {
         grep -q 'Container:[[:space:]]*RUNNING' <<< "$status"
 }
 
+android_ready() {
+    # The log survives framework/compositor restarts. Query the live platform
+    # and PackageManager as the session user instead of trusting an old line.
+    # Waydroid may log an IPC error and still exit zero, so require app data.
+    local apps max_wait="$1"
+    (( max_wait > 0 )) || return 1
+    if (( max_wait > 5 )); then max_wait=5; fi
+    grep -q 'is ready' "$SESSION_LOG" 2>/dev/null || return 1
+    apps="$(timeout "$max_wait" waydroid app list 2>/dev/null)" || return 1
+    grep -q '^packageName:' <<< "$apps"
+}
+
 start() {
+    local ready_deadline
     if session_running; then
-        if grep -q 'is ready' "$SESSION_LOG" 2>/dev/null; then
+        ready_deadline=$((SECONDS + READY_TIMEOUT))
+        if android_ready "$((ready_deadline - SECONDS))"; then
             echo "session already RUNNING"
             return 0
         fi
@@ -84,10 +98,13 @@ start() {
     : > "$SESSION_LOG"
     PYTHONUNBUFFERED=1 setsid nohup waydroid session start \
         > "$SESSION_LOG" 2>&1 < /dev/null 9>&- &
+    ready_deadline=$((SECONDS + READY_TIMEOUT))
     fi
 
-    for _ in $(seq "$READY_TIMEOUT"); do
-        if grep -q 'is ready' "$SESSION_LOG"; then
+    # Probe time counts towards readiness, rather than multiplying the timeout
+    # by the duration of an unresponsive Android IPC call on every iteration.
+    while (( SECONDS < ready_deadline )); do
+        if android_ready "$((ready_deadline - SECONDS))"; then
             echo "session ready"
             # One-time install of the bundled app suite (store, browser,
             # file manager — preseeded by rootfs/preseed-apks.py). Runs as
@@ -127,7 +144,7 @@ start() {
         fi
         sleep 1
     done
-    echo "ERROR: session not ready after ${READY_TIMEOUT}s — tail of $SESSION_LOG:" >&2
+    echo "ERROR: Android framework not ready after ${READY_TIMEOUT}s — tail of $SESSION_LOG:" >&2
     tail -n 20 "$SESSION_LOG" >&2
     return 1
 }

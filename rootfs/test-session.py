@@ -3,6 +3,7 @@ import importlib.util
 import os
 from pathlib import Path
 import subprocess
+import time
 import unittest
 
 spec = importlib.util.spec_from_file_location('firstboot_fixture', Path(__file__).with_name('test-firstboot.py'))
@@ -39,6 +40,7 @@ status) cat "$TEST_STATE" ;;
  echo 'Android is ready'
  sleep 4 ;;
 "session stop") printf 'Session: STOPPED\\nContainer: STOPPED\\n' > "$TEST_STATE" ;;
+"app list") echo 'packageName: com.android.settings' ;;
 esac''')
 
     def run_session(self, command):
@@ -58,6 +60,43 @@ esac''')
         self.log.touch()
         self.assertNotEqual(self.run_session('ensure').returncode, 0)
         self.assertFalse((self.root / 'starts').exists())
+
+    def test_stale_ready_log_does_not_hide_unavailable_framework(self):
+        self.conf.write_text('SESSION_READY_TIMEOUT=1\n')
+        (self.root / 'status').write_text('Session: RUNNING\nContainer: RUNNING\n')
+        self.log.write_text('Android is ready\n')
+        self.stub('waydroid', '''if [[ "$*" == status ]]; then cat "$TEST_STATE"; fi
+if [[ "$*" == 'app list' ]]; then echo 'Failed to access IPlatform service' >&2; fi''')
+        result = self.run_session('ensure')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('framework not ready', result.stderr)
+        self.assertFalse((self.root / 'starts').exists())
+
+    def test_running_framework_can_recover_without_duplicate_session(self):
+        (self.root / 'status').write_text('Session: RUNNING\nContainer: RUNNING\n')
+        self.log.write_text('Android is ready\n')
+        self.stub('waydroid', '''case "$*" in
+status) cat "$TEST_STATE" ;;
+"app list")
+ if [[ -e "$TEST_STARTS" ]]; then echo 'packageName: com.android.settings';
+ else touch "$TEST_STARTS"; fi ;;
+esac''')
+        result = self.run_session('ensure')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.root / 'starts').read_text(), '')
+
+    def test_framework_probe_cannot_multiply_readiness_timeout(self):
+        self.conf.write_text('SESSION_READY_TIMEOUT=1\n')
+        (self.root / 'status').write_text('Session: RUNNING\nContainer: RUNNING\n')
+        self.log.write_text('Android is ready\n')
+        self.stub('waydroid', '''case "$*" in
+status) cat "$TEST_STATE" ;;
+"app list") sleep 10 ;;
+esac''')
+        started = time.monotonic()
+        result = self.run_session('ensure')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertLess(time.monotonic() - started, 6)
 
     def test_stopped_container_does_not_report_ready(self):
         (self.root / 'status').write_text('Session: RUNNING\nContainer: STOPPED\n')
