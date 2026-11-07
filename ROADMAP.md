@@ -31,6 +31,8 @@ must not be repeated just because an earlier journal entry was pending.
   no push/PR performed yet. Broader hardware/coexistence coverage remains open.
 
 ## Completed and evidenced
+- [x] Prevent the embedded nested compositor's default idle blank/lock;
+  regression and one >331second native no-input visibility control pass.
 - [x] Build/sign own permission-free Android frame/input diagnostic; bounded
   nested Windows rendering, mouse and Space controls observed. System UI startup
   ANR remains separate and unresolved.

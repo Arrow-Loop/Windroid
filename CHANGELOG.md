@@ -1,5 +1,16 @@
 # Windroid lab changelog
 
+## 2026-11-07 — nested idle screen
+- Disable the default five-minute idle timeout only on Windroid's embedded
+  nested Weston display. It had hidden a still-drawing Android control behind
+  black output and its own idle-lock overlay. Windows lock settings are unchanged.
+- Delayed-socket regression now requires the option and fails without it.
+  Linux13 lifecycle checks, applicable Git Bash checks, syntax/ShellCheck pass.
+  Deployed helper after backup; normal restart/control launch returned0.
+- Windows frame987 remained visible while paused for over331seconds without
+  injected input. Native mouse/Space controls also passed. A separate System UI
+  startup ANR required recovery; seamless/framework reliability remains open.
+
 ## 2026-11-07 — optional Android frame/input control
 - Added a small permission-free Java Canvas diagnostic with frame/tap counters
   and a Space animation toggle, plus a local-only builder. It is separate from

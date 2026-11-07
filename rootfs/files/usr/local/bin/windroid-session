@@ -86,8 +86,11 @@ start() {
             # Recheck while waiting, instead of waiting for its lost socket
             # for the entire timeout without ever launching a replacement.
             if [[ -z "$weston_pid" ]] && ! nested_weston_running; then
+                # This is an embedded app display. Weston's default 300-second
+                # idle blanker/lock would hide a still-running Android session.
                 WAYLAND_DISPLAY=wayland-0 setsid nohup weston \
                     --backend=wayland-backend.so --socket=wayland-1 --width=1280 --height=800 \
+                    --idle-time=0 \
                     > "$WESTON_LOG" 2>&1 < /dev/null 9>&- &
                 weston_pid=$!
             fi

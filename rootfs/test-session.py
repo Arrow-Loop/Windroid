@@ -146,7 +146,10 @@ fi''')
             'import os,socket,time\ntime.sleep(2.5)\n'
             's=socket.socket(socket.AF_UNIX)\n'
             's.bind(os.environ["XDG_RUNTIME_DIR"]+"/wayland-1")\ntime.sleep(8)\n')
-        self.stub('weston', 'exec "$TEST_PYTHON" "$TEST_COMPOSITOR"')
+        self.stub('weston', '''case " $* " in
+*" --idle-time=0 "*) exec "$TEST_PYTHON" "$TEST_COMPOSITOR" ;;
+*) echo 'embedded compositor must not idle-blank'; exit 23 ;;
+esac''')
         result = self.run_session('start')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue((self.root / 'starts').exists())

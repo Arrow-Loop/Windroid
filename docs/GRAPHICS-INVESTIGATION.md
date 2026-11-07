@@ -210,3 +210,43 @@ left no Weston process, created a new PID and reached live readiness in88s
 match; no renderer, image or account change was retained. This is a lifecycle
 fix, not a seamless graphics fix. Evidence remains in local
 `evidence/integration-2026-11-07`.
+
+## Nested idle screen and independent System UI ANR — November7
+
+The first-party `diagnostics/android-control` workload drew advancing frames in
+Android while the native nested view appeared black. Refreshing the Windows
+window binding and activating it exposed Weston's own "Unlock your desktop"
+overlay. This identifies an idle-screen cause in that observation, without
+attributing all previous black frames or seamless failures to the same cause.
+
+The [official Weston manual](https://manpages.ubuntu.com/manpages/noble/man1/weston.1.html)
+documents a default300second idle timeout that can fade/lock the compositor;
+`--idle-time=0` disables it. Windroid now passes this option only when launching
+its embedded nested display. Source fallback defaults remain unchanged, and no
+Windows lock/security setting or Android authentication setting was changed.
+The delayed-socket regression requires this option and fails when it is removed.
+All13 Linux lifecycle tests and applicable Git Bash checks pass, as do syntax
+and ShellCheck. Installed/source helper hashes match after a backup.
+
+Normal stop/start plus control launch returned0 at10:31:22. Windows displayed
+advancing control frames, then accepted mouse events and Space. Paused frame987
+was visibly confirmed. With no further injected input from10:36:03.476 through
+the10:41:35 observation (over331seconds), Windows still displayed the same
+paused frame987, without a black screen or Weston idle overlay. This is one
+successful bounded idle control, not indefinite availability or seamless proof.
+
+This boot also produced a System UI ANR at10:30:19 while executing
+`com.android.systemui/.keyguard.KeyguardService`. Its main thread was Runnable
+in `NotificationStackSizeCalculator` during startup, with about8.05seconds
+scheduled execution and4.28seconds runnable wait in that trace. SurfaceFlinger
+used344%CPU in the reported interval. The
+[Lineage20 source](https://github.com/LineageOS/android_frameworks_base/blob/lineage-20.0/packages/SystemUI/src/com/android/systemui/statusbar/notification/stack/NotificationStackSizeCalculator.kt)
+builds a sequence from the current child views; this sample alone establishes
+neither an infinite loop nor a lock cycle. Do not patch notification/security
+behavior or relax readiness deadlines based only on that stack.
+
+The visible Wait action dismissed the ANR temporarily; it recurred. Close-app
+recovery restarted System UI and recreated the control Activity, after which
+the input observations above succeeded. System UI PID2966 was later sleeping
+at0%CPU, control PID1774 and SurfaceFlinger104 remained present, and the bounded
+VMBus error count was0. This is recovery evidence, not a framework fix.
