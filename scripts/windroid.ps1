@@ -38,7 +38,8 @@ switch ($Command) {
         # source breaks on ordinary apostrophes in filenames/directories.
         wsl -d $DistroName -u windroid -e waydroid app install $wslPath
         if ($LASTEXITCODE -ne 0) { throw "APK installation failed (exit $LASTEXITCODE)." }
-        Write-Host "Installed. The app appears in Start Menu > Windroid shortly (desktop sync)."
+        # Waydroid returns before Android's PackageInstaller commit finishes.
+        Write-Host "Installation requested. Android may still be processing it."
     }
     "adb" {
         # Official mechanism: adb connect <container IP>:5555

@@ -86,7 +86,7 @@ $null = $menu.Items.Add("Install APK…", $null, {
     $dlg.Filter = "Android packages (*.apk)|*.apk"
     if ($dlg.ShowDialog() -eq "OK") {
         Show-Tip $icon "Windroid" "Installing $([IO.Path]::GetFileName($dlg.FileName))…"
-        Invoke-TrayAction { Install-TrayApk $dlg.FileName } 'Installed. It appears in the Start Menu shortly.'
+        Invoke-TrayAction { Install-TrayApk $dlg.FileName } 'Installation requested. Android may still be processing it.'
     }
 })
 $null = $menu.Items.Add("Android Settings", $null, {

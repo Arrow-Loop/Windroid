@@ -27,6 +27,10 @@ these command paths and the real lifecycle callbacks without starting the UI.
 The focused checks pass on PowerShell 7 and Windows PowerShell 5.1; they do not
 establish live file-picker, notification-area, or Android rendering behavior.
 
+The tray reports "Installation requested" after Waydroid accepts an install
+request. Android commits asynchronously, and an accepted request can remain
+pending; verify completion in Android before launching or reporting success.
+
 A November7 lab-only sharing control used the installed bindfs options and
 shared root propagation to expose a fresh test directory under Android shared
 storage. Windows-to-Android reads and Android-to-Windows writes matched the

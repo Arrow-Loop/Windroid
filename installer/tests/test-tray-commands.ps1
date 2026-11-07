@@ -47,7 +47,7 @@ function Show-Tip($icon, $title, $text, $kind = 'Info') {
 }
 function Assert-ErrorTip {
     if ($script:Tips[-1].Kind -ne 'Error') { throw 'Failed action did not display an error' }
-    if ($script:Tips.Text -match 'Session (running|stopped|restarted)\.|Installed\.') {
+    if ($script:Tips.Text -match 'Session (running|stopped|restarted)\.|Installation requested\.') {
         throw 'Failed action displayed a success notification'
     }
 }
@@ -64,7 +64,7 @@ try {
     }
     foreach ($stage in @('path', 'empty-path', 'ensure', 'install')) {
         $script:Failure = $stage; $script:Calls = @(); $script:Tips = @()
-        Invoke-TrayAction { Install-TrayApk $apk } 'Installed.'
+        Invoke-TrayAction { Install-TrayApk $apk } 'Installation requested.'
         Assert-ErrorTip
         if ($stage -ne 'install' -and ($script:Calls | Where-Object { $_ -contains 'install' })) {
             throw "Installation ran after $stage failed"

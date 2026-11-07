@@ -1,5 +1,17 @@
 # Windroid lab changelog
 
+## 2026-11-07 — asynchronous APK installation messages
+- CLI and tray now say "Installation requested" after a successful Waydroid
+  request, rather than claiming Android finished installing. The platform
+  commits PackageInstaller sessions asynchronously; one lab request remained
+  pending while a direct guest request completed 2.4 seconds after return.
+- Own signed, permission-free diagnostic APK is valid and installed. Quoted
+  spaces/apostrophes reach the guest correctly. No root install pipeline or
+  package-verification setting was added; the pending request cause remains open.
+- CLI/tray command checks pass on PowerShell7 and Windows PowerShell5.1;
+  changed-script parse/BOM checks pass. Updated installed lab scripts after
+  backup. Live tray file-picker/notifications remain unverified.
+
 ## 2026-11-06
 - Created laptop bootstrap script for local inventory, development tools, Windroid clone, and journal directories.
 - Prepared handoff documenting prior confirmed observations and unresolved defects.
