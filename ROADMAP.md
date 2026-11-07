@@ -38,3 +38,11 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [x] Verify first reboot and diagnose VMP/service mismatch with elevated PowerShell 7.
 - [ ] Complete reboot requested by official WSL prerequisite installation; if vmcompute remains absent, investigate Windows servicing before further feature changes.
 
+
+## Runtime checkpoint — 2026-11-06
+- [x] Complete WSL2 prerequisite startup and source VANILLA installation/smoke test.
+- [x] Fix duplicate/spaced firstboot properties and test Linux concurrent initialization.
+- [x] Verify Android IP routing and DNS on one clean session start.
+- [ ] Diagnose AppData kernel load access, warm-start timeout/WSAETIMEDOUT, SystemUI crash and Settings rendering; repeat network tests.
+- [ ] Validate clean GApps install, graphics and app compatibility; previous roadmap runtime tasks remain open.
+

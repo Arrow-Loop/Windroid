@@ -6,6 +6,7 @@ All other branches execute the production script with mocked external services.
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -32,8 +33,9 @@ class FirstbootTests(unittest.TestCase):
         self.stub("systemctl", "exit 0")
         if os.name == "nt":
             self.stub("flock", "exit 0")
+            self.stub('python3', 'set -- "$1" "$(cygpath -w "$2")" "${@:3}"\nexec "$TEST_PYTHON" "$@"')
         self.stub("waydroid", 'echo "$*" >> "$CALLS"\n[[ "${FAIL_INIT:-0}" == 1 && "$*" == *init* ]] && exit 17\nexit 0')
-        self.env = dict(os.environ, CALLS=root + "/calls")
+        self.env = dict(os.environ, CALLS=root + "/calls", TEST_PYTHON=sys.executable.replace('\\', '/'))
         self.conf = self.root / "etc/windroid/windroid.conf"
         self.conf.write_text("GAPPS=true\nFORCE_SOFTWARE_RENDERING=false\nMULTI_WINDOWS=false\n")
         (self.root / "var/lib/waydroid/waydroid.cfg").write_text("[waydroid]\nsuspend_action = freeze\n")
@@ -68,6 +70,20 @@ class FirstbootTests(unittest.TestCase):
         self.assertEqual(self.run_boot().returncode, 0)
         self.assertFalse((self.root / "calls").exists())
 
+    def test_waydroid_formatted_properties_are_normalized(self):
+        import configparser
+        self.conf.write_text('GAPPS=false\nFORCE_SOFTWARE_RENDERING=true\nMULTI_WINDOWS=false\n')
+        cfg_path = self.root / 'var/lib/waydroid/waydroid.cfg'
+        cfg_path.write_text('[properties]\nro.hardware.egl = swiftshader\nro.hardware.egl=swiftshader\n'
+                            'ro.hardware.gralloc = default\n[waydroid]\nsuspend_action = freeze\n')
+        result = self.run_boot()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        cfg = configparser.ConfigParser()
+        cfg.read(cfg_path)
+        self.assertEqual(cfg['properties']['ro.hardware.egl'], 'swiftshader')
+        self.assertEqual(cfg['properties']['persist.waydroid.multi_windows'], 'false')
+        self.assertEqual(cfg['waydroid']['suspend_action'], 'none')
+
     def test_failed_download_can_retry_without_moving_preseed_twice(self):
         preseed = self.root / "etc/waydroid-extra/images"
         preseed.mkdir()
@@ -79,6 +95,17 @@ class FirstbootTests(unittest.TestCase):
         self.env["FAIL_INIT"] = "0"
         self.assertEqual(self.run_boot().returncode, 0)
         self.assertEqual(self.stamp.read_text().strip(), "GAPPS")
+
+    @unittest.skipIf(os.name == 'nt', 'real Linux flock required')
+    def test_concurrent_initializers_only_initialize_once(self):
+        from concurrent.futures import ThreadPoolExecutor
+        self.stub('waydroid', 'echo "$*" >> "$CALLS"\nsleep 0.3\nexit 0')
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(lambda _: self.run_boot(), range(2)))
+        for result in results:
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = (self.root / 'calls').read_text().splitlines()
+        self.assertEqual(sum('init -f -s GAPPS' in line for line in calls), 1)
 
 
 if __name__ == "__main__":

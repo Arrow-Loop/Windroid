@@ -41,16 +41,29 @@ fi
 # regenerates it — the supported override channel, unlike editing
 # waydroid_base.prop directly (UPSTREAM-FACTS §5). waydroid.cfg may not
 # exist yet; init preserves an existing file's sections.
-if [[ "${FORCE_SOFTWARE_RENDERING:-false}" == "true" ]]; then
-    mkdir -p /var/lib/waydroid
-    if [[ ! -f /var/lib/waydroid/waydroid.cfg ]] || ! grep -q '^\[properties\]' /var/lib/waydroid/waydroid.cfg; then
-        printf '\n[properties]\n' >> /var/lib/waydroid/waydroid.cfg
-    fi
-    for kv in 'ro.hardware.gralloc=default' 'ro.hardware.egl=swiftshader'; do
-        grep -qxF "$kv" /var/lib/waydroid/waydroid.cfg || \
-            sed -i "/^\[properties\]/a $kv" /var/lib/waydroid/waydroid.cfg
-    done
-fi
+mkdir -p /var/lib/waydroid
+python3 - /var/lib/waydroid/waydroid.cfg "${FORCE_SOFTWARE_RENDERING:-false}" "${MULTI_WINDOWS:-true}" <<'PYCFG'
+import configparser
+import sys
+
+path, software, multi = sys.argv[1:]
+# Legacy text edits may already have inserted duplicate options. Normalize
+# them once, then write each setting exactly once using Waydroid's INI format.
+cfg = configparser.ConfigParser(strict=False, interpolation=None)
+cfg.read(path)
+for section in ("properties", "waydroid"):
+    if not cfg.has_section(section):
+        cfg.add_section(section)
+if software == "true":
+    cfg.set("properties", "ro.hardware.gralloc", "default")
+    cfg.set("properties", "ro.hardware.egl", "swiftshader")
+cfg.set("properties", "persist.waydroid.multi_windows", "true" if multi == "true" else "false")
+cfg.set("waydroid", "suspend_action", "none")
+with open(path + ".tmp", "w") as output:
+    cfg.write(output)
+import os
+os.replace(path + ".tmp", path)
+PYCFG
 
 # 3. Init. VANILLA path uses the preseeded images in
 # /etc/waydroid-extra/images (init checks that dir first and skips all
@@ -78,20 +91,8 @@ else
     waydroid --details-to-stdout init
 fi
 
-# 4. Multi-window integration (spike Q1) via the same [properties] channel;
-# persist.waydroid.* props are honored from the base prop file.
-if [[ "${MULTI_WINDOWS:-true}" == "true" ]]; then
-    grep -q '^\[properties\]' /var/lib/waydroid/waydroid.cfg || printf '\n[properties]\n' >> /var/lib/waydroid/waydroid.cfg
-    grep -qxF 'persist.waydroid.multi_windows=true' /var/lib/waydroid/waydroid.cfg || \
-        sed -i '/^\[properties\]/a persist.waydroid.multi_windows=true' /var/lib/waydroid/waydroid.cfg
-    # Regenerate waydroid_base.prop from cfg now that [properties] is final.
-    waydroid upgrade --offline
-fi
-
-# Never freeze the container on focus loss — on a desktop, windows spend
-# most of their life unfocused/minimized. suspend_action is an upstream
-# waydroid.cfg key as of 1.6.x (spike-verified; formerly ddcash's patch).
-sed -i 's/^suspend_action = .*/suspend_action = none/' /var/lib/waydroid/waydroid.cfg
+# Rebuild derived props after normalizing the supported [properties] overrides.
+waydroid upgrade --offline
 
 systemctl enable waydroid-container.service
 

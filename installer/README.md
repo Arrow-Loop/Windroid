@@ -41,6 +41,10 @@ otherwise download the upstream distribution ZIP, verify SHA256SUMS.txt, and
 extract its artifacts. Published v0.1.0 has no standalone manifest asset.
 Kernel, modules VHDX and rootfs hashes are all required and checked.
 
+For a reproducible baseline, `-SkipWslUpdate` uses the installed WSL instead
+of running `wsl --update`. The minimum WSL version is still checked; missing
+WSL still goes through prerequisite installation. Default behavior updates WSL.
+
 Guest firstboot waits for `/etc/windroid/.configured`. During configuration the
 installer stops any legacy firstboot/container service, installs matching guest
 helpers from `rootfs/files`, applies GApps/share settings, then writes the gate.

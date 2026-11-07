@@ -27,3 +27,12 @@
 - Ran Microsoft's wsl --install --no-distribution elevated. DISM reported successful prerequisite enablement, exit 0, explicitly requiring another restart. No distro imported or Android runtime tested.
 - Evidence: evidence/2026-11-06-baseline/post-reboot-host.txt and wsl-prerequisite-repair.txt. User approved the diagnostic UAC prompt; source/dependencies were not reinstalled.
 - Saving checkpoint before second reboot. If vmcompute remains absent, inspect servicing/component health instead of repeating blind enable/reboot cycles.
+
+## 2026-11-06 — VANILLA runtime baseline and property normalization
+- Second prerequisite reboot resolved missing vmcompute. WSL delegated updater completed successfully to 3.0.3/WSLg 1.0.79 after its parent command was cancelled; documented the transition instead of treating it as a pinned 2.7 baseline.
+- Added -SkipWslUpdate for explicit reproducible runs; minimum version check remains enforced.
+- Custom kernel under AppData failed with WSL_E_CUSTOM_KERNEL_NOT_FOUND despite shell file access; identical public lab kernel/modules successfully imported Windroid. Retained probe files/config backup and recorded global config override.
+- Real initialization reproduced DuplicateOptionError: Waydroid saved properties with spaces around =, old text matching added duplicate rendering keys. Replaced with atomic configparser normalization. Applied guest helper; full VANILLA firstboot/smoke/integration passed.
+- Six fixture tests pass in WSL with real flock, including concurrent initialization and duplicate/spaced INI properties. Applicable Git Bash tests, PowerShell artifact tests (7/5.1), parse and shell syntax checks pass.
+- Clean session start after WSL shutdown: 80s. Android routing and DNS pings pass. Settings WSLg window observed at splash; complete usability/window movement still pending.
+- Warm restart exceeded readiness timeout and one WSL command returned WSAETIMEDOUT; WSL shutdown recovered it. First boot SystemUI NPE observed; root cause unproven. These remain open, along with GApps and Nintendo.

@@ -1,109 +1,82 @@
 # Windroid session state
 
-Updated: 2026-11-06 (America/New_York). Read this before continuing.
+Updated: 2026-11-06 (America/New_York).
 
-## Current objective
+## Objective
+Make Windroid reliable: installation/GApps, sessions, networking, Windows
+integration, graphics and Nintendo Switch App compatibility. Continue autonomously
+while active; preserve evidence and upstream compatibility.
 
-Investigate and fix installation, GApps initialization, session reliability,
-networking, Windows integration and Nintendo Switch App startup, preserving
-upstream compatibility. Persist progress through usage limits/restarts.
+## Workspace
+- Repository: C:\Users\Public\Documents\Cody-Windroid-Lab\source\Windroid
+- Lab: C:\Users\Public\Documents\Cody-Windroid-Lab
+- Branch codex/lab-reliability; origin Arrow-Loop/Windroid.
+- Read lab HANDOFF.md and journals/ENGINEERING-JOURNAL.md before resuming.
+- Historical commits: ba4e275 Sysnative fix, 3eb30d8 installer/guest protocol,
+  afad1d0 prerequisite diagnosis. No push/PR yet.
 
-## Workspace and source
+## Completed work / last successful operations
+- Both prerequisite reboots completed. Last boot: 2026-11-06 18:42:39 local.
+  vmcompute now exists; WSL2 works. No more prerequisite reboots needed.
+- WSL update originally stalled on an invisible consent prompt. Its delegated
+  MSI finished successfully despite cancellation of its parent wsl command.
+  Current WSL 3.0.3, WSLg 1.0.79; do NOT assume earlier 2.7.14 baseline remains.
+- Official v0.1.0 ZIP already downloaded, hash verified and extracted in lab
+  evidence/release-v0.1.0/Windroid/artifacts. Do not redownload.
+- Installed distro Windroid at %LOCALAPPDATA%\Windroid\distro\vm using those
+  artifacts and source installer. All state.json stages complete; smoke PASS,
+  bundled apps installed, CLI and Start Menu integration created.
+- Kernel AppData path returned WSL_E_CUSTOM_KERNEL_NOT_FOUND despite file being
+  present/readable by the shell. Public-directory probe WORKED. Current global
+  .wslconfig points kernel and modules into lab evidence/2026-11-06-runtime/
+  kernel-access-probe. Original config is saved there as wslconfig-before.txt.
+  Do not delete these kernel files. Installation state still records the old
+  value paths; reconcile metadata before relocating files/uninstall testing.
+- Active kernel: 6.18.33.1-microsoft-standard-WSL2-windroid+; binder works.
+  firstboot stamp /var/lib/windroid/.initialized contains VANILLA.
+- Runtime found duplicate rendering properties after Waydroid rewrote INI keys
+  with spaces. Replaced sed/grep property insertion with atomic configparser
+  normalization, including explicit multi_windows=false support. Applied helper
+  to guest; retry passed firstboot and full installer smoke test.
+- Six isolated firstboot tests PASS inside real WSL, including concurrent flock
+  serialization and spaced/duplicate property normalization. Five applicable
+  tests PASS on Git Bash (concurrency test Linux only). Artifact tests PASS on
+  PowerShell 7 and 5.1; parse/bash syntax/diff checks pass.
+- One clean post-WSL-shutdown session start succeeded in 80 seconds. Both session
+  and container RUNNING, IP 192.168.240.112. Android ping 1.1.1.1 and example.com
+  PASS (routing and DNS), evidence saved. Settings app launched into its own
+  WSLg window; first screenshot showed its splash only, inspect again.
 
-- Repository: `C:\Users\Public\Documents\Cody-Windroid-Lab\source\Windroid`
-- Lab: `C:\Users\Public\Documents\Cody-Windroid-Lab`
-- Branch: `codex/lab-reliability`; initial source `e85d7c6`.
-- Origin: Arrow-Loop/Windroid; upstream releases: calm032019/Windroid.
-- Handoff: lab `HANDOFF.md`; journal: lab `journals/ENGINEERING-JOURNAL.md`.
-- Tracked ROADMAP.md and CHANGELOG.md contain the current lab status; lab copies
-  are mirrored for the original handoff workflow. No push/PR performed.
+## Active investigation and risks
+- Session warm restart exceeded 90s and an overlapping WSL diagnostic returned
+  WSAETIMEDOUT. WSL shutdown recovered guest (systemd running). Root cause not
+  established; host free RAM was ~660 MB. Do not claim stable sessions yet.
+- Initial Android SystemUI KeyguardService/AppOpsControllerImpl NPE observed in
+  crash buffer during first boot. Later sys.boot_completed=1; transient vs ongoing
+  failure not determined. Preserve logs before changing images.
+- GApps, move/resize/clipboard/audio, uninstall/coexistence and Nintendo untested.
+  Nintendo exact APK/tombstone absent here; handoff: x86_64 3.6.0 com.nintendo.znca,
+  SIGSEGV/SEGV_ACCERR libpairipcore.so PC 0x794cb. No account sign-ins or bypasses.
+- No quota polling/automatic reset/credit fallback configured; no parallel agent.
 
-## Completed work
-
-- Read handoff, roadmap, changelog and repository technical docs. Handoff files
-  were initially absent, then supplied in the lab; they have now been read.
-- Captured baseline in lab `evidence/2026-11-06-baseline/`: Windows 11 Pro
-  26200.9711, Surface Book 3, Intel i5-1035G7, about 8 GB RAM, ~104 GB free.
-- Verified Git at `C:\Program Files\Git\cmd\git.exe`; version
-  2.56.0.windows.4. Do not reinstall it. PowerShell 7.6.9 available.
-- WSL 2.7.14.0 installed using elevated setup; VirtualMachinePlatform enabled
-  with NoRestart. Installer explicitly reported RestartNeeded=True.
-  WSLg 1.0.73.2; stock kernel 6.18.33.2-2. No distro imported yet.
-- Downloaded official v0.1.0 ZIP and verified its published SHA-256:
-  `72d63927d5da0a4465b50414c0cdcb5c9f948c957835c4ca9f3ef05bc1d364b8`.
-  Extracted lab `evidence/release-v0.1.0/Windroid/artifacts`; reuse it.
-- Reproduced default installer manifest HTTP Not Found with a disposable
-  install state that skips preflight/WSL. Evidence: `artifact-source-probe.txt`.
-  Release contains artifacts inside ZIP, not individual release assets.
-- Cherry-picked user's existing Sysnative fix `585ddab` as `ba4e275`, retaining
-  author credit. Runtime wizard validation still pending.
-- Configured persistent continuation instructions/checkpoint and researched
-  documented resume support; see docs/CONTINUATION.md.
-
-## Active investigation
-
-Installer/guest configuration changes are implemented with isolated regression
-checks. Firstboot now waits for .configured, uses flock, reprocesses legacy empty
-stamps, records flavour on success and retries failed GApps downloads without
-moving the VANILLA preseed twice. Distribution packagers include guest helpers.
-Artifact discovery extracts and verifies the release ZIP; all artifact hashes
-are checked. WSL error/checkpoint handling and custom distro launchers improved.
-These changes need real WSL/Android validation; no runtime fix is claimed yet.
-
-## Last successful operation and validation
-
-PowerShell parse checks pass. Release discovery/integrity regression tests pass
-in PowerShell 7.6.9 and Windows PowerShell 5.1. Existing config merge/revert tests
-pass. Four isolated firstboot tests pass under Git Bash; flock is stubbed there,
-so Linux lock behavior is pending. Changed shell scripts pass bash -n, and
-Git diff whitespace checks pass. Tests were added to CI but CI has not run.
-No WSL distro imported yet. Windows boot time remains 2026-11-03 07:05 local.
-
-## Outstanding blockers / unknowns
-
-- First reboot confirmed: 2026-11-06 18:35:02 local. WSL2 remains unavailable; VirtualMachinePlatform reports Enabled but vmcompute service/executable are absent. Elevated official WSL prerequisite command completed and requests a second reboot.
-- No Nintendo APK/tombstone on this laptop. Handoff reports x86_64 3.6.0,
-  com.nintendo.znca, SIGSEGV/SEGV_ACCERR in libpairipcore.so at 0x794cb.
-  Do not assume ARM translation, bypass protections, or use personal sign-ins.
-- Graphics/window movement and networking dropouts have not been reproduced
-  here. Recovery-image/BitLocker arrangements remain owner-managed/unverified.
-- No official automatic quota-reset continuation mechanism verified; no
-  polling, scheduler, paid-credit fallback, or reset purchase configured.
+## Uncommitted work
+Structured firstboot property normalization, six-test regression suite, installer
+-SkipWslUpdate switch (still enforces minimum version), README and this checkpoint.
+Commit coherent changes with actual results before a substantial session ends.
 
 ## Exact next action
+Inspect Settings window again (Computer Use sky target returned msrdc.exe window
+1836442, title Settings (Windroid); rediscover fresh handles after resets).
+Capture Android runtime/crash logs and confirm app reaches usable settings UI.
+Save validation and commit the firstboot normalization + skip-update changes.
+Continue warm start/stop reliability and graphics/network checks. Then stop the
+single Waydroid stack and validate GApps via clean reinstall, preserving baseline
+logs and fixing install metadata/kernel access path deliberately. Never run two
+Waydroid stacks concurrently. Do not claim the Nintendo crash fixed without logs.
 
-Second prerequisite reboot is being requested after saving this checkpoint.
-First reboot was verified at 2026-11-06 18:35:02 local. Source remains 3eb30d8.
-Elevated PowerShell 7 diagnostic confirmed VirtualMachinePlatform Enabled,
-Microsoft-Windows-Subsystem-Linux Disabled, Hyper-V-Hypervisor Disabled, and
-vmcompute absent. HypervisorPresent=True, so do not assume firmware is disabled.
-Ran official wsl --install --no-distribution elevated; DISM completed with exit 0
-and explicitly requested restart. Logs: lab evidence/2026-11-06-baseline/
-post-reboot-host.txt and wsl-prerequisite-repair.txt. No distro imported.
-
-On resumption check actual boot time, Get-Service vmcompute,WslService,
-wsl --status and wsl --list --verbose. If vmcompute is STILL absent, do NOT
-repeat another blind feature-enable/reboot cycle. Inspect CBS servicing errors,
-feature dependencies and component health before choosing a targeted repair.
-Do not disable Windows security features to make virtualization work.
-
-If WSL2 is operational, use PowerShell 7 from this repository:
-
-```powershell
-& .\installer\install.ps1 -ArtifactSource 'C:\Users\Public\Documents\Cody-Windroid-Lab\evidence\release-v0.1.0\Windroid\artifacts' -Bench
-```
-
-Capture output in a new lab evidence subdirectory; do not reuse the disposable
-artifact-source-probe state. Verify binder, firstboot VANILLA stamp, session
-start/stop, app windows and networking. Run firstboot tests in WSL with real
-flock and concurrent initialization. Then validate GApps on a clean reinstall
-with evidence retained; only one Waydroid installation may run at a time.
-Continue session/network/graphics priorities and Nintendo exact-version crash
-investigation without account sign-ins or protection bypass.
-
-## Resume
-
-Reopen this desktop chat and send: `Resume Windroid from SESSION_STATE.md.`
-A fresh chat in this workspace can use the same instruction. For CLI use the
-session picker with `codex resume` from this directory; select the correct
-Windroid session rather than guessing a session ID or using global --all.
+## Evidence / resume
+Lab evidence/2026-11-06-runtime contains installation transcripts, kernel access
+probe/config backup, cold-guest-baseline.txt, cold-session-start.txt,
+cold-running-status.txt, android-ip-connectivity.txt, android-dns-connectivity.txt.
+Read AGENTS.md, this file, ROADMAP.md, CHANGELOG.md, docs/CONTINUATION.md and Git
+status/diff on resume. Reopen this chat and say Resume Windroid.

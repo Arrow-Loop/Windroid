@@ -36,6 +36,7 @@ param(
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._-]*$')][string]$DistroName = "Windroid",
     [string]$InstallRoot = "$env:LOCALAPPDATA\Windroid",
     [ValidateRange(2, 64)][int]$MemoryCapGB = 0,   # 0 = auto: min(8GB, 50% RAM)
+    [switch]$SkipWslUpdate,  # reproducible testing with the installed WSL; minimum version still enforced
     [switch]$Bench
 )
 $ErrorActionPreference = "Stop"
@@ -154,8 +155,10 @@ if (-not (Test-Done $state "wsl")) {
         Write-Host "After rebooting, rerun this same command — it resumes automatically." -ForegroundColor Yellow
         exit 0
     }
-    wsl --update | Out-Null
-    if ($LASTEXITCODE -ne 0) { Fail "wsl --update failed (code $LASTEXITCODE); the WSL stage will retry on rerun." }
+    if (-not $SkipWslUpdate) {
+        wsl --update | Out-Null
+        if ($LASTEXITCODE -ne 0) { Fail "wsl --update failed (code $LASTEXITCODE); the WSL stage will retry on rerun." }
+    }
     # .wsl-file features and current fixes need a reasonably fresh WSL (>= 2.4.4).
     # wsl.exe output is UTF-16; strip the interleaved NULs before parsing.
     $verLine = ((wsl --version) -replace "`0", "") | Select-String -Pattern 'WSL[^\d]*([\d.]+)' | Select-Object -First 1
