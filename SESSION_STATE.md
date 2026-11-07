@@ -136,9 +136,9 @@ oncompletedinstall, guardedlegacytargetremoval; uninstallerpreservesotherTools
 files and validatesdistroname. Trayprefersbinicon. PS7/5.1shortcutfixturesand
 existingtraycommandsPASS; changedparse/BOMpass. Actualall9completedinstaller
 resumeexit0 repairedWindowsToolsLNK(correctCOMtarget/args/icon); stagedupdated
-traywithbackup. Sourcefixreadytocommit; resyncsurvivalnotyetvalidated.
-NEXT: commit coherent shortcutfix/docs, stop currentguestnormally via retained
-rootPTY, then `wsl --shutdown` fromPowerShell7 to recovertransport. This ends
+traywithbackup. Shortcutfixcommitted2e39eb0; resyncsurvivalnotyetvalidated.
+Normalgueststop09:17:16->09:17:21 exit0. NEXT: `wsl --shutdown` fromPowerShell7
+to recovertransport. This ends
 PTY11413. Open ONE newrootWSLterminal withhistorydisabled, startnormally, verify
 newToolsLNK/binicon surviveWSLg resync and actualSettingsLNKactivation reaches
 guest; record result. Do not reinstall/resetimages or changeaccountdata.
