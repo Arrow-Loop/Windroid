@@ -59,6 +59,7 @@ real test-matrix results, not guesses.
 | App | Arch | Result | Notes | Tested on |
 |---|---|---|---|---|
 | F-Droid | universal | — | | |
+| Nintendo Switch App 3.6.0 | x86_64 / x86 | Startup fails | x86_64 SEGV_ACCERR in libpairipcore; x86 allocator abort/restart loop. Cause unresolved; [lab report](NINTENDO-3.6.0.md). | Intel i5-1035G7, WSL3.0.3/WSLg1.0.79, 2026-11-06 |
 | (browser TBD) | | — | | |
 | (messenger TBD) | | — | | |
 | (ARM-only app TBD) | arm64 | — | | |

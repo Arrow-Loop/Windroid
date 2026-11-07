@@ -60,3 +60,11 @@ Earlier unchecked items remain open where this checkpoint records only partial c
 - [ ] Complete GApps smoke/integration and permanent graphics/memory fixes.
 - [ ] Await supplied APKMirror path/user Store download, verify artifact, reproduce scoped Nintendo crash. Preserve account data after manual sign-in.
 
+
+## Nintendo and nested compositor checkpoint — 2026-11-06
+- [x] Verify supplied artifact identity/signatures and reproduce original x86_64 Nintendo startup fault locally.
+- [x] Complete unchanged signed x86 ABI control; it also fails (allocator abort/restart loop). Force-stop target; preserve data/evidence.
+- [x] Fix nested compositor socket readiness race; seven Linux lifecycle tests and applicable Git Bash checks pass; real recovered startup reaches ready.
+- [ ] Diagnose Nintendo runtime fault using upstream allocator/runtime evidence and unmodified controls; no protection bypass or successful compatibility claim.
+- [ ] Resolve System UI ANR/seamless rendering and WSL fragmented-memory channel failures; complete GApps smoke/integration and repeated networking validation.
+These entries supersede stale pending-artifact/reboot steps above; historical checkpoints are retained.
