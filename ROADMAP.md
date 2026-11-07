@@ -56,3 +56,5 @@ and framework readiness do not certify visual usability or account compatibility
 
 - [x] Fix nested stop/restart exit race; three regressions and a real normal immediate restart pass. Temporary local diagnostic flag removed.
 
+
+- [ ] Verify new Windows-owned tray shortcut survives WSLg resync; source fix and PS7/5.1 checks pass, actual completed-installer repair succeeded. WSL transport recovery pending before resync check.

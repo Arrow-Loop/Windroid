@@ -7,13 +7,22 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$DistroName = "Windroid",
+    [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._-]*$')][string]$DistroName = "Windroid",
     [string]$InstallRoot = "$env:LOCALAPPDATA\Windroid",
     [switch]$KeepUserData   # export Android /data before unregistering
 )
 $ErrorActionPreference = "Stop"
 $WslConfig = Join-Path $env:USERPROFILE ".wslconfig"
 $StateFile = Join-Path $InstallRoot "state.json"
+
+function Remove-WindroidTrayShortcut([string]$distro, [string]$programsRoot) {
+    $tools = Join-Path $programsRoot "$distro Tools"
+    Remove-Item -LiteralPath (Join-Path $tools 'Windroid Tray.lnk') -Force -ErrorAction SilentlyContinue
+    if ((Test-Path -LiteralPath $tools -PathType Container) -and
+        -not (Get-ChildItem -LiteralPath $tools -Force | Select-Object -First 1)) {
+        Remove-Item -LiteralPath $tools
+    }
+}
 
 Write-Host "==> Stopping Windroid" -ForegroundColor Cyan
 $registered = (wsl --list --quiet 2>$null) -replace "`0", "" | Where-Object { $_ -eq $DistroName }
@@ -78,6 +87,7 @@ if (Test-Path $StateFile) {
 
 Write-Host "==> Removing Windows integration" -ForegroundColor Cyan
 Remove-Item -Recurse -Force (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\$DistroName") -ErrorAction SilentlyContinue
+Remove-WindroidTrayShortcut $DistroName (Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs')
 $binDir = Join-Path $InstallRoot "bin"
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -like "*$binDir*") {

@@ -63,6 +63,34 @@ function Mark-Done([ref]$state, $stage) {
     Save-State $state.Value
 }
 
+function Install-WindroidTrayShortcut([string]$root, [string]$distro, [string]$programsRoot) {
+    $bin = Join-Path $root 'bin'
+    $tray = Join-Path $bin 'windroid-tray.ps1'
+    if (-not (Test-Path -LiteralPath $tray -PathType Leaf)) { return }
+    # WSLg treats every shortcut (and its icon) in its distro folder as its
+    # own, and deletes entries absent from the Linux app list at sync end.
+    $tools = Join-Path $programsRoot "$distro Tools"
+    New-Item -ItemType Directory -Force -Path $tools | Out-Null
+    $shell = New-Object -ComObject WScript.Shell
+    $arguments = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$tray`" -DistroName `"$distro`" -InstallRoot `"$root`""
+    $link = $shell.CreateShortcut((Join-Path $tools 'Windroid Tray.lnk'))
+    $link.TargetPath = 'powershell.exe'
+    $link.Arguments = $arguments
+    $icon = @((Join-Path $bin 'windroid.ico'), (Join-Path $root 'windroid.ico')) |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+    if ($icon) { $link.IconLocation = "$icon,0" }
+    $link.Save()
+
+    # Migrate only the legacy shortcut that points to this installation.
+    $legacy = Join-Path (Join-Path $programsRoot $distro) 'Windroid Tray.lnk'
+    if (Test-Path -LiteralPath $legacy -PathType Leaf) {
+        $old = $shell.CreateShortcut($legacy)
+        if ([IO.Path]::GetFileName($old.TargetPath) -eq 'powershell.exe' -and $old.Arguments -eq $arguments) {
+            Remove-Item -LiteralPath $legacy -Force
+        }
+    }
+}
+
 function Resolve-ArtifactSource([string]$source, [string]$cacheDir) {
     if ($source) { return $source }
     $bundled = Join-Path $PSScriptRoot '..\artifacts'
@@ -420,20 +448,14 @@ if (-not (Test-Done $state "integrate")) {
         Copy-Item $icoSrc (Join-Path $BinDir "windroid.ico") -Force   # tray badge fallback
     }
 
-    if (Test-Path (Join-Path $BinDir "windroid-tray.ps1")) {
-        $programs = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\$DistroName"
-        New-Item -ItemType Directory -Force -Path $programs | Out-Null
-        $shell = New-Object -ComObject WScript.Shell
-        $lnk = $shell.CreateShortcut((Join-Path $programs "Windroid Tray.lnk"))
-        $lnk.TargetPath = "powershell.exe"
-        $lnk.Arguments  = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$BinDir\windroid-tray.ps1`" -DistroName `"$DistroName`" -InstallRoot `"$InstallRoot`""
-        if (Test-Path (Join-Path $InstallRoot "windroid.ico")) { $lnk.IconLocation = "$(Join-Path $InstallRoot "windroid.ico"),0" }
-        $lnk.Save()
-    } else {
+    if (-not (Test-Path (Join-Path $BinDir "windroid-tray.ps1"))) {
         Write-Warning "windows\tray\windroid-tray.ps1 not found next to the installer — tray shortcut not created."
     }
     Mark-Done ([ref]$state) "integrate"
 }
+
+# Repair/migrate the shortcut even when a previous run completed integration.
+Install-WindroidTrayShortcut $InstallRoot $DistroName (Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs')
 
 $elapsed = (Get-Date) - $script:StartTime
 Write-Host ""

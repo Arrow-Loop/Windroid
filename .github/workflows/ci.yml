@@ -74,6 +74,10 @@ jobs:
         shell: pwsh
         run: installer/tests/test-tray-commands.ps1
 
+      - name: Tray shortcut ownership and repair
+        shell: pwsh
+        run: installer/tests/test-tray-shortcut.ps1
+
       - name: Workflow YAML validity
         run: |
           python3 -c "import yaml,glob; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"

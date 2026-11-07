@@ -2,8 +2,17 @@
 
 `tray/windroid-tray.ps1` — stage 1 tray app per ADR-005: PowerShell +
 NotifyIcon + balloon tips, no GUI framework until this has run for two
-weeks in real use. Started from Start Menu > Windroid > Windroid Tray
+weeks in real use. Started from Start Menu > Windroid Tools > Windroid Tray
 (shortcut created by the installer).
+
+For a custom distro name, the folder is `<DistroName> Tools`. WSLg owns the
+separate Android app folder and deletes links absent from its Linux app list
+at sync end, including icons referenced by those links. The Windows tray must
+stay outside that folder. Rerunning the installer repairs/migrates its shortcut
+even if the integration stage is already complete. Migration removes only a
+legacy link targeting the same installation; uninstall preserves unrelated
+files in the Tools folder. The staged `bin/windroid.ico` is preferred so a
+legacy WSLg cleanup cannot remove the tray's icon source.
 
 Menu: Status · Start/Stop/Restart session · Install APK… (file picker →
 `waydroid app install`) · Android Settings (`com.android.settings`) ·

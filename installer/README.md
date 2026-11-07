@@ -64,3 +64,15 @@ cache reuse and corruption rejection. `python3 rootfs/test-firstboot.py` tests
 configuration gating, legacy stamps and download retry behavior with isolated
 fixtures. Git Bash stubs flock; actual Linux locking and Android runtime behavior
 still require WSL validation.
+
+## Tray shortcut ownership and repair
+
+Windows tray shortcuts live under `Start Menu > <DistroName> Tools`, outside
+WSLg's managed `<DistroName>` Android app folder. WSLg sync removes unreported
+links and their referenced icons from its folder, which removed the original
+tray shortcut in the lab. Installer reruns repair the tray link even when all
+installation stages are complete, without reinitializing Android. Only a
+matching legacy link is migrated; unrelated shortcuts/files are preserved.
+`installer/tests/test-tray-shortcut.ps1` covers this behavior using isolated
+files and a COM substitute; checks pass in PowerShell7 and5.1. Actual completed
+installer resume also repaired the lab link; resync survival is checked separately.

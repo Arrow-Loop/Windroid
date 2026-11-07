@@ -377,3 +377,6 @@ driver. Nested Weston separately reports Mesa llvmpipe on this laptop.
 - **RAIL window titles come from the Android app's label** (Jelly ⇒
   "Browser") — don't match windows by package name.
 - Spike timings (i9-13980HX/NVMe): cold start 17.1 s, warm launch 2.5 s.
+
+## Windows tray shortcut ownership — checked 2026-11-07
+WSLg's [sync start/end implementation](https://github.com/microsoft/wslg/blob/main/WSLDVCPlugin/WSLDVCCallback.cpp) seeds a cleanup database from every link under the distro app-menu folder, then deletes files not reported by Linux during sync. [OnLnkFileAdded and directory enumeration](https://github.com/microsoft/wslg/blob/main/WSLDVCPlugin/WSLDVCFileDB.cpp) also track the icon referenced by each link, without requiring a WSLg executable target. Windows-owned tray links must be outside that namespace. The lab's old tray link and root icon were missing; the staged bin icon remained. Use a separate `<DistroName> Tools` folder and prefer its staged bin icon; do not add a periodic shortcut-recreation loop.

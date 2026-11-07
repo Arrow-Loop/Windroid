@@ -99,3 +99,9 @@
 - Three new regressions fail against the old helper. All13 Linux tests pass (18.565s); Git Bash passes with3 Linux-only skips (41.834s). Bash syntax/ShellCheck pass. Actual normal immediate cycle: stop6s, old compositor absent, replacement PID, readiness88s, exit0. Installed/source hashes match.
 - Temporary local Weston diagnostic flag removed after scenegraph/protocol collection. The diagnostic run rendered Settings and later Battery, with buffer releases and continuing commits. This does not establish a permanent or seamless graphics fix. No image/app/account changes.
 - Post-fix normal restart also rendered Settings in nested Weston and passed Android IP/DNS pings2/2 each. This is one successful cycle, not long-session or seamless proof.
+
+## 2026-11-07 — Windows tray shortcut survival
+- Moved the Windows tray shortcut into `<DistroName> Tools`, outside WSLg's managed Android app folder. Upstream WSLg sync scans all links and referenced icons there, then removes those absent from the Linux app list; the lab tray link and root icon were missing.
+- Installer repairs/migrates its link even after completed integration, removing only a matching legacy target. Uninstall removes the owned Tools link and only an empty directory; unrelated Tools files remain. Uninstaller distro names use the installer's validation. Tray/shortcut prefer the retained bin icon.
+- Isolated ownership/path/migration/repair/cleanup checks pass in PS7/5.1, as do existing tray command checks; changed-script parse/BOM checks pass. Actual all-stages-complete installer resume repaired the lab link without WSL/image stages. Resync survival still pending; live tray UI not claimed.
+- Actual Windows Settings shortcut activation encountered the known order7 VMBus allocation/UtilAcceptVsock timeout, with no corresponding guest activity launch. Cancelled only exact verified launcherPID4876. Retained root terminal still works; WSL shutdown recovery planned after checkpoint.

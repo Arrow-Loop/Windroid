@@ -125,7 +125,22 @@ Postfixednormalrestart Settings native Network page rendered; IP/DNS2/2 each,
 controlscompleted09:02:39. No debugflag remains. This is one successfulcycle,
 not a long-session/seamless proof. Current checkpoint commits the lifecyclefix
 with source/tests/report validation; inspect actual Git log for commit ID.
-NEXT: verify registered Windows Windroid Settings shortcut activation with the
-working contained session, then continue remaining integration/reliability
-priorities. Do not repeat renderer/size experiments. RootPTY11413 alive;
-lab evidence/integration-2026-11-07. No image/account changes.
+Windows Settings shortcut exists and desktop sync completed0; ComputerUse's
+installed-app inventory omitted it. ActualLNKactivation09:06 failedknownWSL
+transport: order7vmbus/hvs allocation andUtilAcceptVsock110, no guestactivity.
+Stopped only exact verified Windowswslg launcherPID4876; retainedPTYworks.
+NEW TRAY SHORTCUT FIX: WSLg scans/deletes unreported links AND referencedicons
+insideDistrofolder. OriginaltrayLNK/rooticonmissing, biniconretained. Source
+installer creates `<DistroName> Tools` LNK withstablebinicon, repairs/migrates
+oncompletedinstall, guardedlegacytargetremoval; uninstallerpreservesotherTools
+files and validatesdistroname. Trayprefersbinicon. PS7/5.1shortcutfixturesand
+existingtraycommandsPASS; changedparse/BOMpass. Actualall9completedinstaller
+resumeexit0 repairedWindowsToolsLNK(correctCOMtarget/args/icon); stagedupdated
+traywithbackup. Sourcefixreadytocommit; resyncsurvivalnotyetvalidated.
+NEXT: commit coherent shortcutfix/docs, stop currentguestnormally via retained
+rootPTY, then `wsl --shutdown` fromPowerShell7 to recovertransport. This ends
+PTY11413. Open ONE newrootWSLterminal withhistorydisabled, startnormally, verify
+newToolsLNK/binicon surviveWSLg resync and actualSettingsLNKactivation reaches
+guest; record result. Do not reinstall/resetimages or changeaccountdata.
+No quota/serviceautomation. Currentlabfallbacknestedtrue/multifalse, normalGL,
+no temporarydebugflag/overlays. Sourcehelper0c6ff1a installed/hashverified.

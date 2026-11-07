@@ -52,8 +52,9 @@ function Show-Tip($icon, $title, $text, $kind = "Info") {
 
 $icon = New-Object System.Windows.Forms.NotifyIcon
 # Windroid logo, staged by install.ps1; system icon as fallback.
-$icoPath = Join-Path $InstallRoot "windroid.ico"
-$icon.Icon = if (Test-Path $icoPath) { New-Object System.Drawing.Icon($icoPath) } else { [System.Drawing.SystemIcons]::Application }
+$icoPath = @((Join-Path $PSScriptRoot 'windroid.ico'), (Join-Path $InstallRoot 'windroid.ico')) |
+    Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+$icon.Icon = if ($icoPath) { New-Object System.Drawing.Icon($icoPath) } else { [System.Drawing.SystemIcons]::Application }
 $icon.Text = "Windroid"
 $icon.Visible = $true
 
