@@ -1,5 +1,18 @@
 # Windroid lab changelog
 
+## 2026-11-07 — initial real composer queue-shim trial
+- Activated the diagnostic only in Waydroid's overriding composer service,
+  through removable lab overlays. Its loaded mapping and actual roundtrip
+  dispatch target were verified. Vendor service RC alone was overridden and
+  did not activate the shim; that unused overlay was removed.
+- Normal start/control launch completed0; Windows showed advancing frames and
+  received a click and Space to pause. Android screencap completed0. Composer
+  main was no longer sampled waiting in window creation. This is one successful
+  nested trial, not seamless or long-session proof.
+- System UI still produced a KeyguardService startup ANR and required recovery.
+  Experimental shim remains lab-only during further testing; original images,
+  process privileges and app data are unchanged. Rollback is checkpointed.
+
 ## 2026-11-07 — native Android queue control
 - Built an isolated native probe that loads the unchanged installed HWC and
   calls its exported Wayland client functions. At20000 requests, shared-queue

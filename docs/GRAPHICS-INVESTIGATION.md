@@ -284,3 +284,33 @@ queue passed200 requests in3/3. Host libwayland1.22 differs from the Android
 binary's linked library, so this is supporting mechanism evidence only. The
 next implementation investigation is composer queue ownership, with full
 Android runtime validation required before replacing or shipping a binary.
+
+## Native queue race and first real interposer trial
+
+The native diagnostic now loads the unchanged installed composer into its own
+Android process. Shared/default queue stress stalled3/3 at20000 requests under
+its five-second alarm; private queue completed3/3. A per-call private queue
+interposer also completed3/3, with symbol origin verified. Short200-request
+controls passed in both modes, illustrating why a short success is insufficient.
+
+The first real service trial edited the vendor init definition, but Waydroid's
+`/system/etc/init/init.waydroid.rc` overrides it. That trial did not activate
+the shim and is not an intervention result. The unused vendor RC overlay was
+removed after hash verification. A second trial inserted only service-local
+LD_PRELOAD in the active definition, preserving command/user/groups/capabilities.
+Original image files were not replaced. The two owned experiment files are the
+system RC overlay and vendor library overlay, with backups and rollback hashes
+in the checkpoint/evidence.
+
+The actual roundtrip JUMP_SLOT pointed into the shim's executable mapping.
+Normal start/control launch completed0 at15:04:32 (ready15:04:19); Windows
+displayed advancing frames. A native click reached522,520 at15:07:30; Space
+logged animation=false15:08:16 and Windows displayed paused frame726.
+Android screencap completed0 with31791bytes. Composer81's sampled main thread
+was waiting for Binder work rather than window creation. This is one bounded
+nested frame/input result, not a validated seamless or permanent fix.
+
+System UI independently ANRed15:03:28 while executing KeyguardService, with
+memory pressure reported. Close-app recovery recreated the control Activity;
+input validation occurred afterward. The queue intervention does not resolve
+that startup defect. No account, protected-app or security configuration change.

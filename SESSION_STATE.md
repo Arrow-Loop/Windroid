@@ -62,7 +62,8 @@ API fallback or second agent against this worktree.
 - Lab fallback NESTED_WESTON=true, MULTI_WINDOWS=false. Source defaults remain
   false/true. Normal GL renderer; no temporary overlays, forced sizes, global
   DPI override, HWUI Vulkan override or Weston --debug flag remains.
-- Installed helper now includes uncommitted idle-time fix, SHA256
+  Experimental composer-only queue overlay is active as detailed below.
+- Installed helper includes committed idle-time fixbd8d2b6, SHA256
   bdbfba689dd18116b40cb1c6f49361eb678102e91093113dbcf15055bf9c687b.
 - .wslconfig remains memory=3GB, autoMemoryReclaim=gradual. Host available RAM
   was743MiB/7778 at09:27; do not raise the cap blindly.
@@ -89,62 +90,60 @@ API fallback or second agent against this worktree.
   plus393ms targeted PM query. No root permission/probe change was justified.
 - Microsoft documents dropCache as another reclaim mode; it has NOT been applied.
 
-## Exact next action: investigate composer private roundtrip queue build
-Idle fix committedbd8d2b6; Linux/GitBash checks and native >331sec paused visibility
-passed. Truthful async installation messages8d09062 and own Android control
-0e43a6e committed. Native mouse and Space controls observed. Animation resumed
-10:42:33 after input detection/refresh. Border drag did not verify resize;
-no resize failure/pass claim. SystemUI ANR recovered separately, unresolved.
-Previous control/SF/SystemUI PIDs1774/104/2966, nestedWeston15347 ended at shutdown.
-Original installer AppData kernel files no longer exist, so original ACLs can't
-be reconstructed. New byte-identical working kernel/modules copies now exist
-at %LOCALAPPDATA%\Windroid\kernel for one fresh lookup control. No files replaced.
-Evidence integration-2026-11-07/kernel-path-control has hashes and public config
-backup wslconfig.before.txt. AppData boot/uname returned0 with expected kernel;
-the historical lookup error is not reproduced. Public config restored byte-for-
-byte, shutdown0/publicboot0. Installed WindowsCLI start completed0 at10:48:48,
-Androidready10:48:41. Result collected14:28 after a long gap, not continuous proof.
-New retained rootPTY1497 (HISTFILE=/dev/null). IP/DNS2/2 each pass14:29.
-Normal own control launch returned0/Activitycreated14:29:37, but no draw callbacks
-and Windows shows Weston desktop. Android screencap timed out/zero bytes.
-Target backtraces0: control3366 main waits RenderProxy::setStopped; RenderThread
-waits SurfaceComposer getDynamicDisplayInfo. SF117 main waits HIDLpresent;
-HWC84 main waits wl_display_roundtrip_queue in window::create. HWCwaylandthread135
-polls; thread138 waits adapter recursive mutex during getColorModes. This is a
-specific blocked creation/presentation chain, not the old idle overlay.
-Weston323 epoll; fresh wayland-info on parent/nested/Androidmounted socket all0.
-Only wayland-utils installed (one new package, no upgrades); gdb NOT installed
-because its plan upgraded unrelated Python packages. Host/container socket
-inode/dev match; namespace-aware ss confirms HWC500 stream peers with Weston323.
-Second composer trace14:35:38 retains same window-create roundtrip wait.
-Standalone diagnostics/wayland-roundtrip/probe.py: shared default queue stalls2/3,
-private sync queue passes200 in3/3 on hostlibwayland1.22. This supports a queue
-ownership hypothesis, not Android fix proof. Probe jobs finished; current stall
-preserved. No renderer/DPI/size override; source idle fix remains deployed.
-HWC Android.bp reviewed at upstreampin a575cfcc12ab79a122844218f2c6df5bd208cca0:
-static Wayland, platform/HIDL/generated interfaces; SDK-only build insufficient.
-Host81.3GB free/8GBRAM versus current full-AOSP guidance400GB/64GB (not a measured
-older HAL minimum). No full tree sync, external host or remoteCI initiated.
-NEXT: identify the Waydroid manifest's exact Android Wayland library revision;
-assess a small matching native Android queue probe build before full HAL build.
-Then design/review a per-roundtrip private queue correction and error handling,
-with actual Android validation required before vendor replacement/shipping.
-Do not blindly retry renderers, relaunch Nintendo or claim Linux probe as Android
-runtime proof. Exact sources/results in lab kernel-path-control evidence.
-Do not unregister distros or reset app/account data. Source defaults unchanged.
-Own pending install sessions absent after restart; historical cause unresolved.
-SDK/R8/devkey cached lab tools/android-control; never commit binary/key artifacts.
+## Exact next action: bounded seamless queue-shim control
+Native diagnostic/interposer committed59f93f8. Android shared-queue stress20000
+stalled3/3 (alarm142), private queue3/3pass and shim3/3pass. NDK25c verified
+SHA256769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108;
+cachedZIP labtools/android-control, extractedguest /opt/windroid-lab-tools.
+Native compilation strictwarnings, builder syntax/ShellCheck pass. No fullAOSP
+sync or external/paid build. ManifestWayland AOSPandroid13r75 commit
+21f44c8186caa56b3e01a99554f22ab1aa74094d (metadata1.19.0); exactinstalled
+library tested via exports rather than inferred binary/source match.
+
+EXPERIMENT ACTIVE: only composer service uses LD_PRELOAD, through two new
+Waydroid overlay files (source images untouched):
+- /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
+  SHA256762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2
+- /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
+  SHA256bf330edb93f4e1009f9db96d51dfb08fe96dfaeb7f495616a9c8df594721e4b9
+Original activeRC is lab evidence/integration-2026-11-07/kernel-path-control/
+init.waydroid.rc.before-shim. VendorRC does not control this service; initial
+ineffective vendoroverlayRC was hash-checked/removed. No global preload,
+privilege/capability or security changes. Read-only AT_SECURE0/SELinuxDisabled
+reflect existing image, not agent modifications.
+ROLLBACK: normal gueststop; verify both owned file hashes, remove only those two
+files; normalstart; compare activeRC against original backup and confirm no shim
+mapping/environment. Do not delete overlay directories or unrelated contents.
+
+Actual shim mapping and HWCroundtrip JUMP_SLOT target into shim verified.
+Active normal cycle ready15:04:19/controllaunch0 at15:04:32; native frames visible.
+SystemUI ANR15:03:28 KeyguardService still occurred; close-app recovery recreated
+ownActivity15:06:50. Native tap522,520 at15:07:30; Space animationfalse15:08:16;
+Windows pausedframe726 confirmed. Screencap0/31791bytes. Composer81 main sampled
+waiting for Binder work, not roundtrip. One nested pass, not permanent/seamless
+proof. Androidcontrol1631/SF97/SystemUI2851; hostHWC9767; rootPTY1497 alive.
+All nativeprobe/backgroundtrial jobs finished. Own Androidprobe files are only
+under /data/local/tmp/windroid-lab-queue, retained for reproducibility.
+
+NEXT: back up /etc/windroid/windroid.conf, waydroid.cfg and current runtime
+persist.waydroid.multi_windows=false. waydroid.cfg currently says true while
+Android's persisted runtime value is false; don't confuse the two. Conduct one
+bounded seamless trial with NESTED_WESTON=false/MULTI_WINDOWS=true and runtime
+multi_windows=true using active shim, ordinaryGL and no size/DPI/renderer change.
+Normal stop/start and launch own control. Verify actual socket mapping/native
+frames/input, retain logs. Restore lab nested fallback/config/property afterward
+regardless of outcome; don't claim product defaults fixed from one observation.
+Nintendo remains force-stopped; no account/protected app changes.
+
 ## Blockers, evidence and uncommitted work
-- Unresolved: seamless graphics/framework crashes, WSL fragmented-memory new
-  channels, Nintendo cause. Historical AppData lookup failure not reproduced.
-- Inno compiler download/install was rejected by automatic approval review as
-  'blocked by policy'. Do not retry via another launcher. Core WOW64 detection
-  is verified; compiled wizard UI remains untested. No approval is pending.
-- Source changes committed throughbd8d2b6; pending kernel-control/checkpoint docs.
-- Reports: docs/NINTENDO-3.6.0.md, GRAPHICS-INVESTIGATION.md and
-  WSL-SESSION-RELIABILITY.md. Raw evidence: lab evidence/integration-2026-11-07,
-  graphics-protocol-2026-11-06, 2026-11-06-runtime and nintendo-3.6.0.
-  APKs/native binaries, raw tombstones/memory and GApps images stay local-only.
-- Update this checkpoint/journal after findings, mirror substantive ROADMAP/
-  CHANGELOG updates into lab, and commit coherent changes. No automatic quota
-  continuation was configured; docs/CONTINUATION.md explains supported resume.
+- Unresolved: seamless graphics/framework startup ANRs, WSL memory/channel
+  failures, Nintendo crash cause; historical AppData lookup error not reproduced.
+- Inno installation was rejected by automatic approval review as 'blocked by
+  policy'; do not retry via another launcher. Compiled wizardUI still untested.
+- Source diagnostics committed59f93f8. Pending checkpoint and real-shim trial
+  documentation; inspect actual diff before commit. No push/PR performed.
+- Evidence: lab evidence/integration-2026-11-07/kernel-path-control. Earlier
+  baseline/graphics/Nintendo directories and docs retain prior successful work.
+  Binary images/APKs/SDKs/keys/raw traces stay outside Git.
+- Mirror substantive ROADMAP/CHANGELOG updates into lab and maintain journal.
+  No automatic quota-reset continuation/submission loop or paid fallback.
