@@ -56,3 +56,60 @@ measured minimum requirements for this older individual HAL. No full source sync
 was started. Investigate a smaller native Android Wayland probe/matching-library
 build before considering an entire platform build. No external build host,
 remote CI workload or paid capacity has been requested or configured.
+
+## Native Android probe
+
+`android-probe.c` loads the unchanged installed composer library into its own
+process and resolves exported Wayland functions. It never calls the HAL open
+operation or a service API. `load` checks dependencies and symbol origin without
+connecting; `shared`/`private` use a separate connection. A five-second alarm
+bounds each process. Requests default200; an optional count accepts1..100000.
+
+```bash
+ANDROID_NDK_ROOT=/path/to/verified/android-ndk-r25c \
+  bash diagnostics/wayland-roundtrip/build-android.sh /absolute/output/probe
+```
+
+Stage only that executable in an owned Android test directory. In the lab,
+`LD_LIBRARY_PATH=/vendor/lib64:/apex/com.android.vndk.v33/lib64:/system/lib64`,
+`XDG_RUNTIME_DIR=/run/xdg`, `WAYLAND_DISPLAY=wayland-0` were set only for each
+test process. These paths were verified on this image; do not apply them to
+other images without checking. Keep an external timeout as well.
+
+NDK r25c archive SHA256
+`769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108`, published
+SHA1`53af80a1cce9144025b81c78c8cd556bff42bd0e` verified. The legacy toolchain is
+pinned for this Android13 diagnostic. It is not a product dependency. Compilation
+with `-Wall -Wextra -Werror` and builder syntax/ShellCheck pass.
+
+On November7, load-only succeeded and symbol origin was the installed HWC.
+Three200-request trials passed in each mode. Increasing to20000 requests
+reproduced shared-queue stalls, while all three private-queue trials completed.
+See local `android-queue-stress-results.txt` for exact outcomes. This tests the
+actual linked library, but still does not prove a real composer fix. The running
+composer remained unchanged and stalled during these isolated tests.
+
+The20000-request shared trials all exited142 (the probe's five-second alarm),
+before the next2000-request progress marker. Private trials all exited0. A
+separate `preload` probe mode resolves the replacement through `RTLD_DEFAULT`
+and reports its symbol origin, so a passing test cannot silently use the old
+roundtrip implementation.
+
+## Experimental per-call queue shim
+
+`queue-shim.c` interposes only `wl_display_roundtrip`. Each call creates its own
+sync queue, invokes the original queue-specific function and destroys that
+queue while preserving errno. It resolves the already-loaded HAL via
+`RTLD_NOLOAD`, because HAL modules can be local to the dynamic loader. It does
+not open a HAL, change a display setting or modify the vendor binary.
+
+`build-shim.sh` builds the optional shared library with the same verified NDK.
+Activation is deliberately absent from the builder and installer. Native
+`preload` stress trials with this library passed20000 requests in3/3, with the
+reported roundtrip origin pointing to the shim. This validates isolated
+interposition; a real composer lifecycle/visual/input test is still required.
+
+The installed HAL has a `JUMP_SLOT` relocation for `wl_display_roundtrip`, making
+a composer-only loader experiment possible. Any such experiment needs a backup
+of its init definition, explicit rollback of owned overlay files, and a normal
+container restart. Never apply LD_PRELOAD to all Android services or apps.

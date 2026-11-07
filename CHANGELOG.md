@@ -1,5 +1,16 @@
 # Windroid lab changelog
 
+## 2026-11-07 — native Android queue control
+- Built an isolated native probe that loads the unchanged installed HWC and
+  calls its exported Wayland client functions. At20000 requests, shared-queue
+  mode stalled3/3; private queue passed3/3. Short200-request trials passed both.
+- Added an experimental per-roundtrip queue interposer. Isolated preload trials
+  passed20000 requests3/3 with confirmed symbol origin. This is not yet real
+  composer recovery proof and is not enabled by the installer.
+- Verified/cache-pinned NDK r25c; installed unzip only (no unrelated upgrades).
+  Native strict-warning compilation and builder syntax/ShellCheck pass. No
+  source image, protected app or security configuration change.
+
 ## 2026-11-07 — composer queue investigation
 - Captured a control-app/SF/composer blocked-call chain during native window
   creation, distinct from idle blanking. Fresh protocol clients remain responsive;

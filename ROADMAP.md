@@ -12,6 +12,8 @@ must not be repeated just because an earlier journal entry was pending.
 - [ ] Isolate seamless WSLg presentation and framework/compositor instability.
   Latest nested stall has HWC window creation waiting on a Wayland roundtrip;
   standalone shared-queue probe hangs2/3 while private-queue control passes3/3.
+  Native installed-library stress now hangs3/3 shared and passes3/3 private;
+  experimental isolated interposer passes3/3. Real composer validation next.
   Validate an Android composer queue-ownership correction before claiming a fix.
   GL/Pixman nested controls can navigate; neither partial nor boot-wide HWUI
   Vulkan proved a fix. All temporary renderer/size/protocol overrides removed.
