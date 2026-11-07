@@ -33,3 +33,8 @@ assets/wizard-*.bmp
 
 # Scratch dropbox for images/files handed over during a session
 .filedump/
+
+# Optional Android diagnostic build/signing outputs
+diagnostics/android-control/*.apk
+diagnostics/android-control/*.p12
+diagnostics/android-control/*.keystore

@@ -31,6 +31,9 @@ must not be repeated just because an earlier journal entry was pending.
   no push/PR performed yet. Broader hardware/coexistence coverage remains open.
 
 ## Completed and evidenced
+- [x] Build/sign own permission-free Android frame/input diagnostic; bounded
+  nested Windows rendering, mouse and Space controls observed. System UI startup
+  ANR remains separate and unresolved.
 - [x] Audit authorized dedicated Windows11Pro/i5/8GB host; existing Git/tools,
   handoff and upstream development documentation reviewed.
 - [x] Establish tracked continuation/checkpoint and engineering journal. No

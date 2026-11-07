@@ -1,5 +1,14 @@
 # Windroid lab changelog
 
+## 2026-11-07 — optional Android frame/input control
+- Added a small permission-free Java Canvas diagnostic with frame/tap counters
+  and a Space animation toggle, plus a local-only builder. It is separate from
+  bundled apps and does not fetch tools or contact a service.
+- Built with verified cached SDK33/R8 and JDK21; APK signatures verified.
+  Windows rendered advancing frames and received mouse/Space input after a
+  separate System UI startup ANR recovery. No seamless/Nintendo pass claimed.
+- APKs, SDK binaries and local development signing keys remain outside Git.
+
 ## 2026-11-07 — asynchronous APK installation messages
 - CLI and tray now say "Installation requested" after a successful Waydroid
   request, rather than claiming Android finished installing. The platform
