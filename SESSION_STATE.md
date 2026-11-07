@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-06 (America/New_York), validation checkpoint about20:33 local.
+Updated 2026-11-06 (America/New_York), recovery checkpoint21:09 local.
 
 ## Objective and scope
 Make Windroid reliable and investigate Nintendo Switch App startup. Work only in
@@ -75,13 +75,17 @@ false; original windroid.conf restored; two experiment-created overlay files
 removed after byte checks. Original compositor definition matches backup.
 Untraced nested start21:00:47->21:02:33 ready106s. Live framework query passes,
 but current Windows contained view appears BLACK after show-full-ui/Settings.
-NEXT: inspect newly captured rollback-settings-android.png and bounded crash/
-Weston logs to distinguish Android content from nested/WSLg presentation. Keep
-original images/data/config; do not reinstall. Root PTY52561 remains available.
-Code draft complete/tested: live app-list readiness query rejects stale-log/IPC
+Android rollback screenshot now VERIFIED full Settings UI, awake/displayON;
+Windows Weston window is black. Thus framework rendering recovered, presentation
+path did not. No bounded crash records in rollback sample.
+NEXT: authorized WSL shutdown (not unregister/reinstall), reopen one root PTY
+with history disabled before Android, start nested session and verify Windows
+Settings. This resets presentation/shared-memory paths after repeated in-place
+restarts. Old root PTY52561 will be invalid after shutdown. Preserve images/data.
+Code committed4d2a694; graphics checkpoint16032e2. Completed/tested: live app-list readiness query rejects stale-log/IPC
 errors, waits for recovery without duplicate session, and uses a wall-clock
 readiness budget. Healthy live ensure probe1.909s; deployed to guest after backup.
-Commit completed code/docs, then continue runtime recovery and next roadmap work.
+Continue runtime recovery and next roadmap work after saving reboot/VM checkpoint.
 ## Validation, uncommitted work and blockers
 - Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
   Current documentation checkpoint includes resumed GApps/network validation and
@@ -96,4 +100,3 @@ Commit completed code/docs, then continue runtime recovery and next roadmap work
 - Evidence: lab evidence/2026-11-06-runtime and evidence/nintendo-3.6.0. Raw APKs,
   native binaries, tombstones/memory dumps and GApps images remain local-only.
   Bundle bb97fcb5123085bf3fe7793724bec516bb2b10a3e74358997d31c8ab6775cc95.
-
