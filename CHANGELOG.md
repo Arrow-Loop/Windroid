@@ -93,3 +93,9 @@
 - Lab-only bindfs shared-storage read/write control passed; temporary mount and empty target directory removed, personal Downloads unchanged. Six awake IP/DNS samples across five minutes passed all12 ping commands. No persistent sampler installed.
 - Passive analysis of the twelve existing Nintendo x86_64 records found matching runtime/file instruction bytes: an eight-byte read whose computed operand lies in a no-access mapping, while PC lies in an executable mapping. This narrows the fault mechanism without establishing its cause or intentional rejection; no relaunch or app modification.
 - Read-only installed HWC symbol/disassembly inspection confirms the upstream focus-unlock and dimension-change hotplug guards are already present. No compositor rebuild, replacement or image change applied.
+
+## 2026-11-07 — nested compositor restart completion
+- Fixed another nested lifecycle race: stop now waits for the current user's Weston to exit and reports timeout while still attempting container shutdown. Start rechecks a disappearing existing compositor instead of waiting the whole socket deadline without launching a replacement.
+- Three new regressions fail against the old helper. All13 Linux tests pass (18.565s); Git Bash passes with3 Linux-only skips (41.834s). Bash syntax/ShellCheck pass. Actual normal immediate cycle: stop6s, old compositor absent, replacement PID, readiness88s, exit0. Installed/source hashes match.
+- Temporary local Weston diagnostic flag removed after scenegraph/protocol collection. The diagnostic run rendered Settings and later Battery, with buffer releases and continuing commits. This does not establish a permanent or seamless graphics fix. No image/app/account changes.
+- Post-fix normal restart also rendered Settings in nested Weston and passed Android IP/DNS pings2/2 each. This is one successful cycle, not long-session or seamless proof.

@@ -41,7 +41,7 @@ must not be repeated just because an earlier journal entry was pending.
 - [x] Validate VANILLA uninstall and installed GApps CLI/Start Menu staging.
 - [x] Fix CLI APK path/error propagation, with PowerShell7/5.1 checks.
 - [x] Fix lifecycle locking, live framework readiness, probe termination and
-  nested compositor socket race; ten Linux lifecycle tests and applicable
+  nested compositor socket race; thirteen Linux lifecycle tests and applicable
   Git Bash tests pass, plus syntax/ShellCheck.
 - [x] Verify exact Nintendo artifact/signatures and reproduce both ABI failures;
   retain local-only evidence and stop the target restart loop.
@@ -53,4 +53,6 @@ Completion above applies only to the stated evidence. Installer smoke success
 and framework readiness do not certify visual usability or account compatibility.
 
 - [x] Lab-only bindfs namespace read/write control and six awake IP/DNS samples pass; app file-picker permissions and long-session reliability remain open.
+
+- [x] Fix nested stop/restart exit race; three regressions and a real normal immediate restart pass. Temporary local diagnostic flag removed.
 

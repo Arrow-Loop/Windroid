@@ -32,7 +32,7 @@ quota polling, retry submissions, paid-credit fallback, or parallel agents.
 - Session helper fixes committed: lifecycle serialization, failure propagation,
   explicit nested socket readiness, live framework/package response required
   beyond stale ready log, bounded health query with TERM-to-KILL escalation.
-  Ten Linux lifecycle tests and applicable Git Bash checks pass; ShellCheck and
+  Thirteen Linux lifecycle tests and applicable Git Bash checks pass; ShellCheck and
   Bash syntax pass. Commits include db3d92c,4d2a694,83a4ca9; inspect actual log.
 - Nintendo3.6.0/14330 unchanged signed x86_64 splits reproduce libpairipcore
   SEGV_ACCERR +0x794cb. Unchanged x86 split also fails with allocator abort and
@@ -103,8 +103,29 @@ Passive Nintendo analysis: runtime/filebytes match atPC0x794cb; eight-byte data
 read fromrax+rdx falls in---mapping inall12records, whilePCisinr-x. Missing raw
 fault address limits confirmation; intentionality/cause stillunresolved. No
 relaunch or app/protection changes. Reports/journal and mirrored lab docs updated.
-NEXT: inspect debuggerd usage, then capture bounded live backtraces of ONLY
-unprotected HWC and SurfaceFlinger in the current black nested session, before
-any restart. Compare frame/fence waiting with another lock cycle; preserve
-Android/WSLg logs and account data. Evidence: lab evidence/integration-2026-11-07.
-After meaningful findings, update checkpoint/journal and commit coherent docs.
+Live HWC84/SurfaceFlinger118 snapshots exit0: Waylandpoll/EGLsemwait/SFLooperpoll;
+no sampled focus-lock cycle. Expected nested route verified. Temporary Weston
+--debug diagnostic restart instead exposed lifecycle race: old stop returned
+before Weston exit; start reused disappearing compositor and timedout180s
+without launching replacement (08:48:47->08:51:52). Three new isolated tests
+fail old helper. New source waits bounded own-UID Weston exit on stop and
+rechecks disappearing existing compositor while waiting for socket on start.
+All13 Linux lifecycle tests pass18.565s; syntax/ShellCheck pass. Git Bash13-test run also passes41.834s with3 Linux-only skips.
+Existing Windows Python: C:\Users\sdelo\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+WINDROID_TEST_BASH=C:\Program Files\Git\bin\bash.exe; PATH python is only an
+unusable Store alias. Do not install Python or repeat discovery.
+LIFECYCLE FIX validated and ready to commit: rootfs/files/usr/local/bin/windroid-session
+and rootfs/test-session.py. Three new tests fail old source; all13Linuxpass18.565s,
+GitBashpass41.834s with3Linuxskips; syntax/ShellCheck pass. Temporary--debug
+flag REMOVED; installed/source SHA25601afec178e057cc9eaeb286cf1267a679b562b939c95771f15787a4f8aeaccc6.
+Actualnormalimmediatecycle: stop09:00:19->09:00:25(6s), oldWeston25619absent,
+newPID29196, readiness09:01:53(88s), exit0. Diagnosticrunbeforethis renderedSettings
+andlaterBattery; scenegraphbufferrelease/commitscontinue. No graphicsfixclaim.
+Postfixednormalrestart Settings native Network page rendered; IP/DNS2/2 each,
+controlscompleted09:02:39. No debugflag remains. This is one successfulcycle,
+not a long-session/seamless proof. Current checkpoint commits the lifecyclefix
+with source/tests/report validation; inspect actual Git log for commit ID.
+NEXT: verify registered Windows Windroid Settings shortcut activation with the
+working contained session, then continue remaining integration/reliability
+priorities. Do not repeat renderer/size experiments. RootPTY11413 alive;
+lab evidence/integration-2026-11-07. No image/account changes.

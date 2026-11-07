@@ -174,3 +174,39 @@ width and height at `0x47cba`/`0x47cbf` and skips `do_hotplug` when unchanged.
 These specific fixes are already reflected in the installed binary. Rebuilding
 them alone is not a new test hypothesis; this does not exclude other lock or
 surface-lifecycle defects. No binary was patched or replaced.
+
+## Local Weston diagnostics and restart race
+
+Bounded `debuggerd -b` snapshots of HWC and SurfaceFlinger in the black nested
+session completed successfully. The sampled Wayland thread was polling, the
+EGL worker was waiting for work, and SurfaceFlinger's main thread was in its
+Looper. This sample did not show the focus-lock cycle; idle waits alone do not
+prove the whole presentation path healthy. The expected nested socket binding
+and a single Weston process were verified.
+
+Enabling only Weston's documented local `--debug` interface required a restart
+and exposed another lifecycle gap: stop returned while the old Weston was
+exiting. Start could observe it once, skip launching a replacement, and wait
+180 seconds for a socket that disappeared. The log retained the old compositor's
+shutdown and no new startup. Three isolated regressions reproduce the old
+helper's missing exit wait, false stop success and missing replacement.
+
+The helper now waits within its configured budget for the current user's
+nested compositor to exit, reports failure if it does not, and still attempts
+container shutdown. Startup rechecks an existing compositor while waiting for
+its socket, so disappearance can launch a replacement. Thirteen Linux tests
+pass; Git Bash passes with three Linux-only skips. Syntax/ShellCheck pass.
+
+The diagnostic start reached ready in93s. Before launching an app, Weston showed
+its own desktop and the scene graph had only shell views. After supported
+Settings launch, it recorded the1x1 parent plus1280x768 child, buffer releases
+and continuing commits; Windows rendered Settings. Battery selection appeared
+by3,970ms, with the full page observed later, so no exact navigation latency
+is claimed. This control does not explain earlier intermittent black output.
+
+The temporary flag was removed. A normal immediate cycle then stopped in6s,
+left no Weston process, created a new PID and reached live readiness in88s
+(09:00:25->09:01:53 on November7), exit0. Installed helper and source SHA256
+match; no renderer, image or account change was retained. This is a lifecycle
+fix, not a seamless graphics fix. Evidence remains in local
+`evidence/integration-2026-11-07`.

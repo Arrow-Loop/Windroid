@@ -43,6 +43,10 @@ session_running() {
         grep -q 'Container:[[:space:]]*RUNNING' <<< "$status"
 }
 
+nested_weston_running() {
+    pgrep -u "$(id -u)" -f 'weston --backend=wayland-backend' >/dev/null
+}
+
 android_ready() {
     # The log survives framework/compositor restarts. Query the live platform
     # and PackageManager as the session user instead of trusting an old line.
@@ -72,19 +76,22 @@ start() {
         # WSLg's RDP compositor directly (stuck 1x1 buffer bug).
         local weston_pid=''
         local weston_socket="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wayland-1"
-        if ! pgrep -f 'weston --backend=wayland-backend' >/dev/null; then
-            WAYLAND_DISPLAY=wayland-0 setsid nohup weston \
-                --backend=wayland-backend.so --socket=wayland-1 --width=1280 --height=800 \
-                > "$WESTON_LOG" 2>&1 < /dev/null 9>&- &
-            weston_pid=$!
-        fi
         for _ in $(seq "$READY_TIMEOUT"); do
-            [[ -S "$weston_socket" ]] && break
             if [[ -n "$weston_pid" ]] && ! kill -0 "$weston_pid" 2>/dev/null; then
                 echo "ERROR: nested Weston exited before creating $weston_socket" >&2
                 tail -n 20 "$WESTON_LOG" >&2
                 return 1
             fi
+            # An existing compositor can be finishing a previous shutdown.
+            # Recheck while waiting, instead of waiting for its lost socket
+            # for the entire timeout without ever launching a replacement.
+            if [[ -z "$weston_pid" ]] && ! nested_weston_running; then
+                WAYLAND_DISPLAY=wayland-0 setsid nohup weston \
+                    --backend=wayland-backend.so --socket=wayland-1 --width=1280 --height=800 \
+                    > "$WESTON_LOG" 2>&1 < /dev/null 9>&- &
+                weston_pid=$!
+            fi
+            [[ -S "$weston_socket" ]] && break
             sleep 1
         done
         if [[ ! -S "$weston_socket" ]]; then
@@ -150,12 +157,25 @@ start() {
 }
 
 stop() {
+    local weston_stopped=false
     waydroid session stop 2>/dev/null || true
-    pkill -f 'weston --backend=wayland-backend' 2>/dev/null || true
+    pkill -u "$(id -u)" -f 'weston --backend=wayland-backend' 2>/dev/null || true
+    for _ in $(seq "$READY_TIMEOUT"); do
+        if ! nested_weston_running; then
+            weston_stopped=true
+            break
+        fi
+        sleep 1
+    done
+    if [[ "$weston_stopped" != true ]]; then
+        echo "ERROR: nested Weston did not stop after ${READY_TIMEOUT}s" >&2
+    fi
+    # Still attempt container shutdown if Weston did not exit.
     if ! sudo -n /usr/local/sbin/windroid-prep down; then
         echo 'ERROR: could not stop the Android container' >&2
         return 1
     fi
+    [[ "$weston_stopped" == true ]] || return 1
     echo "stopped"
 }
 

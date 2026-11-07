@@ -114,6 +114,27 @@ esac''')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('could not stop', result.stderr)
 
+    def test_stop_waits_for_compositor_exit(self):
+        self.env['TEST_PROBES'] = self.posix + '/weston-probes'
+        self.stub('pgrep', '''n=$(cat "$TEST_PROBES" 2>/dev/null || echo 0)
+n=$((n + 1)); echo "$n" > "$TEST_PROBES"
+(( n < 3 ))''')
+        self.stub('prep', '''if [[ "$1" == down ]]; then
+cat "$TEST_PROBES" 2>/dev/null > "$TEST_STARTS" || echo 0 > "$TEST_STARTS"
+fi''')
+        result = self.run_session('stop')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertGreaterEqual(int((self.root / 'starts').read_text()), 3)
+
+    def test_unresponsive_compositor_stop_is_reported(self):
+        self.conf.write_text('SESSION_READY_TIMEOUT=1\n')
+        self.stub('pgrep', 'exit 0')
+        self.stub('prep', '[[ "$1" != down ]] || echo down > "$TEST_STARTS"')
+        result = self.run_session('stop')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('nested Weston did not stop', result.stderr)
+        self.assertEqual((self.root / 'starts').read_text().strip(), 'down')
+
     @unittest.skipIf(os.name == 'nt', 'Linux Wayland socket fixture required')
     def test_nested_start_waits_for_delayed_socket(self):
         self.conf.write_text('NESTED_WESTON=true\nSESSION_READY_TIMEOUT=6\n')
@@ -123,6 +144,26 @@ esac''')
         self.env['TEST_COMPOSITOR'] = self.posix + '/compositor.py'
         (self.root / 'compositor.py').write_text(
             'import os,socket,time\ntime.sleep(2.5)\n'
+            's=socket.socket(socket.AF_UNIX)\n'
+            's.bind(os.environ["XDG_RUNTIME_DIR"]+"/wayland-1")\ntime.sleep(8)\n')
+        self.stub('weston', 'exec "$TEST_PYTHON" "$TEST_COMPOSITOR"')
+        result = self.run_session('start')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.root / 'starts').exists())
+
+    @unittest.skipIf(os.name == 'nt', 'Linux Wayland socket fixture required')
+    def test_nested_start_replaces_exiting_compositor(self):
+        self.conf.write_text('NESTED_WESTON=true\nSESSION_READY_TIMEOUT=6\n')
+        runtime = self.root / 'runtime'
+        runtime.mkdir()
+        self.env['XDG_RUNTIME_DIR'] = self.posix + '/runtime'
+        self.env['TEST_COMPOSITOR'] = self.posix + '/compositor.py'
+        self.stub('pgrep', '''if [[ ! -e "$TEST_STARTS.probe" ]]; then
+touch "$TEST_STARTS.probe"; exit 0
+fi
+exit 1''')
+        (self.root / 'compositor.py').write_text(
+            'import os,socket,time\n'
             's=socket.socket(socket.AF_UNIX)\n'
             's.bind(os.environ["XDG_RUNTIME_DIR"]+"/wayland-1")\ntime.sleep(8)\n')
         self.stub('weston', 'exec "$TEST_PYTHON" "$TEST_COMPOSITOR"')
