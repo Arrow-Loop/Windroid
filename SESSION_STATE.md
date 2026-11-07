@@ -54,91 +54,70 @@ API fallback or second agent against this worktree.
   Missing reported fault address limits confirmation; cause/intent unresolved.
   No new Nintendo launch, APK modification or protection change.
 
-## Actual environment and rollback status
-- Distro Windroid; InstallRoot: lab runtime\Windroid. WSL3.0.3/WSLg1.0.79,
-  binder kernel6.18.33.1-microsoft-standard-WSL2-windroid+ in public lab directory.
-- Verified GApps system20260927/vendor20261022; official feed still lists this
-  vendor as latest. Keep app/account data; never automate sign-in or credentials.
-- Lab fallback NESTED_WESTON=true, MULTI_WINDOWS=false. Source defaults remain
-  false/true. Normal GL renderer; no temporary overlays, forced sizes, global
-  DPI override, HWUI Vulkan override or Weston --debug flag remains.
-  Experimental composer-only queue overlay is active as detailed below.
-- Installed helper includes committed idle-time fixbd8d2b6, SHA256
-  bdbfba689dd18116b40cb1c6f49361eb678102e91093113dbcf15055bf9c687b.
-- .wslconfig remains memory=3GB, autoMemoryReclaim=gradual. Host available RAM
-  was743MiB/7778 at09:27; do not raise the cap blindly.
-- Old root PTYs11413/40201 ended at WSL shutdown. Retained rootPTY1497 is alive
-  with HISTFILE=/dev/null; verify session IDs after resets. Reuse it to
-  avoid additional VMBus allocations. No listener/monitoring service installed.
-- Nintendo currently installed ABI is x86 and target remains force-stopped.
+## Actual environment and active experiment
+- Distro Windroid; InstallRoot: lab runtime\Windroid. WSL 3.0.3 / WSLg 1.0.79,
+  binder kernel 6.18.33.1-microsoft-standard-WSL2-windroid+ in public lab path.
+- Verified GApps system 20260927 / vendor 20261022. Preserve app/account data.
+- Lab fallback NESTED_WESTON=true, MULTI_WINDOWS=false; Android persist multi=false.
+  Source defaults remain false/true. Normal GL; no size, DPI or Vulkan override.
+- Original .wslconfig restored byte-for-byte after the CPU comparison:
+  SHA256 C86527AFE90712FC8B7C6CC8655A5C3F40A90A57D80F21801AE58F58C40D0879.
+  processors key absent (8 logical CPUs); memory=3GB / autoMemoryReclaim=gradual.
+- Installed helper SHA256 bdbfba689dd18116b40cb1c6f49361eb678102e91093113dbcf15055bf9c687b.
+- Retained root PTY 68395 verified alive at 16:03; HISTFILE=/dev/null. Prior
+  PTYs 1497/56941 ended at WSL shutdown. Reuse current terminal where available.
+  Its variable i points to lab evidence/integration-2026-11-07.
+- Nintendo installed ABI x86 remains force-stopped. Do not repeat launches blindly.
+- EXPERIMENT ACTIVE: composer-only LD_PRELOAD scoped to window::create.
+  /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
+  SHA256 762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2
+  /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
+  SHA256 c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578
+  Both hashes rechecked 16:03. No global/app preload or original image changes.
+  Original RC backup: lab evidence/integration-2026-11-07/kernel-path-control/
+  init.waydroid.rc.before-shim. Rollback: normal stop, verify these hashes,
+  remove only these two owned files, normal start; compare original RC/no map.
 
-## Active investigation and last successful operations
-- Seamless/stale/black presentation remains intermittent. GL/Pixman and both
-  HWUI Vulkan controls do not justify a renderer-default fix. Installed HWC
-  already contains upstream focus-unlock and hotplug dimension guards; no
-  blind rebuild. See docs/GRAPHICS-INVESTIGATION.md.
-- Bounded HWC/SF backtraces showed idle polling/work waits, not the known focus
-  lock cycle. Temporary Weston diagnostics later recorded mapped Settings
-  surfaces, releases and continuing commits; Settings/Battery rendered.
-  All instrumentation was removed. A titlebar movement attempt was inconclusive.
-- New Windows shortcut activation at09:06 reproduced order7 VMBus ring allocation
-  failure and UtilAcceptVsock110; exact blocked launcher4876 was cancelled.
-  Clean WSL shutdown recovered it; this is recovery, not a permanent fix.
-- Rapid warm activations later passed, but memory snapshots showed free memory
-  moving into file cache. Causality is unproven. Source getAppsInfo enumerates
-  apps/loads labels; a catalog query measured836ms versus259ms platform property
-  plus393ms targeted PM query. No root permission/probe change was justified.
-- Microsoft documents dropCache as another reclaim mode; it has NOT been applied.
+## Latest findings and last successful operations
+- Native installed-library stress: 20,000 requests, shared queue hangs 3/3;
+  private queue passes 3/3. Scoped interposer source committed f7d3d48.
+  Actual composer logs verify original initialization and private window calls.
+  This is diagnostic evidence, not a shipped compositor fix.
+- Seamless control rendered/received mouse and Space after one verified System UI
+  recovery. Maximize recreated an updating view but retained an old-size view in
+  Windows. Nested fallback/config/runtime property subsequently restored.
+- Paired cold starts: four CPUs ready 15:41:30 (~90s); restored eight CPUs ready
+  15:49:48 (~85s), CLI exit0 at 15:49:53. Both rendered the control without System
+  UI recovery in the captured observation; eight-CPU native frame651 seen 15:52.
+  Four/eight worker counts verified. No causal CPU fix; original config retained.
+- First four-CPU click arrived0,0, next at correct662,313. Upstream pointer-enter
+  handler ignores sx/sy. Candidate pointer and window-sync source patches apply
+  and reverse individually/combined at a575cfcc12ab79a122844218f2c6df5bd208cca0.
+  Neither candidate has been compiled as a full HAL or runtime-validated.
+- NDK r25c cached/verified and extracted at /opt/windroid-lab-tools/android-ndk-r25c.
+  ZIP SHA256 769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108.
+- Small component-build feasibility now active: pinned VNDK33 header snapshot
+  d79ad875113d34c9665a65b8a33dcf7a4fb7dcf1 downloaded to lab tools/hwc-native-build.
+  Installed hidl-gen, libwayland-bin and dependency android-libboringssl, exit0;
+  zero upgrades/removals. Plan/install logs retained in kernel-path-control.
 
-## Exact next action: bounded four-vCPU System UI startup control
-Native queue diagnostic committed59f93f8; newer scoped source pending commit.
-NDK25c ZIP SHA256769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108;
-cached labtools/android-control, extracted /opt/windroid-lab-tools/android-ndk-r25c.
-Original native20000-request stress: shared3/3alarm142; private3/3pass; broad
-shim3/3pass. Broad prototype affected registryinit, so it was removed, not shipped.
-Seamless broad trial: ready15:14:02, launch0. InitialwhiteWindowsframe was
-confounded by SystemUIANR. After verified SystemUI495 TERM15:17:32, nativefull
-controlvisible; tap377/883 andSpacepausedframe883 passed. Maximize15:21:06
-recreatedActivity/view3000x1810, but Windows retainedold927x1553pausedview over
-newupdatingview. Androidscreenshotonlynewview. Headerdragmovementinconclusive.
-OldPID84tracequarantined wrong-pid84; actualcomposer85traceused. NoNintendochange.
+## Exact next action
+Inspect/hash/extract cached VNDK33 headers and fetch pinned HWC source plus needed
+Waydroid HIDL definitions. Determine whether an isolated NDK/VNDK33 component build
+can reproduce an UNMODIFIED baseline before compiling the two candidates. Record
+compiler/ABI/dependency limitations explicitly. Do not install a candidate vendor
+binary before baseline checks, rollback preparation and bounded validation.
+No full AOSP sync, external build host or paid service is authorized/needed.
+If isolated build is infeasible, document the specific blocker and advance other
+roadmap checks rather than repeating completed experiments.
 
-Fallback restoration complete15:24:35: config/cfg byte-matchbackups in lab
-kernel-path-control; runtime multi=false; broad overlay files hashchecked/removed.
-New SCOPED shim uses privatequeue only for window::create, passes othercalls to
-original; no hard-coded addresses, logsfirstpath. Source compiledstrictwarnings.
-RealHWC84 logged originalinit15:26:35.852 thenprivatewindow15:26:35.857. Ready
-15:28:36/control0 15:28:44; Windowscounter1291visible with separateSystemUIANR.
-Warm own-probe outsideWindow callprintsoriginshim/originalbranch thenalarm142,
-confirmingpass-through; firstboot-timeprobe0bytes is inconclusive, notqueueproof.
-
-EXPERIMENT ACTIVE, composer-only LD_PRELOAD via two owned files:
-- /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
-  SHA256762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2
-- /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
-  SHA256c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578
-Original image files unchanged. ActiveRCbackup init.waydroid.rc.before-shim in
-lab evidence/integration-2026-11-07/kernel-path-control. ROLLBACK normalstop,
-verifythesehashes/removeonly2files, normalstart and compareoriginalRC/no shimmap.
-No globalpreload, privilege/security/renderer/DPI/size change. Source product
-false/true defaults retained; lab nestedtrue/multifalse restored. RootPTY1497
-alive, sourcehelperbdbfba... unchanged; Androidcontrol1673/SF106/SystemUI493.
-
-NEXT: prepare one processors=4 .wslconfig trial with rawbackup/hash, retaining
-memory3GB/reclaimgradual/kernel paths/nestedfallback/scopedshim. Baseline8vCPU
-ready134sec andSystemUIKeyguardANR15:27:48. SystemUIalreadyAOTspeed/prebuilt,
-so don'trecompile. CurrentSwiftShaderprimarysource defaults workerpool to logical
-CPUcount (inference, notexactbinarysourceproof); baselineHWC had8workerthreads.
-Hypothesis: fewerworkers reduce oversubscription/pressure on4physical-core/8GB
-host. Microsoftdocuments processors key. Stopnormally/checkpoint/shutdownWSL,
-which endsPTY1497. StartviarealWindowsCLI, verify nproc4/ready/ANR/UI; restore
-original.wslconfig afterboundedtrialregardlessofresult. No CPUconfigchange yet.
-
-## Blockers and evidence
-- Unresolved: startupSystemUIANR, stalepresentation/resize, WSLmemorychannels,
-  Nintendo nativecrashes. Queue intervention is diagnostic, not shipped fix.
-- Inno install rejected by automatic approval review ('blocked by policy'); do
-  not retry through another launcher. Compiled wizard UI remains untested.
-- Pending: scopedshim source + docs/checkpoint; inspectdiffbeforecommit.
-- Reports/evidence and journal retain exactcommands/results. Rawbinaries/APKs/
-  SDKs/keys/memorytraces remain outsideGit. No push/PR or quota automation.
+## Blockers, validation and uncommitted work
+- Open: intermittent System UI ANR, seamless stale/resize presentation, first input,
+  WSL VMBus channel allocation, Nintendo native crashes and remaining integration.
+- Inno compiler install was rejected by automatic approval review (blocked by
+  policy); do not retry through another launcher. Wizard UI remains untested.
+- Pending coherent commit: CPU comparison, two UNBUILT source candidates and
+  checkpoint/docs. Inspect actual diff; applicability is not runtime validation.
+- Raw binaries/APKs/SDKs/traces remain outside Git. No push/PR or quota automation.
+- Journal: lab journals/ENGINEERING-JOURNAL.md. Prior detailed evidence remains
+  under evidence/integration-2026-11-07/{kernel-path-control,cpu-budget-control}.

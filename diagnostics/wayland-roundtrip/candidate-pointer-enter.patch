@@ -1,0 +1,27 @@
+--- a/hwcomposer/wayland-hwc.cpp
++++ b/hwcomposer/wayland-hwc.cpp
+@@ -873,9 +873,13 @@
+ };
+
+ static void
+-pointer_handle_enter(void *data, struct wl_pointer *,
++pointer_handle_motion(void *data, struct wl_pointer *pointer,
++                      uint32_t time, wl_fixed_t sx, wl_fixed_t sy);
++
++static void
++pointer_handle_enter(void *data, struct wl_pointer *pointer,
+                      uint32_t serial, struct wl_surface *surface,
+-                     wl_fixed_t, wl_fixed_t)
++                     wl_fixed_t sx, wl_fixed_t sy)
+ {
+     if (!surface) {
+         // The surface this enter event corresponds to was already destroyed
+@@ -885,5 +889,8 @@
+     struct display *display = (struct display *)data;
+     display->pointer_surface = surface;
+     display->pointer_enter_serial = serial;
++    // Enter already carries the surface-local position. A click can arrive
++    // before any motion event, so initialize Android's pointer position now.
++    pointer_handle_motion(data, pointer, 0, sx, sy);
+     display->cursor_handler->on_cursor_enter(display);
+ }

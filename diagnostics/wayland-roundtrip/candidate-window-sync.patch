@@ -1,0 +1,38 @@
+--- a/hwcomposer/wayland-hwc.cpp
++++ b/hwcomposer/wayland-hwc.cpp
+@@ -544,9 +544,25 @@
+     window->set_app_id(std::move(appID));
+
+     wl_surface_commit(window->surface);
++    // A second thread dispatches the default queue. Give this thread sole
++    // ownership of each sync callback, while configure events stay on the
++    // background dispatcher's default queue.
++    auto window_roundtrip = [&]() {
++        std::unique_ptr<wl_event_queue, decltype(&wl_event_queue_destroy)> queue(
++            wl_display_create_queue(display->display), wl_event_queue_destroy);
++        if (!queue) {
++            ALOGE("Could not allocate window sync queue");
++            abort();
++        }
++        if (wl_display_roundtrip_queue(display->display, queue.get()) < 0) {
++            ALOGE("Window Wayland roundtrip failed: %s", strerror(errno));
++            abort();
++        }
++    };
++
+     // Wait for first configure event
+     do {
+-        wl_display_roundtrip(display->display);
++        window_roundtrip();
+     } while (!window->configured);
+
+     if (calibrating) {
+@@ -567,7 +583,7 @@
+         if (window->viewport && display->req_width && display->req_height)
+             wp_viewport_set_destination(window->viewport, display->req_width, display->req_height);
+         wl_surface_commit(window->surface);
+-        wl_display_roundtrip(display->display);
++        window_roundtrip();
+
+         if (fs) {
+             wp_fractional_scale_v1_destroy(fs);

@@ -1,5 +1,16 @@
 # Windroid lab changelog
 
+## 2026-11-07 — CPU budget comparison and source candidates
+- Both four- and restored eight-vCPU cold starts reached readiness in about90s
+  and rendered the control without System UI recovery in the observed window.
+  Four/eight renderer workers were verified. This does not establish a CPU-cap
+  fix; original .wslconfig was restored byte-for-byte. RAM remains3GB/gradual.
+- First pointer click in the four-vCPU run arrived0,0; the next had correct
+  coordinates. Source enter handler ignores position, a separate input hypothesis.
+- Prepared two narrowly scoped upstream source candidate patches for window
+  sync ownership and pointer enter. Applicability/reverse checks pass at the
+  pinned revision. Full HAL build/runtime validation remains pending.
+
 ## 2026-11-07 — scoped queue experiment and seamless control
 - Narrowed the diagnostic interposer to exported window creation callers;
   initialization/other calls use the original function. Strict compilation and

@@ -30,6 +30,8 @@ must not be repeated just because an earlier journal entry was pending.
   no-access mapping; its cause remains unresolved. No bypass or compatibility claim.
 - [ ] Finish Windows integration checks: live tray, app shortcuts, lab-only file
   sharing, clipboard/audio and window movement. Do not inspect account data.
+  Investigate first pointer click arriving0,0; source ignores enter coordinates.
+  Candidate source patch is unbuilt and has not been runtime-validated.
 - [ ] Compile/exercise wizard page when compiler installation is permitted;
   prior installation was rejected by automatic approval review. Core Sysnative
   detection is already verified in a real32bit process.
