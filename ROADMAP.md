@@ -80,3 +80,9 @@ These entries supersede stale pending-artifact/reboot steps above; historical ch
 - [x] Identify forced-size maximized-state protocol error; revert unsupported workaround and retain evidence.
 - [ ] Recover/validate contained presentation after rollback (framework ready, current Windows view black), then isolate default-size seamless geometry/input/ANR behavior. Readiness is not graphics proof.
 - [ ] Continue wizard Sysnative runtime check, long-session networking/WSL transport, and Nintendo cause investigation after runtime stabilization.
+
+## Matched controls and WOW64 probe — 2026-11-06
+- [x] Validate core Sysnative detection in a real32bit process on this laptop, including old redirected-path failure and new native-path success.
+- [ ] Compile/exercise wizard page when compiler installation is permitted; automatic approval review rejected the attempted installation command.
+- [x] Compare GL/Pixman under matched full-UI launch path; preserve defaults because renderer-only improvement is unproven.
+- [ ] Finish clean after-readiness seamless launch/navigation control; distinguish transient/app-ANR effects from persistent presentation failure.

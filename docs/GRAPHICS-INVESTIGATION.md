@@ -83,3 +83,43 @@ waits for framework recovery without spawning another daemon. Ten isolated
 Linux lifecycle tests pass; applicable Git Bash tests pass with two Linux-only
 skips. The recovered real guest passed a live ensure probe in1.909s. This checks
 framework responsiveness, not app ANRs or the Windows presentation path.
+
+## Subsequent controls
+
+A WSL shutdown restored presentation initially, but full-UI startup reproduced
+a System UI ANR. Its main thread waited in `RenderProxy::setStopped`; a render
+thread was runnable in `memmove` and ANGLE texture staging. This is a specific
+backend lead, not proof of a deadlock. Raw target-only trace remains local.
+
+The temporary `debug.hwui.renderer=skiavk` trial was verified with
+`dumpsys gfxinfo`: both System UI and Settings used Skia Vulkan. Android rendered
+Settings while the Windows view stayed black. The setting was cleared; it is
+not a verified workaround. No renderer override was persisted.
+
+Waydroid's `active_apps=Waydroid` selects full-desktop mode, while an app package
+selects single-app mode even with multi_windows=false. The source app launcher
+changes that property. `show-full-ui` additionally expands/collapses the
+notification shade. Comparisons must distinguish those paths. A later control
+set full-desktop mode and used Android `am` only to launch Settings after
+readiness, avoiding the shade refresh.
+
+Weston 13's supported `--renderer=pixman` was tested only in the installed lab
+helper, with a backup. It reached readiness in 124 seconds. A Battery click
+reached Android and produced a Battery screencap while an immediate Windows
+capture still showed Network. A normal animated `weston-simple-shm` client
+rendered inside the same desktop; Android updates also became visible. However,
+updates later occurred without the animation, so repaint starvation is not an
+established cause. The control client was stopped.
+
+A bounded navigation sample without the control client showed Battery at
+1,790 ms and Network at 5,355 ms after the next click. Thus this Pixman/full-UI
+path can update and navigate, with latency. Earlier isolated stale snapshots
+are not proof that every such frame is permanently frozen. An original-GL
+control using the same full-UI/no-shade launch method is in progress before any
+claim that Pixman alone improved reliability. Source renderer defaults remain
+unchanged.
+
+The live-framework timeout now escalates to SIGKILL after one additional second
+if the query ignores termination. A stubborn 30-second mock distinguishes this
+from an unbounded wait. Linux and Git Bash checks pass; the latter uses a wider
+wall-time assertion to allow process startup under this host's Android load.

@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-06 (America/New_York), recovery checkpoint21:09 local.
+Updated 2026-11-06 (America/New_York), active control checkpoint21:41 local.
 
 ## Objective and scope
 Make Windroid reliable and investigate Nintendo Switch App startup. Work only in
@@ -51,7 +51,7 @@ No quota polling, resets/credits, parallel agents or personal-account automation
 - Kernel order7 vmbus_alloc_ring/hvs_probe failures precede WSL new-session
   WSAETIMEDOUT (upstream WSL#40795). Runtime compaction80 experiment did NOT
   prevent recurrence and was not persisted. WSL shutdown recovers channels.
-- Established persistent root WSL PTY52561 after prior shutdown; reuse it rather
+- Established persistent root WSL PTY11413 after21:09 shutdown; reuse it rather
   than opening many WSL commands under fragmentation. It may expire on reset:
   never assume tool session IDs remain live. No listener/service was installed.
 - Fresh source session start reached ready20:13:18. Session helper in guest has
@@ -65,27 +65,34 @@ No quota polling, resets/credits, parallel agents or personal-account automation
   Target force-stopped20:17:06; pidof then empty. System UI ANR observed.
 
 ## Last successful operation and exact next action
-Resumed graphics protocol investigation21:00-21:08 local. Detailed methods and
-results: docs/GRAPHICS-INVESTIGATION.md. Direct-mode Settings showed a native
-frame but an Android ANR; not a usable result. no_background switch not proven.
-Forced640x480 size caused exact maximized-state protocol violation and HAL
-restart loops. Do not repeat the unsafe override or global DPI test.
-Rollback completed: width/height/no_background cleared to empty; multi_windows
-false; original windroid.conf restored; two experiment-created overlay files
-removed after byte checks. Original compositor definition matches backup.
-Untraced nested start21:00:47->21:02:33 ready106s. Live framework query passes,
-but current Windows contained view appears BLACK after show-full-ui/Settings.
-Android rollback screenshot now VERIFIED full Settings UI, awake/displayON;
-Windows Weston window is black. Thus framework rendering recovered, presentation
-path did not. No bounded crash records in rollback sample.
-NEXT: authorized WSL shutdown (not unregister/reinstall), reopen one root PTY
-with history disabled before Android, start nested session and verify Windows
-Settings. This resets presentation/shared-memory paths after repeated in-place
-restarts. Old root PTY52561 will be invalid after shutdown. Preserve images/data.
-Code committed4d2a694; graphics checkpoint16032e2. Completed/tested: live app-list readiness query rejects stale-log/IPC
-errors, waits for recovery without duplicate session, and uses a wall-clock
-readiness budget. Healthy live ensure probe1.909s; deployed to guest after backup.
-Continue runtime recovery and next roadmap work after saving reboot/VM checkpoint.
+Graphics protocol experiment overlays removed; dimensions/no_background empty,
+HWUI debug override empty, multi_windows=false, nested config restored. Original
+compositor definition matched backup; Android data/images retained.
+After WSL shutdown, new rootPTY11413 is live. Fresh start ready21:11:15. Full UI
+reproduced SystemUI ANR (render thread ANGLE texture staging); later host view
+black with Android Settings rendering. Runtime skiavk confirmed for both UI
+processes but did not fix presentation; cleared before container restart.
+Temporary installed-helper Pixman trial reached ready124s. Full-UI property plus
+Android am Settings launch (no shade refresh) rendered a usable frame. Battery
+click reached Android; bounded later navigation showed old page1790ms/new5355ms.
+Simple-shm animation control worked and was stopped; updates also occurred after
+it stopped, so no claim that animation is required to unfreeze presentation.
+MATCHED GL CONTROL: ready114s, full-UI/no-shade launch rendered and navigated;
+existing windroid-app also rendered withoutblack. Pixman alone not proven fix;
+source/installed helper now originalGL default with83a4ca9, no renderer override.
+NEXT ACTIVE CONTROL: clean seamless repeat justified by previous premature-launch
+ANR confound. Settings force-stopped, runtime multi_windowstrue, stop in progress.
+Apply select-direct.py only once STOPPED, start normally, waitlive readiness,
+then launch only via windroid-app Settings and test native navigation. No early
+am/show-full-ui calls. Restore original nestedconf/multifalse afterward if needed.Current Git code commits4d2a694/83a4ca9 validated; ten Linux tests, applicable Git
+Bash tests (two Linux-only skips), syntax/ShellCheck pass. Stubborn query test
+passes Linux2.234s/GitBash4.844s. No code awaiting commit except docs updates.
+Wizard compiler installation was rejected by automatic approval review with
+blocked by policy; do not retry via another launcher. Read-only32bit
+probe completedexit0: redirectedSystem32wsl absent, Sysnativepresent/status0,
+hypervisortrue. Core WOW64 fix runtime-verified; compiledwizardUI untested.
+Per-process launcher ExecutionPolicy flag used; global policy unchanged. Continue remaining
+roadmap work after this controlled rendering comparison without routine approval.
 ## Validation, uncommitted work and blockers
 - Completed code/tests committed db3d92c; Nintendo report checkpoint4222460.
   Current documentation checkpoint includes resumed GApps/network validation and
@@ -93,7 +100,7 @@ Continue runtime recovery and next roadmap work after saving reboot/VM checkpoin
   modern software-renderer identity; check actual Git state for final status.
 - Ten Linux lifecycle tests pass; Git Bash ten tests pass with two Linux-only
   skips. Bash syntax/ShellCheck warning level pass. Live query passes. Current
-  changes: session helper/tests and graphics report/checkpoint/changelog/roadmap.
+  changes are documentation only; helper/tests committed4d2a694 and83a4ca9.
 - Prior firstboot6 Linux tests, CLI/artifacts PS7/5.1 checks pass as documented.
 - Blockers: seamless graphics, intermittent SurfaceFlinger DEAD_OBJECT abort,
   WSL fragmented-memory new-channel failures. Nintendo cause still unresolved.
