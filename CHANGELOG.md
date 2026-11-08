@@ -1,5 +1,12 @@
 # Windroid lab changelog
 
+## 2026-11-08 — CI exit status
+- Hosted Noble run passes firstboot6/lifecycle13 and PowerShell parsing/artifacts.
+  CLI assertions passed but its expected mocked failure left LASTEXITCODE nonzero.
+- Clear that status only after all CLI assertions pass. GitHub-style wrappers
+  now exit0 for CLI and tray tests in PowerShell7 and Windows PowerShell5.1.
+  UTF-8 BOM retained; hosted rerun pending.
+
 ## 2026-11-08 — CI target reproducibility
 - First published CI run on ubuntu-latest (now26.04) failed the strict stubborn
   child timeout regression at30s. Kept the test and deadline unchanged.

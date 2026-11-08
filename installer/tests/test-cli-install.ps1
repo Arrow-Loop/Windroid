@@ -29,6 +29,8 @@ try {
             throw "Installation ran after $failure failed"
         }
     }
+    # Expected native failures above must not become the runner's exit status.
+    $global:LASTEXITCODE = 0
     Write-Host 'ALL CLI INSTALL TESTS PASS'
 } finally {
     Remove-Item -LiteralPath $apk -Force
