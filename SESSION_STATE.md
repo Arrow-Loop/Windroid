@@ -15,7 +15,7 @@ API fallback or second agent against this worktree.
 - Handoff: lab HANDOFF.md; journal: lab journals/ENGINEERING-JOURNAL.md.
 - Read AGENTS.md, ROADMAP.md, CHANGELOG.md, docs/CONTINUATION.md, README.md and
   docs/PLAN.md. Check actual Git status, branch, recent commits and diff.
-- Branch: codex/lab-reliability. No push/PR performed. Use command-local commit
+- Branch: codex/lab-reliability. Development branch published; no PR/merge performed. Use command-local commit
   identity only; Git already exists at C:\Program Files\Git\cmd\git.exe.
 - Use PowerShell 7.6.9 (bundled). Windows PowerShell 5.1 is a test target.
 - Windows Python is bundled at C:\Users\sdelo\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe.
@@ -55,28 +55,30 @@ API fallback or second agent against this worktree.
   No new Nintendo launch, APK modification or protection change.
 
 ## Actual environment and active experiment
-- Nov8 rollback completed0: container RUNNING in restored fallback. Lab NESTED_WESTON=true,
-  MULTI_WINDOWS=false; runtime multi=false restored before stop. Config files
-  byte-match Nov8 before-seamless backups. Source defaults remain false/true.
-- Removed hash-verified owned HWC source-candidate overlay. Original vendor
-  image remains unchanged, original HWC SHA256
-  3dcfbc40b2944fd02d252b06c2eddbfcfd30b926f60d52a8d75ade245c68d1d8.
-- Prior scoped composer-only preload restored from verified backups:
-  /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
-  SHA256 762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2;
-  /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
-  SHA256 c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578.
-  Original RC backup in lab evidence/integration-2026-11-07/kernel-path-control/
-  init.waydroid.rc.before-shim. Rollback this experiment by normal stop,
-  hash-check/remove ONLY these two files and normal start.
-- Windroid distro / lab runtime\Windroid, WSL3.0.3/WSLg1.0.79, binder kernel
-  6.18.33.1-microsoft-standard-WSL2-windroid+. Official GApps images retained.
-- Original .wslconfig SHA256 C86527AFE90712FC8B7C6CC8655A5C3F40A90A57D80F21801AE58F58C40D0879;
-  eight CPUs, memory3GB/reclaimgradual. Normal GL; no size/DPI/Vulkan override.
-- Installed helper SHA256 bdbfba689dd18116b40cb1c6f49361eb678102e91093113dbcf15055bf9c687b.
-- Retained root PTY68395 alive. Variables i=Nov7 integration evidence,
-  j=Nov8 integration evidence; b=guest native build root; c=lab build cache.
-- Nintendo installed ABI x86 remains force-stopped. No protected app change.
+- Nov8 MODAL trial STAGED, container STOPPED. NESTED_WESTON=true,
+  MULTI_WINDOWS=true; Android runtime multi=true was set before stop.
+- Owned source queue+modal overlay:
+  /var/lib/waydroid/overlay/vendor/lib64/hw/hwcomposer.waydroid.so
+  SHA256 790b3148d7007d4fbf2ee1236827d347439ddb1f2612ea38bad5f28c1164449a.
+  Staging0/hash verified; no pointer patch. Prior scoped RC/library overlays
+  hash-checked/removed so they cannot mask the source trial. Original images
+  unchanged; original HWC SHA2563dcfbc40b2944fd02d252b06c2eddbfcfd30b926f60d52a8d75ade245c68d1d8.
+- Rollback: set runtime multi=false while container responds, normal stop0,
+  run lab tools/hwc-native-build/restore-scoped-fallback-modal-local.sh.
+  It verifies790... and saved original/scoped hashes, removes ONLY owned HWC
+  overlay, restores original nestedtrue/multifalse config backups byte-for-byte
+  and prior scoped RC/shim. Then normal start/verify actual hashes/property.
+- Saved scoped files in guest build root rollback-scoped:
+  RC SHA256762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2;
+  shim SHA256c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578.
+  Current these are absent from overlay; do not remove unrelated overlay files.
+- WSL3.0.3/WSLg1.0.79, binder6.18.33.1-windroid+, official GApps retained.
+  .wslconfig original SHA256C86527AFE90712FC8B7C6CC8655A5C3F40A90A57D80F21801AE58F58C40D0879;
+  eight CPUs/memory3GB/reclaimgradual. Normal GL/no size/DPI/Vulkan override.
+- Retained rootPTY68395; i=Nov7 evidence, j=Nov8 evidence, b=guest native build
+  root, c=lab native-build cache. No second agent/writer.
+- Nintendo unchanged/force-stopped. Only own diagnostic APK updated; fault now
+  disarmed after bounded intentional test, no automatic fault submission/loop.
 ## Latest findings and last successful operations
 - Native installed-library stress: 20,000 requests, shared queue hangs 3/3;
   private queue passes 3/3. Scoped interposer source committed f7d3d48.
@@ -101,27 +103,30 @@ API fallback or second agent against this worktree.
   zero upgrades/removals. Plan/install logs retained in kernel-path-control.
 
 ## Exact next action
-Own-control30s diagnostic validated: normal/default-off input works; explicit
-fresh launch flag lab.block_input_once=true arms only first click. Intentional
-block12:18:16.504->12:18:46.505 produced MotionEvent ANR after5002ms; nested
-native/Android modal visible, actual SurfaceFlinger raw layer
-Application Not Responding: org.windroid.lab.control#189. Dialog auto-cleared
-on recovery; native second click taps2/faultoff and no second block. Keep these
-intentional ANRs separate from spontaneous earlier focus failure.
+Modal source790... active after normal start0 in83s; hash/runtime true/no shim verified.
+Default control launch0/native frames1469->1752; tap1 at662,323, no target ANR.
+NEXT armed30s fresh own Activity and one native click, then test modal presentation/Wait/cleanup.
+Prior plan: normal start
+nested+multi=true, verify actual candidate map/hash and no shim, confirm runtime
+multi=true. Launch own diagnostic normally; then explicit fresh armed30s Activity
+and ONE native click to observe whether raw ANR dialog now appears as a window,
+accepts Wait/Close and is removed after recovery. Do not call prototype a fix
+before this runtime comparison. Restore original scoped fallback after bounded
+trial using script above regardless of outcome.
 
-NEXT prepare a narrow upstream HWC candidate for raw ANR layers, which current
-multi-window get_window ignores (only TID/InputMethod handled). No routing fix
-exists yet. Use existing source/build cache and validate compilation plus bounded
-multi-window runtime before shipping. Consider raw title/app-name lookup and
-native close behavior; do not route arbitrary system/security layers blindly.
-Current fallback remains usable with original HWC+scoped shim, multi=false.
-Own control installed30s APK SHA2563e63c05f81ae631c33c8bb037a872431ab21c6aa05d5c35e5c7012d972779076;
-normal input currently disarmed. Original APK backup and12s variant retained in
-Nov8 component-control. No other app/package changed.
+Fixture30s is validated in nested full UI: begin12:18:16.504/end12:18:46.505,
+intentional MotionEvent ANR after5002ms, raw ANR layer#189/native modal visible,
+auto-dismiss on recovery and second click taps2/faultoff. No spontaneous failure
+count from intentional trials. Original direct source-queue trial failed startup/
+focus input; rollback was verified. Evidence under Nov8 component-control.
 
-Prior direct trial failed readiness/input; source candidate/config rolled back.
-See NATIVE-BUILD.md and Nov8 component-control for exact evidence. No full
-compatibility/permanent fix claim. Nintendo unchanged/force-stopped.
+GitHub publication authorized; actual Git push succeeded37 commits through
+cde4cff71a7a3ecb869504295289323cf69f2a86; branch tracks origin/codex/lab-reliability.
+User completed GCM browser sign-in (exit0); no credentials read/logged. No API
+snapshot/PR/merge/force-push. PROGRESS.md and AGENTS record periodic checkpoint
+pushes. First CI run42505826944 failed stubborn-child timeout at30s on new Ubuntu26 runner.
+CI target now pinned to shipped Noble24.04, unchanged strict tests; local6+13 pass.
+Push this coherent CI/progress update, inspect hosted result afterward.
 ## Blockers, validation and uncommitted work
 - Open: intermittent System UI ANR, seamless stale/resize presentation, first input,
   WSL VMBus channel allocation, Nintendo native crashes and remaining integration.
@@ -129,10 +134,6 @@ compatibility/permanent fix claim. Nintendo unchanged/force-stopped.
   policy); do not retry through another launcher. Wizard UI remains untested.
 - Build/probe documentation committed2eb12b5; nested-service results b44949f.
   Pending: current seamless investigation/checkpoint updates.
-- Raw binaries/APKs/SDKs/traces remain outside Git. No push/PR or quota automation.
+- Raw binaries/APKs/SDKs/traces remain outside Git. No PR/merge or quota automation.
 - Journal: lab journals/ENGINEERING-JOURNAL.md. Prior detailed evidence remains
   under evidence/integration-2026-11-07/{kernel-path-control,cpu-budget-control}.
-
-Modal source prototype candidate-anr-layer.patch now compiles/strict-links/isolated-load0, SHA256790b3148d7007d4fbf2ee1236827d347439ddb1f2612ea38bad5f28c1164449a (queue+modal only, no pointer patch). Forward/reverse checks0. NEXT one bounded nested+multi=true runtime trial to test actual ANR-layer window/input/cleanup; no native-close or shipping claim. Backups/config originals and scoped overlays unchanged so far; verify runtime stage/checkpoint before mutation.
-
-Nov8 user authorized periodic GitHub publishing, then requested an interactive credentials window. CLI push failed because no cached HTTPS username and prompting was disabled; no remote change. Visible PowerShell7/GCM browser login opened for Arrow-Loop; only exit status is recorded in lab tools/github-publish/login-result.json, no credentials logged/read. NEXT verify login result, push committed codex/lab-reliability to verified origin Arrow-Loop/Windroid, then resume modal trial. Modal prep stop0 already completed: container STOPPED, runtime multi=true, config still original nestedtrue/multifalse, original HWC+scoped overlays still staged. Candidate790... NOT installed yet. No second writer.

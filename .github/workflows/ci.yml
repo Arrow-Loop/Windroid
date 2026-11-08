@@ -12,7 +12,9 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    # Match rootfs/build.sh's Noble base; latest moved to a different userspace.
+    # Keep the stubborn-child deadline regression strict on our shipped target.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +30,7 @@ jobs:
 
       - name: Python compile + preseed dry parse
         run: |
+          timeout --version
           python3 -m py_compile rootfs/preseed-images.py
           python3 rootfs/test-firstboot.py
           python3 rootfs/test-session.py

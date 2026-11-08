@@ -31,9 +31,10 @@ patches are clearly separated from validated installer/session changes.
 
 ## Current checkpoint
 
-The modal trial is paused for user-requested GitHub sign-in/publication. The
-container is stopped; original HWC and the earlier scoped lab shim are retained.
-The new modal prototype is not installed. Android app/account data is preserved.
+GitHub sign-in and the first37-commit publication succeeded. The queue/modal
+prototype is now running in a bounded nested multi-window trial with no preload.
+Its startup/default window render; modal input and cleanup remain under test.
+Original images/data and exact fallback rollback are preserved.
 
 Continue from [SESSION_STATE.md](SESSION_STATE.md). Read the full
 [CHANGELOG.md](CHANGELOG.md), open [ROADMAP.md](ROADMAP.md),
@@ -43,3 +44,7 @@ Continue from [SESSION_STATE.md](SESSION_STATE.md). Read the full
 Completed checkpoints will be pushed at meaningful milestones, approximately
 30–60minutes of active work, and before substantial session handoffs. This
 requires an active session; no quota-reset polling/submission automation exists.
+
+First hosted CI run exposed a timeout regression failure on the new Ubuntu26
+runner. CI is now pinned to the shipped Ubuntu24.04 target; the unchanged local
+6 firstboot/13 lifecycle tests pass. Hosted validation of that change is pending.

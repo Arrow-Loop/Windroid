@@ -1,5 +1,11 @@
 # Windroid lab changelog
 
+## 2026-11-08 — CI target reproducibility
+- First published CI run on ubuntu-latest (now26.04) failed the strict stubborn
+  child timeout regression at30s. Kept the test and deadline unchanged.
+- Pinned lint CI to Ubuntu24.04, matching rootfs/build.sh's shipped Noble base,
+  and added timeout version output. Local Noble firstboot6/lifecycle13 pass.
+  Hosted rerun remains pending; no claim of Ubuntu26 support or confirmed cause.
 ## 2026-11-08 — repeatable modal diagnostic
 - Added explicit, default-off one-shot input block to the permission-free lab
   control. Verified build/sign, original signer match and diagnostic update.
