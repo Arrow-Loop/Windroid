@@ -132,3 +132,5 @@ compatibility/permanent fix claim. Nintendo unchanged/force-stopped.
 - Raw binaries/APKs/SDKs/traces remain outside Git. No push/PR or quota automation.
 - Journal: lab journals/ENGINEERING-JOURNAL.md. Prior detailed evidence remains
   under evidence/integration-2026-11-07/{kernel-path-control,cpu-budget-control}.
+
+Modal source prototype candidate-anr-layer.patch now compiles/strict-links/isolated-load0, SHA256790b3148d7007d4fbf2ee1236827d347439ddb1f2612ea38bad5f28c1164449a (queue+modal only, no pointer patch). Forward/reverse checks0. NEXT one bounded nested+multi=true runtime trial to test actual ANR-layer window/input/cleanup; no native-close or shipping claim. Backups/config originals and scoped overlays unchanged so far; verify runtime stage/checkpoint before mutation.

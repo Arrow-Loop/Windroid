@@ -1,0 +1,21 @@
+--- a/hwcomposer/modes/multi-window.cpp
++++ b/hwcomposer/modes/multi-window.cpp
+@@ -44,6 +44,18 @@
+             return windows.add(pdev, layer_info.tid, layer_info.aid, layer_info.tid, color_transparent);
+         }
+     } else if (layer_info.type == LayerSplitType::RawName) {
++        // System-server ANR dialogs have no Activity task ID. Ignoring this
++        // raw layer hides the dialog while Android still intercepts input.
++        if (layer_info.aid.rfind("Application Not Responding: ", 0) == 0) {
++            auto it = windows.find(layer_info.aid);
++            if (it != windows.end())
++                return it->second.get();
++            // Use the existing desktop identity without looking up a raw
++            // surface name as an Android package through the task service.
++            auto *dialog = windows.add(pdev, layer_info.aid, "Waydroid", "none", color_transparent);
++            dialog->set_title(layer_info.aid.c_str());
++            return dialog;
++        }
+         if (layer_info.aid == "InputMethod") {
+             auto it = windows.find("InputMethod");
+             if (it != windows.end()) {

@@ -27,3 +27,20 @@ capture/relative input, scaling and subsurface offsets need validation.
 The intended integration is an upstream composer source correction, rather
 than automatic installation of diagnostic interposers. No PR, remote build,
 paid capacity or image publication has been performed.
+
+## Raw ANR layer prototype
+
+`candidate-anr-layer.patch` targets the same pinned source. The intentional lab
+fault captured `Application Not Responding: org.windroid.lab.control#189` as a
+raw SurfaceFlinger layer. Current multi-window routing accepts TID layers and
+only InputMethod raw layers. The prototype gives this specific ANR prefix a
+separate window, reuses the existing Waydroid desktop identity and sets its
+raw title without package-name lookup. It does not route arbitrary raw layers.
+
+Combined queue/modal source compiles and strict-links; isolated Android load0.
+SHA256 `790b3148d7007d4fbf2ee1236827d347439ddb1f2612ea38bad5f28c1164449a`.
+Forward/reverse dry-run checks pass. Runtime presentation, dialog placement,
+input, native close, dismissal/cleanup and multiple dialogs remain unvalidated.
+It is a prototype, not a shipped fix. In particular, taskless system windows
+need review of native-close semantics; Android dialog buttons remain the intended
+recovery actions for the bounded test.
