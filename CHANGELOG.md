@@ -1,5 +1,12 @@
 # Windroid lab changelog
 
+## 2026-11-08 — repeatable modal diagnostic
+- Added explicit, default-off one-shot input block to the permission-free lab
+  control. Verified build/sign, original signer match and diagnostic update.
+  Normal launch/input pass; explicit30s block produces labeled intentional ANR.
+- Captured actual raw ANR layer name and visible dialog in nested full UI.
+  Recovery cleared the dialog; second click did not block. This supports source
+  modal-routing investigation without conflating deliberate/spontaneous failures.
 ## 2026-11-08 — direct focus failure and experiment rollback
 - Direct source-candidate startup missed180s live readiness; app catalog also
   timed out, while explicit PM/owned Activity controls responded. A separate

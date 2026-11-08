@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -16,7 +17,10 @@ import android.view.View;
 public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ControlView view = new ControlView(this);
+        boolean blockInput = savedInstanceState == null
+                && getIntent().getBooleanExtra("lab.block_input_once", false);
+        getIntent().removeExtra("lab.block_input_once");
+        ControlView view = new ControlView(this, blockInput);
         setContentView(view);
         view.requestFocus();
         Log.i("WindroidLab", "activity created");
@@ -30,9 +34,11 @@ public final class MainActivity extends Activity {
         private float lastX = Float.NaN;
         private float lastY = Float.NaN;
         private boolean animate = true;
+        private boolean blockNextInput;
 
-        ControlView(Context context) {
+        ControlView(Context context, boolean blockInput) {
             super(context);
+            blockNextInput = blockInput;
             unit = getResources().getDisplayMetrics().density;
             paint.setTypeface(Typeface.MONOSPACE);
             paint.setTextSize(22 * unit);
@@ -52,7 +58,8 @@ public final class MainActivity extends Activity {
                 "View: " + getWidth() + " x " + getHeight(),
                 Float.isNaN(lastX) ? "Touch: none" : "Touch: " + Math.round(lastX) + ", " + Math.round(lastY),
                 "Animation: " + (animate ? "running" : "paused"),
-                "Click to count. Space pauses/resumes."
+                "Click to count. Space pauses/resumes.",
+                blockNextInput ? "Lab fault armed: first click blocks input for 30s." : "Lab fault: off."
             };
             float y = 48 * unit;
             for (String line : lines) {
@@ -70,6 +77,12 @@ public final class MainActivity extends Activity {
                 lastX = event.getX();
                 lastY = event.getY();
                 Log.i("WindroidLab", "tap=" + taps + " x=" + lastX + " y=" + lastY);
+                if (blockNextInput) {
+                    blockNextInput = false;
+                    Log.w("WindroidLab", "intentional_block_begin duration_ms=30000");
+                    SystemClock.sleep(30000);
+                    Log.w("WindroidLab", "intentional_block_end");
+                }
                 invalidate();
             }
             return true;

@@ -101,25 +101,27 @@ API fallback or second agent against this worktree.
   zero upgrades/removals. Plan/install logs retained in kernel-path-control.
 
 ## Exact next action
-Restoration validated: original HWC hash3dcfbc... and scoped shim mapping verified;
-runtime multi=false; fallback start0 (11:58:13->12:00:07,114s), control0, native
-frames460->2146, mouse512,375/taps1. Keyboard pause logged12:05:33.381; confirm
-native paused frame if needed. IP/DNS each2/2 pass; no target ANR in captured log.
+Own-control30s diagnostic validated: normal/default-off input works; explicit
+fresh launch flag lab.block_input_once=true arms only first click. Intentional
+block12:18:16.504->12:18:46.505 produced MotionEvent ANR after5002ms; nested
+native/Android modal visible, actual SurfaceFlinger raw layer
+Application Not Responding: org.windroid.lab.control#189. Dialog auto-cleared
+on recovery; native second click taps2/faultoff and no second block. Keep these
+intentional ANRs separate from spontaneous earlier focus failure.
 
-NEXT build a deterministic OWN-control input-block diagnostic (explicit intent
-extra, off by default, one bounded block) to reproduce ANR modal visibility and
-collect actual SurfaceFlinger layer metadata. Current HWC multi-window get_window
-accepts TID layers and only InputMethod raw layers; other RawName layers are
-ignored. This supports a modal-routing hypothesis, but actual ANR layer names
-were not captured yet. Avoid a speculative routing patch before collecting them.
-Keep existing verified SDK/jars/signing key; do not reinstall/redownload.
+NEXT prepare a narrow upstream HWC candidate for raw ANR layers, which current
+multi-window get_window ignores (only TID/InputMethod handled). No routing fix
+exists yet. Use existing source/build cache and validate compilation plus bounded
+multi-window runtime before shipping. Consider raw title/app-name lookup and
+native close behavior; do not route arbitrary system/security layers blindly.
+Current fallback remains usable with original HWC+scoped shim, multi=false.
+Own control installed30s APK SHA2563e63c05f81ae631c33c8bb037a872431ab21c6aa05d5c35e5c7012d972779076;
+normal input currently disarmed. Original APK backup and12s variant retained in
+Nov8 component-control. No other app/package changed.
 
-Original target ANR extracted only PID2816 from retained Nov8 11:53:48 trace.
-Main nativePollOnce/JNI-end and render observer waiting at dump time; does not
-prove cause at input timeout. Primary issue713 led to old per-layer fence fix
-6aafe205; current source already has releaseFenceFd=-1 and no old per-buffer
-fence timeline. Do not reapply old fix or reset Android data based on comments.
-Evidence Nov8 component-control; source build/cache paths unchanged.
+Prior direct trial failed readiness/input; source candidate/config rolled back.
+See NATIVE-BUILD.md and Nov8 component-control for exact evidence. No full
+compatibility/permanent fix claim. Nintendo unchanged/force-stopped.
 ## Blockers, validation and uncommitted work
 - Open: intermittent System UI ANR, seamless stale/resize presentation, first input,
   WSL VMBus channel allocation, Nintendo native crashes and remaining integration.

@@ -10,6 +10,20 @@ This provides a known Java Canvas workload for Android/Windows frame and input
 comparisons. A draw callback or Android screenshot alone does not prove that
 Windows received the frame. Native app compatibility requires separate evidence.
 
+## Explicit one-shot input fault
+
+For ANR/modal-routing diagnostics only, launch a fresh Activity with boolean
+intent extra `lab.block_input_once=true`. Its visible status says the fault is
+armed. The first click blocks this test app's UI thread for30seconds, with
+`intentional_block_begin` / `intentional_block_end` log markers. Android may show
+an input ANR dialog. Further clicks do not block; Activity recreation disables
+the fault. A normal launch leaves it off. No other app/process is changed.
+
+Keep intentional ANR records separate from spontaneous failures. Capture Android
+and native Windows presentation plus actual SurfaceFlinger layer names before
+changing modal routing. Stop/relaunch only this diagnostic after the experiment;
+do not clear app data or dismiss unrelated prompts.
+
 ## Build locally on Linux/WSL
 
 Requires a JDK, `aapt`, `apksigner`, an official Android platform `android.jar`
@@ -64,3 +78,23 @@ return. An explicit root PackageManager diagnostic also accepted the same APK;
 this is not the shipped installation path. Inspect final package metadata
 before claiming completion. CLI/tray wording now reflects a request, not an
 installation guarantee. No package verification or permissions were changed.
+
+## Intentional ANR control — November8
+
+The explicit30s build signs with the existing lab key; its SHA256 is
+`3e63c05f81ae631c33c8bb037a872431ab21c6aa05d5c35e5c7012d972779076`.
+Original installed control APK was backed up; matching signer verified before
+root-PM diagnostic update. This does not validate the asynchronous installer.
+Default launch/click showed fault off and responsive input.
+
+An initial12s variant generated an ANR but resumed before a persistent modal was
+observed. The30s trial began12:18:16.504 and ended12:18:46.505. Android reported
+an intentional MotionEvent ANR after5002ms. Nested Windows and Android both
+showed the ANR dialog during the block. SurfaceFlinger listed the raw layer
+`Application Not Responding: org.windroid.lab.control#189`, alongside the app's
+TID-prefixed layer. The dialog disappeared after recovery without a UI action;
+a second click counted2 with fault off and no second block.
+
+These deliberate fault records must not be counted as spontaneous failures.
+They provide repeatable layer/input evidence for modal-routing investigation,
+not proof that a candidate composer fix works in multi-window mode.
