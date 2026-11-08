@@ -40,3 +40,10 @@ cannot promise it will keep executing while the app/session is stopped.
 CLI alternative: run `codex resume` in the repository and select the intended
 session. An explicit known session ID is preferable for scripted one-shot use.
 No actual resume command is executed by this document or any project hook.
+
+## Visual supervision
+Read AGENTS.md's visual-supervision rule on every resume. Check the relevant
+window first on apparent failure/stall and periodically during longer active
+UI/runtime tests (roughly30–60seconds). Stop completed owned visible diagnostics.
+This is active-session behavior, not unattended background execution.
+

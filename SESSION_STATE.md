@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-08 13:15 America/New_York. Read before changing files.
+Updated 2026-11-08 13:17 America/New_York. Read before changing files.
 
 ## Objective and authorization
 Make Windroid reliable and investigate Nintendo Switch App startup. Continue
@@ -99,7 +99,7 @@ allowance-reset continuation verified/configured; checkpoint does not run Codex.
 ## Uncommitted work and exact next action
 Modal/fixture checkpoint9ff4462 committed/pushed/CI green. Last runtime fallback
 start0 in112s, original HWC/scoped map/runtimefalse verified; own normal launch0,
-native frame926/tap662,368/faultoff. Further documentation checkpoint pending.
+native frame926/tap662,368/faultoff. Confirmation checkpoint748a2a5 committed/pushed.
 
 ## Latest resolved observation: installation confirmation
 User reported seeing an app scan prompt (possibly Play Protect), clicked Scan,
@@ -116,7 +116,8 @@ User interaction plausibly explains this wait but scan-provider/internal cause w
 not instrumented. Original Nov7 pending session cause remains unconfirmed.
 
 ## Exact next action
-1. Update/push this confirmation checkpoint. Latest earlier remote278f6ba; clean
+1. Confirmation checkpoint748a2a5 pushed. Visual-supervision rule now saved in
+   AGENTS.md/docs/CONTINUATION.md; publish this instruction checkpoint. Clean
    runtime remains original HWC+scoped lab shim/nestedfallback/runtime multi=false.
 2. Inspect installer/CLI/tray documentation for accurate guidance that Android may
    require an on-screen scan/confirmation after Installation requested. Do not
@@ -128,5 +129,10 @@ not instrumented. Original Nov7 pending session cause remains unconfirmed.
    Modal candidate remains separate from product until further direct/native-close/
    scaling tests pass. Nintendo unchanged, no need for new target launches.
 
-Screen inspection is on demand during active work, not continuous monitoring.
+User now explicitly requires screen-first checks on failures/stalls, plus active
+UI/runtime inspection at launch, after likely prompt steps and roughly30–60s
+during waits. Stop completed owned diagnostics; document any deliberate bounded
+run. At13:16 native Weston window showed only its patterned desktop, no visible
+control animation or prompt. No input was needed; no test was restarted.
+This is periodic observation during active work, not continuous/background monitoring.
 Save context and actual outcomes; no polling/submission service or quota fallback.

@@ -1,5 +1,11 @@
 # Windroid lab changelog
 
+## 2026-11-08 — active visual supervision
+- Persisted user-requested screen-first failure/stall checks and periodic window
+  inspection during active UI/runtime tests; completed visible diagnostics stop.
+- Current native window inspected: patterned compositor desktop, no visible test
+  animation or prompt. No further install/restart/input performed.
+
 ## 2026-11-08 — installation confirmed after user interaction
 - User reported accepting an app scan and Install prompt. Verified own package
   update13:11:54 and session1002420193 final success/applied at13:14:25.
