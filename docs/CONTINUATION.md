@@ -46,4 +46,3 @@ Read AGENTS.md's visual-supervision rule on every resume. Check the relevant
 window first on apparent failure/stall and periodically during longer active
 UI/runtime tests (roughly30–60seconds). Stop completed owned visible diagnostics.
 This is active-session behavior, not unattended background execution.
-
