@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-08 13:10 America/New_York. Read before changing files.
+Updated 2026-11-08 13:15 America/New_York. Read before changing files.
 
 ## Objective and authorization
 Make Windroid reliable and investigate Nintendo Switch App startup. Continue
@@ -101,32 +101,32 @@ Modal/fixture checkpoint9ff4462 committed/pushed/CI green. Last runtime fallback
 start0 in112s, original HWC/scoped map/runtimefalse verified; own normal launch0,
 native frame926/tap662,368/faultoff. Further documentation checkpoint pending.
 
-Active next-roadmap investigation: Windows asynchronous APK installation.
-Actual PS7 scripts/windroid.ps1 install of verified owned current APK returned0
-13:08:34 with truthful requested wording. Target lastUpdateTime stayed12:51:39.
-Only owned request interval/system installer session selected:1002420193,
-created13:08:33.647/committed13:08:34.032; still active/sealed/progress0.9/no final
-status. Preserve this session for diagnosis; do not resubmit or abandon blindly.
-Nov8 component-control/own-windows-install-recheck.txt, own-install-request-sessions.txt,
-own-install-stage-check.txt hold bounded evidence. No root-PM substitute for this test.
+## Latest resolved observation: installation confirmation
+User reported seeing an app scan prompt (possibly Play Protect), clicked Scan,
+then Install. Do not treat this helpful intervention as an error. Agent had not
+observed the actual prompt, so exact provider/text remains user-reported.
+At13:14:25 verified own org.windroid.lab.control lastUpdateTime13:11:54 and
+session1002420193 mDestroyed=true/mFinalStatus=1/Session installed/mSessionApplied=true.
+Windows request at13:08:34 therefore completed after user interaction, not while
+initial CLI returned. No install retry, root-PM substitute, data clear or verifier
+setting change was needed. Staged APK had matched the verified source hash.
+Evidence: Nov8 component-control/own-install-request-sessions.after-user-approval.txt.
+The previous pending-session trace is historical; do not resume debugging it as stuck.
+User interaction plausibly explains this wait but scan-provider/internal cause was
+not instrumented. Original Nov7 pending session cause remains unconfirmed.
 
-Installed host app_manager.install ignores installApp return and logs some errors.
-Upstream Java copies bytes into PackageInstaller before asynchronous commit/return,
-so removing temporary source file after call is not a proven deletion race.
-Primary source android_frameworks_waydroid revisiond6902a3e9874466c84e6e03817310c7ad8042272,
-services/java/id/waydro/server/WayDroidService.java. No fix claimed yet.
+## Exact next action
+1. Update/push this confirmation checkpoint. Latest earlier remote278f6ba; clean
+   runtime remains original HWC+scoped lab shim/nestedfallback/runtime multi=false.
+2. Inspect installer/CLI/tray documentation for accurate guidance that Android may
+   require an on-screen scan/confirmation after Installation requested. Do not
+   promise completion, suppress verification or approve security prompts blindly.
+   For a future owned install, actively capture the actual dialog before deciding
+   whether its buttons may be automated under computer-use rules. User handles
+   any security/privacy consent action requiring their decision.
+3. Continue remaining roadmap: live tray/integration and direct graphics/focus.
+   Modal candidate remains separate from product until further direct/native-close/
+   scaling tests pass. Nintendo unchanged, no need for new target launches.
 
-Staged own APK hash matches ea76d3ef...91a9fcb at13:10:23; source bytes are intact.
-EXACT NEXT: inspect this owned pending session's relevant
-PackageInstaller thread/wait state with bounded commands; avoid all-account/full
-package dumps. Compare its state with preserved Nov7 pending1753262248 versus
-successful1157688239/1485978451 in control-install-session-details.txt and
-control-own-install-sessions.before-restart.txt. Those old IDs no longer appear.
-Do not rerun old collect-control-install-sessions.py: it overwrites its Nov7
-output; new lab tools/hwc-native-build/collect-own-install-recheck.py is interval-
-scoped but overwrites Nov8 request-sessions, so preserve snapshots before reuse.
-Guest rg absent; use grep/find. No more Nintendo launches needed.
-
-Update checkpoint/journal/ROADMAP/CHANGELOG and push coherent milestones. Modal
-candidate stays separate from product until direct/native-close/scaling/focus
-cases pass. Reuse all verified tools/artifacts. No binaries/artifacts tracked.
+Screen inspection is on demand during active work, not continuous monitoring.
+Save context and actual outcomes; no polling/submission service or quota fallback.

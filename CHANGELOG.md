@@ -1,5 +1,11 @@
 # Windroid lab changelog
 
+## 2026-11-08 — installation confirmed after user interaction
+- User reported accepting an app scan and Install prompt. Verified own package
+  update13:11:54 and session1002420193 final success/applied at13:14:25.
+- Earlier pending session is resolved; no retry/root-PM substitution or security
+  setting change needed. Exact prompt provider was not captured by the agent.
+
 ## 2026-11-08 — Windows install completion recheck
 - Actual PS7 CLI request0 reproduced pending own diagnostic session1002420193;
   package update time unchanged. Existing request wording is accurate, not proof
