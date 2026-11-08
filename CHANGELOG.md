@@ -1,5 +1,16 @@
 # Windroid lab changelog
 
+## 2026-11-08 — direct focus failure and experiment rollback
+- Direct source-candidate startup missed180s live readiness; app catalog also
+  timed out, while explicit PM/owned Activity controls responded. A separate
+  documented active-app property exposed native frames, not launcher success.
+- Android ANR dialogs were absent from the native app window and intercepted
+  input. One verified SystemUI recovery was followed by an owned-control focus
+  ANR (5002ms waiting for FocusEvent). Seamless input/resize did not pass.
+- Removed the source-candidate overlay after hash checks, restored original HWC
+  plus the previous scoped lab shim, and restored fallback configs byte-for-byte.
+  Runtime multi=false verified. Fallback start114s/control0/native mouse pass;
+  keyboard logged pause, Android IP/DNS2/2 each pass. No ANR captured in fallback.
 ## 2026-11-08 — rebuilt composer service controls
 - Actual unchanged baseline and queue-only source candidate ran with verified
   hashes/maps and no preload. Both rendered nested control and received input;

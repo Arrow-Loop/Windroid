@@ -20,6 +20,9 @@ must not be repeated just because an earlier journal entry was pending.
   Direct WSLg control rendered/received input after System UI recovery, but
   maximize retained a stale old-size view in Windows; integration remains open.
   Validate an Android composer queue-ownership correction before claiming a fix.
+  Nov8 direct trial still failed startup/input: Android ANR modals were absent
+  from the native app window; own control timed out on FocusEvent. Source binary
+  trial rolled back to original HWC+prior scoped shim/nested fallback.
   GL/Pixman nested controls can navigate; neither partial nor boot-wide HWUI
   Vulkan proved a fix. All temporary renderer/size/protocol overrides removed.
 - [ ] Resolve WSL fragmented-memory VMBus/new-session failures with a specific

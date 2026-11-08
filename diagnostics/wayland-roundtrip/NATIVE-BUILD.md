@@ -65,7 +65,8 @@ No host Linux library is linked into Android output.
 
 Compilation/load success does not prove runtime ABI, framework startup, window
 creation, pointer input, disconnect handling, scaling or seamless resize. Native
-Windows checks paused when Windows locked. Do not label the patch a fix yet.
+Windows checks resumed November8 after unlock; results follow below. Do not
+label the patch a complete graphics fix.
 
 ## Reproduce cached build
 
@@ -98,3 +99,31 @@ The baseline's short successful run prevents treating the candidate's short
 success as causal reliability proof. The paired startup times do not establish
 an improvement. Full disconnect/scaling/error and long-session tests remain.
 Evidence is retained in lab evidence/integration-2026-11-08/component-control.
+
+## Direct startup and modal visibility follow-up
+
+The subsequent direct-WSLg run failed live readiness at180s. A later app-list
+query also timed out at15s, while root PackageManager and an explicit launch of
+the owned control Activity responded. This remains a launcher/framework failure.
+The raw Activity launch omitted Waydroid's normal `waydroid.active_apps` step;
+app_manager.py confirms that property precedes its normal app launch. Applying
+the same documented property for the owned diagnostic produced a native control
+window with advancing frames. This does not validate the failed launcher route.
+
+Android captured a SystemUI ANR modal over the control, while Windows rendered
+only the control. A native click did not reach the app. The hidden modal is an
+input confound, distinct from a pointer-coordinate failure. SystemUI's later
+sampled main thread was polling; the ANR dialog still existed in WindowManager.
+Composer samples showed idle Binder work/default Wayland dispatch rather than
+a window-creation roundtrip. These samples are not proof against every deadlock.
+One verified SystemUI recovery is being used to continue graphics diagnostics;
+startup success must not be claimed after that intervention.
+
+The verified SystemUI493 TERM occurred11:53:15, and SystemUI2955 restarted.
+Control Activity recreated in the same process2816. Input still failed: Android
+reported its ANR at11:53:47, waiting5002ms for `FocusEvent(hasFocus=true)`.
+Its later sampled main thread was idle in Looper polling, so that late sample
+does not establish the cause of the earlier timeout. Its ANR modal was likewise
+absent from the Windows control window. No additional process recovery or
+resize result was attempted. Runtime multi=false was restored and normal stop
+returned0. Rollback of config/source experiment is recorded in the checkpoint.
