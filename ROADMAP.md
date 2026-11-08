@@ -7,6 +7,8 @@ must not be repeated just because an earlier journal entry was pending.
 ## Next priorities
 - [ ] Trace the original control APK's pending asynchronous install session;
   truthful CLI/tray request wording is fixed, completion guarantees remain open.
+  Nov8 actual PS7 retry reproduces owned pending session1002420193 with unchanged
+  target update time; inspect its installer wait before further retries.
 - [ ] Validate live tray actions after committed974d6c5 (PS7/5.1 checks pass); staged with
   backup in lab runtime; live file-picker/notification-area behavior remains open.
 - [ ] Isolate seamless WSLg presentation and framework/compositor instability.

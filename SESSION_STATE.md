@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-08 13:05 America/New_York. Read before changing files.
+Updated 2026-11-08 13:10 America/New_York. Read before changing files.
 
 ## Objective and authorization
 Make Windroid reliable and investigate Nintendo Switch App startup. Continue
@@ -78,12 +78,12 @@ quota polling/retry submissions/credit purchases/API fallback or second agent.
 ## Publication and validation
 - User manually completed GCM browser sign-in; no credentials inspected/logged.
   Push37 commits through cde4cff succeeded; subsequent594f749/f640b37 pushed.
-  Remote f640b375a48a67b594e3d49143ebffe8d9321fe6 verified.
+  Remote9ff44628d82b811372551dd6194c7a745979b1c7 verified; modal checkpoint pushed.
 - CI first failed timeout regression on ubuntu-latest26. Kept strict test/deadline,
   pinned shipped Noble24.04 and print timeout version. Hosted firstboot6/lifecycle13
   pass. Later CLI assertions passed but expected LASTEXITCODE4 leaked into wrapper;
   f640b37 clears status only after success. PS7/5.1 CLI/tray wrapper exit0/BOM pass.
-- Hosted run42507669546 all green: https://github.com/Arrow-Loop/Windroid/actions/runs/42507669546
+- Hosted runs42507669546 and42508236932 all green; latest modal checkpoint: https://github.com/Arrow-Loop/Windroid/actions/runs/42507669546
   Not a Windows runtime/complete graphics certification.
 - PROGRESS.md is the public status; push coherent milestones roughly30–60min of
   active work and before substantial handoff. No APK/SDK/keys/rawprivate logs.
@@ -97,21 +97,36 @@ retry via another launcher. Compiled wizard UI untested. No supported automatic
 allowance-reset continuation verified/configured; checkpoint does not run Codex.
 
 ## Uncommitted work and exact next action
-Own bounded-duration fixture and modal runtime results are ready for coherent
-commit/push. Last runtime check: fallback start0 in112s, original HWC/scoped map/
-runtime false verified; own normal launch0, native frame926/tap662,368/faultoff.
-Current diff is authoritative; raw artifacts stay outside Git.
-1. Finish checkpoint commit/push and verify remote; CI f640b37 already green.
-2. Next roadmap active investigation: original asynchronous APK install. Read
-   Nov7 control-own-install-sessions.txt and Nov8 component-control/
-   old-install-session-current.txt (collector selects only owned session IDs).
-   Original1753262248 was pending;1157688239/1485978451 had installed successfully.
-   Installed Waydroid tools/actions/app_manager.py copies to a fixed base.apk,
-   calls platformService.installApp then removes base.apk; it does not await an
-   install callback/result and logs errors without necessarily failing CLI.
-   Inspect upstream platform service implementation before changing semantics.
-   Guest rg absent; use grep/find (do not install merely for this search).
-3. Reproduce only with owned diagnostic through shipped CLI; preserve signer and
-   app data. No repeated Nintendo launches or broad package/account dumps.
-4. Modal candidate remains separate from product until direct/native-close and
-   scaling/focus cases pass. Reuse all verified tools/artifacts.
+Modal/fixture checkpoint9ff4462 committed/pushed/CI green. Last runtime fallback
+start0 in112s, original HWC/scoped map/runtimefalse verified; own normal launch0,
+native frame926/tap662,368/faultoff. Further documentation checkpoint pending.
+
+Active next-roadmap investigation: Windows asynchronous APK installation.
+Actual PS7 scripts/windroid.ps1 install of verified owned current APK returned0
+13:08:34 with truthful requested wording. Target lastUpdateTime stayed12:51:39.
+Only owned request interval/system installer session selected:1002420193,
+created13:08:33.647/committed13:08:34.032; still active/sealed/progress0.9/no final
+status. Preserve this session for diagnosis; do not resubmit or abandon blindly.
+Nov8 component-control/own-windows-install-recheck.txt, own-install-request-sessions.txt,
+own-install-stage-check.txt hold bounded evidence. No root-PM substitute for this test.
+
+Installed host app_manager.install ignores installApp return and logs some errors.
+Upstream Java copies bytes into PackageInstaller before asynchronous commit/return,
+so removing temporary source file after call is not a proven deletion race.
+Primary source android_frameworks_waydroid revisiond6902a3e9874466c84e6e03817310c7ad8042272,
+services/java/id/waydro/server/WayDroidService.java. No fix claimed yet.
+
+Staged own APK hash matches ea76d3ef...91a9fcb at13:10:23; source bytes are intact.
+EXACT NEXT: inspect this owned pending session's relevant
+PackageInstaller thread/wait state with bounded commands; avoid all-account/full
+package dumps. Compare its state with preserved Nov7 pending1753262248 versus
+successful1157688239/1485978451 in control-install-session-details.txt and
+control-own-install-sessions.before-restart.txt. Those old IDs no longer appear.
+Do not rerun old collect-control-install-sessions.py: it overwrites its Nov7
+output; new lab tools/hwc-native-build/collect-own-install-recheck.py is interval-
+scoped but overwrites Nov8 request-sessions, so preserve snapshots before reuse.
+Guest rg absent; use grep/find. No more Nintendo launches needed.
+
+Update checkpoint/journal/ROADMAP/CHANGELOG and push coherent milestones. Modal
+candidate stays separate from product until direct/native-close/scaling/focus
+cases pass. Reuse all verified tools/artifacts. No binaries/artifacts tracked.

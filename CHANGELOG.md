@@ -1,5 +1,10 @@
 # Windroid lab changelog
 
+## 2026-11-08 — Windows install completion recheck
+- Actual PS7 CLI request0 reproduced pending own diagnostic session1002420193;
+  package update time unchanged. Existing request wording is accurate, not proof
+  of completed installation. Preserved bounded evidence; root cause remains open.
+
 ## 2026-11-08 — bounded modal runtime validation
 - Added optional10..90s duration to the explicit one-shot lab fault; default30s,
   disabled on normal launch/recreation and on invalid duration. Build/sign pass.
