@@ -127,3 +127,33 @@ does not establish the cause of the earlier timeout. Its ANR modal was likewise
 absent from the Windows control window. No additional process recovery or
 resize result was attempted. Runtime multi=false was restored and normal stop
 returned0. Rollback of config/source experiment is recorded in the checkpoint.
+
+## November8 raw-ANR routing prototype
+
+Queue+modal binary SHA256
+790b3148d7007d4fbf2ee1236827d347439ddb1f2612ea38bad5f28c1164449a
+ran as the actual composer, without preload, NESTED_WESTON=true and
+MULTI_WINDOWS=true. Normal startup passed0 in83s and default control input
+passed. This isolates multi-window routing inside nested Weston; direct WSLg
+presentation remains unvalidated for this prototype.
+
+An explicit30s owned-control fault produced the raw ANR window. Native Windows
+showed the dialog and open_windows changed1->2->1 on automatic recovery. The
+first attempted button click occurred after auto-dismiss and was only another
+app tap, so it is not counted as a dialog-button pass.
+
+A bounded explicit90s fault then held the dialog long enough for native input.
+At12:57:59, clicking its Close app button caused ActivityManager to kill only
+org.windroid.lab.control PID3389, reason "user request after error". Its process
+was absent and open_windows0 at12:58:01. Normal launcher relaunch returned0,
+created PID3526 with fault off, rendered advancing frames and accepted tap1 at
+662,323. Thus dialog presentation, Android Close app and cleanup pass this
+bounded comparison. Wait, native titlebar close, placement/scaling, multiple
+simultaneous dialogs and direct WSLg remain unvalidated. This is a candidate,
+not a shipped or complete graphics reliability fix.
+
+Runtime multi=false was restored, normal stop0 completed, and the hash-checked
+restore script returned0. Original config backups were restored byte-for-byte;
+only the owned candidate overlay was removed. The earlier scoped lab RC/shim
+was restored, not a pristine production environment. Subsequent fallback
+startup verification is recorded in SESSION_STATE.md and the lab journal.

@@ -1,11 +1,20 @@
 # Windroid lab changelog
 
+## 2026-11-08 — bounded modal runtime validation
+- Added optional10..90s duration to the explicit one-shot lab fault; default30s,
+  disabled on normal launch/recreation and on invalid duration. Build/sign pass.
+- Queue+raw-ANR source prototype renders the dialog in nested multi-window mode.
+  Native Android Close app killed only the owned test PID3389; windows2->0.
+  Normal relaunch0/faultoff/native tap pass. Earlier30s auto-dismiss is separate.
+- Direct WSLg, Wait, native titlebar close/scaling/multiple dialogs remain open.
+  Hash-checked candidate removal/config/scoped-fallback restore0; no image/data reset.
+
 ## 2026-11-08 — CI exit status
 - Hosted Noble run passes firstboot6/lifecycle13 and PowerShell parsing/artifacts.
   CLI assertions passed but its expected mocked failure left LASTEXITCODE nonzero.
 - Clear that status only after all CLI assertions pass. GitHub-style wrappers
   now exit0 for CLI and tray tests in PowerShell7 and Windows PowerShell5.1.
-  UTF-8 BOM retained; hosted rerun pending.
+  UTF-8 BOM retained; hosted run42507669546 passes all steps.
 
 ## 2026-11-08 — CI target reproducibility
 - First published CI run on ubuntu-latest (now26.04) failed the strict stubborn

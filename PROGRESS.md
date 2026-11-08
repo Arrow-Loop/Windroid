@@ -26,15 +26,16 @@ patches are clearly separated from validated installer/session changes.
 - Added an explicit, default-off one-shot fault to the permission-free lab app.
   It reproducibly exposes an ANR raw layer; normal input and recovery pass.
 - Prepared a narrowly scoped raw-ANR routing prototype. Compile/link/load pass;
-  multi-window runtime testing is next. Dialog placement/close behavior remain
-  unvalidated. The temporary source binary trial was rolled back.
+  nested multi-window dialog presentation, Android Close app and cleanup pass.
+  Direct WSLg, native titlebar close and placement remain
+  unvalidated. The bounded source trial was rolled back to the earlier lab fallback.
 
 ## Current checkpoint
 
-GitHub sign-in and the first37-commit publication succeeded. The queue/modal
-prototype is now running in a bounded nested multi-window trial with no preload.
-Its startup/default window render; modal input and cleanup remain under test.
-Original images/data and exact fallback rollback are preserved.
+Development branch publication and subsequent checkpoints succeeded. Hosted CI
+run42507669546 is green after pinning the shipped Ubuntu24.04 target and fixing
+the CLI fixture's expected-failure exit status. The modal prototype passed its
+bounded dialog button/cleanup test and was removed. Fallback startup/hash/runtime configuration are verified; original images and Android data are preserved.
 
 Continue from [SESSION_STATE.md](SESSION_STATE.md). Read the full
 [CHANGELOG.md](CHANGELOG.md), open [ROADMAP.md](ROADMAP.md),
@@ -45,6 +46,5 @@ Completed checkpoints will be pushed at meaningful milestones, approximately
 30–60minutes of active work, and before substantial session handoffs. This
 requires an active session; no quota-reset polling/submission automation exists.
 
-First hosted CI run exposed a timeout regression failure on the new Ubuntu26
-runner. CI is now pinned to the shipped Ubuntu24.04 target; the unchanged local
-6 firstboot/13 lifecycle tests pass. Hosted validation of that change is pending.
+Hosted checks validate source/fixtures; Windows runtime evidence and remaining
+limitations are recorded separately above.

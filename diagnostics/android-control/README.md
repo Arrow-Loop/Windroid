@@ -14,10 +14,13 @@ Windows received the frame. Native app compatibility requires separate evidence.
 
 For ANR/modal-routing diagnostics only, launch a fresh Activity with boolean
 intent extra `lab.block_input_once=true`. Its visible status says the fault is
-armed. The first click blocks this test app's UI thread for30seconds, with
+armed. The first click blocks this test app's UI thread for30seconds by default, with
 `intentional_block_begin` / `intentional_block_end` log markers. Android may show
 an input ANR dialog. Further clicks do not block; Activity recreation disables
 the fault. A normal launch leaves it off. No other app/process is changed.
+Optional integer extra `lab.block_input_ms` accepts10000..90000ms; an out-of-range
+value disables the fault. A longer interval permits manual dialog-button tests
+before automatic recovery.
 
 Keep intentional ANR records separate from spontaneous failures. Capture Android
 and native Windows presentation plus actual SurfaceFlinger layer names before

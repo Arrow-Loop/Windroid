@@ -19,8 +19,14 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         boolean blockInput = savedInstanceState == null
                 && getIntent().getBooleanExtra("lab.block_input_once", false);
+        int blockInputMs = getIntent().getIntExtra("lab.block_input_ms", 30000);
+        if (blockInputMs < 10000 || blockInputMs > 90000) {
+            Log.w("WindroidLab", "invalid block duration; fault disabled");
+            blockInput = false;
+        }
         getIntent().removeExtra("lab.block_input_once");
-        ControlView view = new ControlView(this, blockInput);
+        getIntent().removeExtra("lab.block_input_ms");
+        ControlView view = new ControlView(this, blockInput, blockInputMs);
         setContentView(view);
         view.requestFocus();
         Log.i("WindroidLab", "activity created");
@@ -35,10 +41,12 @@ public final class MainActivity extends Activity {
         private float lastY = Float.NaN;
         private boolean animate = true;
         private boolean blockNextInput;
+        private final int blockInputMs;
 
-        ControlView(Context context, boolean blockInput) {
+        ControlView(Context context, boolean blockInput, int blockMs) {
             super(context);
             blockNextInput = blockInput;
+            blockInputMs = blockMs;
             unit = getResources().getDisplayMetrics().density;
             paint.setTypeface(Typeface.MONOSPACE);
             paint.setTextSize(22 * unit);
@@ -59,7 +67,7 @@ public final class MainActivity extends Activity {
                 Float.isNaN(lastX) ? "Touch: none" : "Touch: " + Math.round(lastX) + ", " + Math.round(lastY),
                 "Animation: " + (animate ? "running" : "paused"),
                 "Click to count. Space pauses/resumes.",
-                blockNextInput ? "Lab fault armed: first click blocks input for 30s." : "Lab fault: off."
+                blockNextInput ? "Lab fault armed: first click blocks input for " + blockInputMs / 1000 + "s." : "Lab fault: off."
             };
             float y = 48 * unit;
             for (String line : lines) {
@@ -79,8 +87,8 @@ public final class MainActivity extends Activity {
                 Log.i("WindroidLab", "tap=" + taps + " x=" + lastX + " y=" + lastY);
                 if (blockNextInput) {
                     blockNextInput = false;
-                    Log.w("WindroidLab", "intentional_block_begin duration_ms=30000");
-                    SystemClock.sleep(30000);
+                    Log.w("WindroidLab", "intentional_block_begin duration_ms=" + blockInputMs);
+                    SystemClock.sleep(blockInputMs);
                     Log.w("WindroidLab", "intentional_block_end");
                 }
                 invalidate();

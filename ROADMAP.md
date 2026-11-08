@@ -1,6 +1,6 @@
 # Windroid lab roadmap
 
-Updated 2026-11-07. SESSION_STATE.md records the exact next action. Historical
+Updated 2026-11-08. SESSION_STATE.md records the exact next action. Historical
 checkpoints remain in Git and the engineering journal; completed work below
 must not be repeated just because an earlier journal entry was pending.
 
@@ -23,6 +23,8 @@ must not be repeated just because an earlier journal entry was pending.
   Nov8 direct trial still failed startup/input: Android ANR modals were absent
   from the native app window; own control timed out on FocusEvent. Source binary
   trial rolled back to original HWC+prior scoped shim/nested fallback.
+  Narrow raw-ANR prototype passes nested multi-window presentation, Android
+  Close app and cleanup; direct WSLg/native close/scaling/Wait remain open.
   GL/Pixman nested controls can navigate; neither partial nor boot-wide HWUI
   Vulkan proved a fix. All temporary renderer/size/protocol overrides removed.
 - [ ] Resolve WSL fragmented-memory VMBus/new-session failures with a specific
@@ -45,7 +47,8 @@ must not be repeated just because an earlier journal entry was pending.
   original cause remains unknown. Lab configuration uses the working public path.
 - [ ] Confirm owner recovery-image availability before destructive recovery.
 - [ ] Prepare narrowly scoped validated upstream contributions and test matrix;
-  no push/PR performed yet. Broader hardware/coexistence coverage remains open.
+  development branch checkpoints pushed; no PR/merge performed. Hosted CI green.
+  Broader hardware/coexistence coverage remains open.
 
 ## Completed and evidenced
 - [x] Prevent the embedded nested compositor's default idle blank/lock;
