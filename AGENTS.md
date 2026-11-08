@@ -32,3 +32,13 @@ lab and Windroid repositories; do not access unrelated machines/accounts.
 Do not install quota polling, retry submissions, reset purchases, paid-credit
 fallback, or an API-key fallback. A saved checkpoint does not itself run Codex.
 Do not run a second agent against the same worktree while this chat is active.
+
+## Publishing progress
+User authorized periodic GitHub publishing on November8,2026. Update PROGRESS.md
+and push completed coherent checkpoints to the development branch in
+Arrow-Loop/Windroid at meaningful milestones (roughly30–60minutes of active work)
+and before substantial session handoffs. Publish code and accurate validation,
+keeping draft experiments labeled. Verify remote/branch and push result. Preserve
+history; do not force-push or merge without separate authorization. Do not publish
+APKs, signing keys, SDKs, account data or raw private logs. Perform publication
+within the active session; do not install a polling/submission service.
