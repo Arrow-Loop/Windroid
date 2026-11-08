@@ -6,8 +6,9 @@ to installed vendor images or installer inputs. Individual and combined
 `git apply --check` checks pass against that exact source; reverse checks also
 pass against generated candidate files. The queue-only HAL now compiles and links
 with strict undefined-symbol checks and passes isolated Android load-only.
-The combined queue/pointer HAL also compiles, strict-links and loads. Service/runtime validation remains
-pending; see NATIVE-BUILD.md.
+The combined queue/pointer HAL also compiles, strict-links and loads. Queue-only
+actual-service nested frame/mouse/keyboard controls pass on November8; seamless
+and longer validation remain. See NATIVE-BUILD.md.
 
 `candidate-window-sync.patch` gives only window-creation sync callbacks private
 queues and fails explicitly on queue/connection errors. Initialization retains

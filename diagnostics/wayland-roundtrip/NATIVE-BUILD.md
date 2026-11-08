@@ -77,3 +77,24 @@ commands and normalization are recorded in the journal/evidence. Reuse verified
 cached archives. A live service experiment must preserve original image hashes,
 remove the scoped diagnostic preload to isolate source behavior, and checkpoint
 owned overlay paths plus rollback before a normal stop/start.
+
+## November8 nested service comparison
+
+Both rebuilt baseline and queue-only candidate ran as the actual composer via
+one owned vendor overlay, with original images unchanged and no diagnostic
+preload. Active file hashes and service mappings were verified. Lab nested
+fallback, eight CPUs, 3GB memory and normal GL remained identical.
+
+| Result | Unchanged baseline | Queue-only source candidate |
+|---|---|---|
+| Normal start | exit0,58s | exit0,83s |
+| Control launch | exit0,11:28:08 | exit0,11:33:01 |
+| Native frames | 100 through475 observed | 288 through1011 observed |
+| Native mouse | tap1 at674,409 visible | tap1 at512,367 visible |
+| Keyboard | Android animation=false logged | native paused frame1011 confirmed |
+| SystemUI ANR | none in captured startup events | none in captured startup events |
+
+The baseline's short successful run prevents treating the candidate's short
+success as causal reliability proof. The paired startup times do not establish
+an improvement. Full disconnect/scaling/error and long-session tests remain.
+Evidence is retained in lab evidence/integration-2026-11-08/component-control.

@@ -1,6 +1,6 @@
 # Windroid session state
 
-Updated 2026-11-07, America/New_York. Read this before changing files.
+Updated 2026-11-08, America/New_York. Read this before changing files.
 
 ## Objective and scope
 Make Windroid reliable and investigate Nintendo Switch App startup on this
@@ -68,16 +68,18 @@ API fallback or second agent against this worktree.
   PTYs 1497/56941 ended at WSL shutdown. Reuse current terminal where available.
   Its variable i points to lab evidence/integration-2026-11-07.
 - Nintendo installed ABI x86 remains force-stopped. Do not repeat launches blindly.
-- EXPERIMENT ACTIVE: composer-only LD_PRELOAD scoped to window::create.
-  /var/lib/waydroid/overlay/system/etc/init/init.waydroid.rc
-  SHA256 762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2
-  /var/lib/waydroid/overlay/vendor/lib64/libwindroid_queue.so
-  SHA256 c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578
-  Both hashes rechecked 16:03. No global/app preload or original image changes.
-  Original RC backup: lab evidence/integration-2026-11-07/kernel-path-control/
-  init.waydroid.rc.before-shim. Rollback: normal stop, verify these hashes,
-  remove only these two owned files, normal start; compare original RC/no map.
-
+- ACTUAL VERIFIED Nov8 11:34: container RUNNING. Queue-only source candidate is
+  active at /var/lib/waydroid/overlay/vendor/lib64/hw/hwcomposer.waydroid.so,
+  SHA256 4bdce01b33e7a3907f44e1387cc9f64ff078533d20b4b89a5819822e7fcf310d.
+  Nov7 normal stop0 and stage0 completed, but checkpoint was interrupted before
+  recording them. Do not repeat staging/removal. Scoped RC/library overlays were
+  hash-checked and removed. Original image unchanged. Baseline trial passed short frame/input controls.
+- Backup in /opt/windroid-lab-tools/hwc-native-build/rollback-scoped:
+  hwcomposer.original.so SHA256 3dcfbc40b2944fd02d252b06c2eddbfcfd30b926f60d52a8d75ade245c68d1d8;
+  init.waydroid.rc SHA256 762eece58f962bd9a0dc0efcc1a9ee0b591f94a2bd769d721e6ce0eb61398ab2;
+  libwindroid_queue.so SHA256 c80b386d7425c4f31f3ca8f264d9028254f6657000c9d87bfa4d2c7f93150578.
+  Rollback: stop normally, verify/remove ONLY the owned baseline HWC overlay,
+  restore saved RC/library to their original overlay paths and verify hashes.
 ## Latest findings and last successful operations
 - Native installed-library stress: 20,000 requests, shared queue hangs 3/3;
   private queue passes 3/3. Scoped interposer source committed f7d3d48.
@@ -93,7 +95,7 @@ API fallback or second agent against this worktree.
 - First four-CPU click arrived0,0, next at correct662,313. Upstream pointer-enter
   handler ignores sx/sy. Candidate pointer and window-sync source patches apply
   and reverse individually/combined at a575cfcc12ab79a122844218f2c6df5bd208cca0.
-  Neither candidate has been compiled as a full HAL or runtime-validated.
+  Both candidates compile/strict-link and isolated-load; no service runtime proof yet.
 - NDK r25c cached/verified and extracted at /opt/windroid-lab-tools/android-ndk-r25c.
   ZIP SHA256 769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108.
 - Small component-build feasibility now active: pinned VNDK33 header snapshot
@@ -102,28 +104,26 @@ API fallback or second agent against this worktree.
   zero upgrades/removals. Plan/install logs retained in kernel-path-control.
 
 ## Exact next action
-All baseline/queue-only/combined composer builds strict-link and isolated-load0.
-See diagnostics/wayland-roundtrip/NATIVE-BUILD.md for exact inputs/limitations.
-Cached scripts in lab tools/hwc-native-build; guest build root
-/opt/windroid-lab-tools/hwc-native-build. Baseline queue stress shared3/3alarm142,
-private3/3pass0. No rebuilt binary installed in service yet.
+Queue-only candidate4bdce0... staged after baseline normal stop0/hash checks;
+scoped preload files absent. Root PTY68395 alive. Nov8 start0 in83s; active HWC hash/maps verified, control0 at11:33:01.
+Native frames288->630 and click512,367/taps1 observed. No SystemUI ANR captured.
+Keyboard native pause confirmed frame1011. NEXT bounded seamless trial: backups
+under Nov8 component-control; set Android persist.waydroid.multi_windows=true,
+normal stop0, change only NESTED_WESTON=false/MULTI_WINDOWS=true in verified
+/etc/windroid/windroid.conf, start/launch control. Keep queue-only candidate.
+Restore both config backups and runtime false after trial, regardless of result.
+Collect
+exit/readiness timing, active HWC hash/maps, launch own control, native frames and
+mouse/Space. Then bounded seamless window lifecycle comparison if stable.
+Baseline74fbd6... trial: start0 in58s, control0, native frames100->475/tap674,409;
+Android keyboard animation=false11:29:40.061. No SystemUI ANR in captured events.
+This is a short baseline pass, so no candidate causal claim yet.
 
-NEXT normal stop via retained rootPTY68395/user windroid, verify stop0, then one
-bounded rebuilt BASELINE service trial without preload. Original HWC and both
-scoped-overlay files backed up in guest build root rollback-scoped with matching
-hashes recorded before-component-backup-hashes.txt. New owned overlay path
-/var/lib/waydroid/overlay/vendor/lib64/hw/hwcomposer.waydroid.so does not yet exist.
-After stop0/hash checks: remove ONLY the two recorded scoped overlay files and
-stage baseline74fbd6... at the new path. Normal start, verify actual loaded hash,
-framework/control progress and target failures. Then queue-only4bdce0... trial
-with otherwise identical config. Preserve app/account data and original images.
-Rollback: normal stop, verify/remove owned HWC overlay; restore the exact backed
-up RC/library from rollback-scoped to their recorded paths, verify hashes, start.
-
-Windows is LOCKED (16:24 observation); native UI automation stopped; user asked
-to unlock. Continue non-UI work. Android capture before-component.png shows own
-control frame17340, taps0. This is Android progress, not native Windows proof.
-No UI interaction through lock/authentication. Pointer runtime must wait unlock.
+Evidence Nov8: lab evidence/integration-2026-11-08/component-control.
+Build scripts/cache: lab tools/hwc-native-build; guest /opt/windroid-lab-tools/
+hwc-native-build. See diagnostics/wayland-roundtrip/NATIVE-BUILD.md.
+User unlocked Windows; refreshed native window usable. Prior handles expire on
+normal restart. Original CPU/RAM/renderer/lab nested settings retained.
 ## Blockers, validation and uncommitted work
 - Open: intermittent System UI ANR, seamless stale/resize presentation, first input,
   WSL VMBus channel allocation, Nintendo native crashes and remaining integration.

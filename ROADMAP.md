@@ -14,7 +14,8 @@ must not be repeated just because an earlier journal entry was pending.
   standalone shared-queue probe hangs2/3 while private-queue control passes3/3.
   Native installed-library stress now hangs3/3 shared and passes3/3 private;
   experimental isolated interposer passes3/3. Baseline and source candidates now
-  compile/strict-link/load; rebuilt service validation remains pending.
+  compile/strict-link/load; Nov8 baseline and queue candidate nested-service
+  frame/input controls pass. Seamless and longer validation remain.
   Scoped lab interposer preserves startup dispatch and renders nested control.
   Direct WSLg control rendered/received input after System UI recovery, but
   maximize retained a stale old-size view in Windows; integration remains open.

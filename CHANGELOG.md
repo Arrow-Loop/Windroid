@@ -1,5 +1,13 @@
 # Windroid lab changelog
 
+## 2026-11-08 — rebuilt composer service controls
+- Actual unchanged baseline and queue-only source candidate ran with verified
+  hashes/maps and no preload. Both rendered nested control and received input;
+  native candidate pause confirmed at frame1011. No SystemUI ANR captured.
+- Start58s baseline /83s candidate; these bounded successes establish neither a
+  performance improvement nor a permanent graphics fix. Seamless trial next.
+- Resumption found completed baseline staging beyond the saved checkpoint;
+  verified actual state and continued without repeating the mutation.
 ## 2026-11-07 — isolated native composer builds
 - Built the unchanged pinned composer, queue-only candidate and combined pointer
   candidate with NDK25c/VNDK33. All12 C++ units compile; strict links and isolated
