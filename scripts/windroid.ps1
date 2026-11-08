@@ -39,7 +39,7 @@ switch ($Command) {
         wsl -d $DistroName -u windroid -e waydroid app install $wslPath
         if ($LASTEXITCODE -ne 0) { throw "APK installation failed (exit $LASTEXITCODE)." }
         # Waydroid returns before Android's PackageInstaller commit finishes.
-        Write-Host "Installation requested. Android may still be processing it."
+        Write-Host "Installation requested. Check Android for scan or confirmation prompts."
     }
     "adb" {
         # Official mechanism: adb connect <container IP>:5555

@@ -68,6 +68,15 @@ Requirements: Windows 11 (x86-64), virtualization enabled in firmware,
 WSL enablement), reboot and run the installer again — it resumes where it
 left off. Nothing is downloaded during install; everything ships inside.
 
+### Installing an APK
+
+Use the tray's **Install APK…** action or `windroid install <path-to.apk>`.
+“Installation requested” means Android received the request; it does not confirm
+that the app is installed. Check the Android window for a scan or installation
+confirmation and complete any required prompts. A request can remain pending
+while waiting for that interaction. Once installation finishes, the app's
+shortcut appears after desktop synchronization.
+
 ## What it's built from
 
 - **WSL2** provides the lightweight utility VM;

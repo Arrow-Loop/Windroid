@@ -1,5 +1,10 @@
 # Windroid lab changelog
 
+## 2026-11-08 — APK prompt guidance
+- CLI/tray request messages and README direct users to Android scan/confirmation
+  prompts. Request submission still does not claim completed installation.
+- Existing CLI and tray path/error fixtures pass in PowerShell7 and5.1.
+
 ## 2026-11-08 — active visual supervision
 - Persisted user-requested screen-first failure/stall checks and periodic window
   inspection during active UI/runtime tests; completed visible diagnostics stop.
